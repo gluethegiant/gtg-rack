@@ -2,7 +2,7 @@
   "slug": "GlueTheGiant",
   "name": "Glue the Giant",
   "version": "1.0.0",
-  "license": "GPLv3",
+  "license": "GPL-3.0-or-later",
   "brand": "Glue the Giant",
   "author": "Paul Merchant",
   "authorEmail": "prmerchant@gmail.com",
@@ -51,7 +51,6 @@
       "name": "Enter Mixer Bus",
       "description": "Three stereo inputs to bus",
       "tags": [
-        "Mixer",
         "Utility"
       ]
     },
@@ -60,7 +59,6 @@
       "name": "Exit Mixer Bus",
       "description": "Three stereo outputs from bus",
       "tags": [
-        "Mixer",
         "Utility"
       ]
     }
