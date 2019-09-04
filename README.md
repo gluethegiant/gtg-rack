@@ -1,6 +1,6 @@
 # Glue the Giant Rack Modules
 
-Although rack modules that mimic real-world mixing consoles can be used to mix VCV Rack patches to a stereo output, they don't take advantage of the power or flexibility inherent in a modular environment. Modular mixers tend to make it complicated to route effects.
+Although rack modules that mimic real-world mixing consoles can be used to mix VCV Rack patches to a stereo output, they don't take advantage of the power or flexibility inherent in a modular environment. Most modular mixers tend to make it complicated to route send effects.
 
 The Glue the Giant modular bus mixers use polyphonic cables to route sound along three stereo buses. The bus design makes it easy to efficiently patch together modules while creating simple or complex effect sends and returns.
 
