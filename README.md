@@ -7,6 +7,8 @@ mixers use polyphonic cables to route sound along three stereo buses. The bus
 design makes it easy to efficiently patch together modules while creating
 simple or complex effect sends and returns.
 
+![alt text](https://github.com/gluethegiant/gtg-rack/blob/master/design/screenshot.png)
+
 ### Mini Bus Mixer
 
 One mono or polyphonic input
