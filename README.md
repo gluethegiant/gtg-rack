@@ -1,4 +1,4 @@
-# Glue the Giant Rack Modules
+# Glue the Giant Rack Modules for VCV Rack
 
 Mixing a VCV Rack patch to stereo output is a common task.
 You can use monolithic rack modules that mimic real-world mixing consoles, but they don't take advantage of the power or flexibility inherent in a modular environment.
