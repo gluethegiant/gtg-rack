@@ -53,6 +53,10 @@ The designs help to give these modules a unique look.
 Try to not copy them too closely.
 All the code is released to use under the GPL 3 license and above.
 
+### Building
+
+To build these rack modules, [see the official VCV Rack documentation](https://vcvrack.com/manual/Building.html).
+
 ### Release Notes
 
 v. 1.0.0 Initial Release
