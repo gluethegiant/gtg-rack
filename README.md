@@ -6,7 +6,7 @@ And other modular mixers tend to make it complicated to route multiple sounds to
 
 The Glue the Giant modular bus mixers turn a polyphonic cable into three stereo mix buses.
 The bus design makes it easy to efficiently patch together modules while creating simple or complex effect sends and returns.
-And the School Bus Mixer module comes with a fine tuned constant power panning law and CV controls.
+And the School Bus Mixer module comes with a finely tuned constant power panning law and CV controls.
 
 ![alt text](https://github.com/gluethegiant/gtg-rack/blob/master/design/screenshot.png)
 
@@ -44,6 +44,14 @@ And the School Bus Mixer module comes with a fine tuned constant power panning l
 ### Exit Bus
 
 * Three stereo outputs from three stereo buses
+
+### Copyrights, Trademarks, Licenses, Etc.
+
+"Glue the Giant" is the name of a band and a software developer.
+Don't steal it.
+The designs help to give these modules a unique look.
+Try to not copy them too closely.
+All the code is released to use under the GPL 3 license and above.
 
 ### Release Notes
 
