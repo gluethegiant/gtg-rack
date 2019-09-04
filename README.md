@@ -48,7 +48,7 @@ And the School Bus Mixer module comes with a finely tuned constant power panning
 ### Copyrights, Trademarks, Licenses, Etc.
 
 "Glue the Giant" is the name of a band and a software developer.
-Don't steal it.
+Do your best to not steal it (we know it's cool).
 The designs help to give these modules a unique look.
 Try to not copy them too closely.
 All the code is released to use under the GPL 3 license and above.
