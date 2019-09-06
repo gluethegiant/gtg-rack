@@ -33,7 +33,7 @@ And the School Bus Mixer module comes with a finely tuned constant power panning
 
 * Sums three stereo buses to left and right stereo mix
 * Master level control
-* Aux input that accepts stereo, mono or polyphonic cables
+* Aux input that accepts stereo, mono, or polyphonic cables
 * Aux level control
 * Left and right peak meters with a brief hold on peak indicators
 
