@@ -2768,9 +2768,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1"
-     inkscape:cx="-400.64744"
-     inkscape:cy="335.70309"
+     inkscape:zoom="4"
+     inkscape:cx="65.834225"
+     inkscape:cy="208.71179"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -3006,72 +3006,60 @@
        d="m 5.2139442,217.36251 c -0.159093,0 -0.346098,-0.11023 -0.424249,-0.24844 l -2.552466,-4.51771 c -0.07815,-0.13817 -0.07815,-0.35451 0,-0.49407 l 2.552466,-4.51775 c 0.07815,-0.13816 0.265156,-0.24703 0.424249,-0.24703 h 5.0993538 c 0.159092,0 0.346098,0.10894 0.424249,0.24703 l 2.552467,4.51775 c 0.07813,0.13956 0.07813,0.3559 0,0.49407 l -2.552467,4.51771 c -0.07815,0.13818 -0.265157,0.24844 -0.424249,0.24844 z m 0,0"
        id="path5232"
        inkscape:connector-curvature="0" />
-    <text
-       xml:space="preserve"
+    <g
+       aria-label="L"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.11666656px;line-height:1.25;font-family:Rubik;-inkscape-font-specification:'Rubik Bold';letter-spacing:0px;word-spacing:0px;display:inline;opacity:1;fill:#2c89a0;fill-opacity:1;stroke:none;stroke-width:0.26458332;enable-background:new"
-       x="1.9598708"
-       y="183.59036"
-       id="text3392-3"><tspan
-         sodipodi:role="line"
-         id="tspan3390"
-         x="1.9598708"
-         y="183.59036"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.11666656px;font-family:Rubik;-inkscape-font-specification:'Rubik Bold';fill:#2c89a0;fill-opacity:1;stroke-width:0.26458332">L</tspan></text>
-    <text
-       id="text3396-6"
-       y="193.71399"
-       x="1.809833"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.11666656px;line-height:1.25;font-family:Rubik;-inkscape-font-specification:'Rubik Bold';letter-spacing:0px;word-spacing:0px;display:inline;opacity:1;fill:#2c89a0;fill-opacity:1;stroke:none;stroke-width:0.26458332;enable-background:new"
-       xml:space="preserve"><tspan
+       id="text3392-3">
+      <path
+         d="m 2.1609541,183.59036 q -0.021167,0 -0.0381,-0.0148 -0.014817,-0.0169 -0.014817,-0.0381 v -1.37584 q 0,-0.0233 0.014817,-0.0381 0.016933,-0.0148 0.0381,-0.0148 h 0.2794 q 0.023283,0 0.0381,0.0148 0.014817,0.0148 0.014817,0.0381 v 1.10914 h 0.64135 q 0.023283,0 0.0381,0.0169 0.014817,0.0148 0.014817,0.0381 v 0.21167 q 0,0.0212 -0.014817,0.0381 -0.014817,0.0148 -0.0381,0.0148 z"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.11666656px;font-family:Rubik;-inkscape-font-specification:'Rubik Bold';fill:#2c89a0;fill-opacity:1;stroke-width:0.26458332"
-         y="193.71399"
-         x="1.809833"
-         id="tspan3394"
-         sodipodi:role="line">R</tspan></text>
-    <text
-       id="text5148-7"
-       y="209.34036"
-       x="1.9598708"
+         id="path1500" />
+    </g>
+    <g
+       aria-label="R"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.11666656px;line-height:1.25;font-family:Rubik;-inkscape-font-specification:'Rubik Bold';letter-spacing:0px;word-spacing:0px;display:inline;opacity:1;fill:#2c89a0;fill-opacity:1;stroke:none;stroke-width:0.26458332;enable-background:new"
+       id="text3396-6">
+      <path
+         d="m 2.0109164,193.71399 q -0.021167,0 -0.0381,-0.0148 -0.014817,-0.0169 -0.014817,-0.0381 v -1.37583 q 0,-0.0233 0.014817,-0.0381 0.016933,-0.0148 0.0381,-0.0148 h 0.5757333 q 0.2772833,0 0.4318,0.127 0.1566333,0.12489 0.1566333,0.3556 0,0.14817 -0.06985,0.25189 -0.06985,0.10371 -0.1926167,0.15875 l 0.2899833,0.5207 q 0.00635,0.0127 0.00635,0.0233 0,0.0169 -0.014817,0.0317 -0.0127,0.0127 -0.029633,0.0127 H 2.882983 q -0.061383,0 -0.086783,-0.0572 l -0.2413,-0.46567 h -0.2159 v 0.4699 q 0,0.0233 -0.016933,0.0381 -0.014817,0.0148 -0.0381,0.0148 z m 0.5714999,-0.82338 q 0.097367,0 0.1481667,-0.0466 0.0508,-0.0487 0.0508,-0.13335 0,-0.0847 -0.0508,-0.13335 -0.048683,-0.0508 -0.1481667,-0.0508 H 2.3389997 v 0.36407 z"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.11666656px;font-family:Rubik;-inkscape-font-specification:'Rubik Bold';fill:#2c89a0;fill-opacity:1;stroke-width:0.26458332"
+         id="path1503" />
+    </g>
+    <g
+       aria-label="L"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.11666656px;line-height:1.25;font-family:Rubik;-inkscape-font-specification:'Rubik Bold';letter-spacing:0px;word-spacing:0px;display:inline;opacity:1;fill:#ff9841;fill-opacity:1;stroke:none;stroke-width:0.26458332;enable-background:new"
-       xml:space="preserve"><tspan
+       id="text5148-7">
+      <path
+         d="m 2.1609541,209.34036 q -0.021167,0 -0.0381,-0.0148 -0.014817,-0.0169 -0.014817,-0.0381 v -1.37584 q 0,-0.0233 0.014817,-0.0381 0.016933,-0.0148 0.0381,-0.0148 h 0.2794 q 0.023283,0 0.0381,0.0148 0.014817,0.0148 0.014817,0.0381 v 1.10914 h 0.64135 q 0.023283,0 0.0381,0.0169 0.014817,0.0148 0.014817,0.0381 v 0.21167 q 0,0.0212 -0.014817,0.0381 -0.014817,0.0148 -0.0381,0.0148 z"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.11666656px;font-family:Rubik;-inkscape-font-specification:'Rubik Bold';fill:#ff9841;fill-opacity:1;stroke-width:0.26458332"
-         y="209.34036"
-         x="1.9598708"
-         id="tspan5146"
-         sodipodi:role="line">L</tspan></text>
-    <text
-       xml:space="preserve"
+         id="path1506" />
+    </g>
+    <g
+       aria-label="L"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.11666656px;line-height:1.25;font-family:Rubik;-inkscape-font-specification:'Rubik Bold';letter-spacing:0px;word-spacing:0px;display:inline;opacity:1;fill:#c83737;fill-opacity:1;stroke:none;stroke-width:0.26458332;enable-background:new"
-       x="1.9598699"
-       y="235.34036"
-       id="text5152-5"><tspan
-         sodipodi:role="line"
-         id="tspan5150"
-         x="1.9598699"
-         y="235.34036"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.11666656px;font-family:Rubik;-inkscape-font-specification:'Rubik Bold';fill:#c83737;fill-opacity:1;stroke-width:0.26458332">L</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.11666656px;line-height:1.25;font-family:Rubik;-inkscape-font-specification:'Rubik Bold';letter-spacing:0px;word-spacing:0px;display:inline;opacity:1;fill:#ff9841;fill-opacity:1;stroke:none;stroke-width:0.26458332;enable-background:new"
-       x="1.809833"
-       y="219.46399"
-       id="text5156-3"><tspan
-         sodipodi:role="line"
-         id="tspan5154"
-         x="1.809833"
-         y="219.46399"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.11666656px;font-family:Rubik;-inkscape-font-specification:'Rubik Bold';fill:#ff9841;fill-opacity:1;stroke-width:0.26458332">R</tspan></text>
-    <text
-       id="text5160-5"
-       y="245.464"
-       x="1.809833"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.11666656px;line-height:1.25;font-family:Rubik;-inkscape-font-specification:'Rubik Bold';letter-spacing:0px;word-spacing:0px;display:inline;opacity:1;fill:#c83737;fill-opacity:1;stroke:none;stroke-width:0.26458332;enable-background:new"
-       xml:space="preserve"><tspan
+       id="text5152-5">
+      <path
+         d="m 2.1609532,235.34036 q -0.021167,0 -0.0381,-0.0148 -0.014817,-0.0169 -0.014817,-0.0381 v -1.37584 q 0,-0.0233 0.014817,-0.0381 0.016933,-0.0148 0.0381,-0.0148 h 0.2794 q 0.023283,0 0.0381,0.0148 0.014817,0.0148 0.014817,0.0381 v 1.10914 h 0.64135 q 0.023283,0 0.0381,0.0169 0.014817,0.0148 0.014817,0.0381 v 0.21167 q 0,0.0212 -0.014817,0.0381 -0.014817,0.0148 -0.0381,0.0148 z"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.11666656px;font-family:Rubik;-inkscape-font-specification:'Rubik Bold';fill:#c83737;fill-opacity:1;stroke-width:0.26458332"
-         y="245.464"
-         x="1.809833"
-         id="tspan5158"
-         sodipodi:role="line">R</tspan></text>
+         id="path1512" />
+    </g>
+    <g
+       aria-label="R"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.11666656px;line-height:1.25;font-family:Rubik;-inkscape-font-specification:'Rubik Bold';letter-spacing:0px;word-spacing:0px;display:inline;opacity:1;fill:#ff9841;fill-opacity:1;stroke:none;stroke-width:0.26458332;enable-background:new"
+       id="text5156-3">
+      <path
+         d="m 2.0109164,219.46399 q -0.021167,0 -0.0381,-0.0148 -0.014817,-0.0169 -0.014817,-0.0381 v -1.37583 q 0,-0.0233 0.014817,-0.0381 0.016933,-0.0148 0.0381,-0.0148 h 0.5757333 q 0.2772833,0 0.4318,0.127 0.1566333,0.12489 0.1566333,0.3556 0,0.14817 -0.06985,0.25189 -0.06985,0.10371 -0.1926167,0.15875 l 0.2899833,0.5207 q 0.00635,0.0127 0.00635,0.0233 0,0.0169 -0.014817,0.0317 -0.0127,0.0127 -0.029633,0.0127 H 2.882983 q -0.061383,0 -0.086783,-0.0572 l -0.2413,-0.46567 h -0.2159 v 0.4699 q 0,0.0233 -0.016933,0.0381 -0.014817,0.0148 -0.0381,0.0148 z m 0.5714999,-0.82338 q 0.097367,0 0.1481667,-0.0466 0.0508,-0.0487 0.0508,-0.13335 0,-0.0847 -0.0508,-0.13335 -0.048683,-0.0508 -0.1481667,-0.0508 H 2.3389997 v 0.36407 z"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.11666656px;font-family:Rubik;-inkscape-font-specification:'Rubik Bold';fill:#ff9841;fill-opacity:1;stroke-width:0.26458332"
+         id="path1509" />
+    </g>
+    <g
+       aria-label="R"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.11666656px;line-height:1.25;font-family:Rubik;-inkscape-font-specification:'Rubik Bold';letter-spacing:0px;word-spacing:0px;display:inline;opacity:1;fill:#c83737;fill-opacity:1;stroke:none;stroke-width:0.26458332;enable-background:new"
+       id="text5160-5">
+      <path
+         d="m 2.0109164,245.464 q -0.021167,0 -0.0381,-0.0148 -0.014817,-0.0169 -0.014817,-0.0381 v -1.37584 q 0,-0.0233 0.014817,-0.0381 0.016933,-0.0148 0.0381,-0.0148 h 0.5757333 q 0.2772833,0 0.4318,0.127 0.1566333,0.12488 0.1566333,0.3556 0,0.14816 -0.06985,0.25188 -0.06985,0.10372 -0.1926167,0.15875 l 0.2899833,0.5207 q 0.00635,0.0127 0.00635,0.0233 0,0.0169 -0.014817,0.0318 -0.0127,0.0127 -0.029633,0.0127 H 2.882983 q -0.061383,0 -0.086783,-0.0572 l -0.2413,-0.46566 h -0.2159 v 0.4699 q 0,0.0233 -0.016933,0.0381 -0.014817,0.0148 -0.0381,0.0148 z m 0.5714999,-0.82338 q 0.097367,0 0.1481667,-0.0466 0.0508,-0.0487 0.0508,-0.13335 0,-0.0847 -0.0508,-0.13335 -0.048683,-0.0508 -0.1481667,-0.0508 H 2.3389997 v 0.36407 z"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.11666656px;font-family:Rubik;-inkscape-font-specification:'Rubik Bold';fill:#c83737;fill-opacity:1;stroke-width:0.26458332"
+         id="path1515" />
+    </g>
     <path
        style="display:inline;fill:#4d4d4d;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.28177232;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 5.2139443,191.56447 c -0.159093,0 -0.346098,-0.11023 -0.424249,-0.24844 l -2.552466,-4.51771 c -0.07815,-0.13817 -0.07815,-0.35451 0,-0.49407 l 2.552466,-4.51775 c 0.07815,-0.13816 0.265156,-0.24703 0.424249,-0.24703 h 5.0993547 c 0.159091,0 0.346097,0.10894 0.424248,0.24703 l 2.552467,4.51775 c 0.07813,0.13956 0.07813,0.3559 0,0.49407 l -2.552467,4.51771 c -0.07815,0.13818 -0.265157,0.24844 -0.424248,0.24844 z m 0,0"
