@@ -28,6 +28,7 @@ And the School Bus Mixer module comes with a finely tuned constant power panning
 
 * Three stereo sends for use with modular bus mixers
 * Three stereo returns for use with modular bus mixers
+* Manually connect outputs to inputs on buses that need to pass through
 
 ### Bus Depot
 

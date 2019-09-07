@@ -47,7 +47,7 @@ struct BusDepot : Module {
 		configParam(LEVEL_PARAM, 0.f, 1.f, 1.f, "Master level");
 		for (int i = 0; i < 2; i++) {vu_meters[i].lambda = 15.f;}
 		vu_divider.setDivision(512);
-		light_divider.setDivision(16);
+		light_divider.setDivision(64);
 	}
 
 	void process(const ProcessArgs &args) override {
@@ -98,6 +98,11 @@ struct BusDepot : Module {
 			outputs[LEFT_OUTPUT].setVoltage(summed_out[0]);
 			outputs[RIGHT_OUTPUT].setVoltage(summed_out[1]);
 		}
+
+		// hit peak lights
+		if (summed_out[0] > 10.f) peak_left = 1.0;
+		if (summed_out[1] > 10.f) peak_right = 1.0;
+
 		// get levels for lights
 		if (vu_divider.process()) {   // check levels infrequently
 			for (int i = 0; i < 2; i++) {
@@ -107,8 +112,6 @@ struct BusDepot : Module {
 
 		if (light_divider.process()) {   // set lights infrequently
 			// make peak lights stay on when hit
-			if (vu_meters[0].getBrightness(0.f, 0.f) > 0) peak_left = 1.0;
-			if (vu_meters[1].getBrightness(0.f, 0.f) > 0) peak_right = 1.0;
 			if (peak_left > 0) peak_left -= 15 / args.sampleRate; else peak_left = 0;
 			if (peak_right > 0) peak_right -= 15 / args.sampleRate; else peak_right = 0;
 			lights[LEFT_LIGHTS + 0].setBrightness(peak_left);
