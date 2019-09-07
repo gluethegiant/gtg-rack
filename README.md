@@ -60,7 +60,7 @@ To build these rack modules, [see the official VCV Rack documentation](https://v
 
 ### Release Notes
 
-v. 1.0.1 
+v. 1.0.0 VCV Rack Library Release
 
 - Peak indicators on Bus Depot more accurate
 - Peak indicators stay on longer
