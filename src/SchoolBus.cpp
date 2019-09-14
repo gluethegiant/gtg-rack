@@ -7,9 +7,9 @@ struct SchoolBus : Module {
 		ON_PARAM,
 		PAN_ATT_PARAM,
 		PAN_PARAM,
-		ENUMS(LEVEL_PARAMS, 3),
 		BLUE_POST_PARAM,
 		ORANGE_POST_PARAM,
+		ENUMS(LEVEL_PARAMS, 3),
 		NUM_PARAMS
 	};
 	enum InputIds {
@@ -40,7 +40,7 @@ struct SchoolBus : Module {
 	bool input_on = true;
 	float onramp = 0.0;
 	bool post_fades[2] = {false, false};
-	float pan_pos = 0.5;
+	float pan_pos = 0.0;
 	float pan_levels[2] = {1.f, 1.f};
 
 	SchoolBus() {

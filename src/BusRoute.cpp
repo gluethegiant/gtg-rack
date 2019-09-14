@@ -48,20 +48,20 @@ struct BusRouteWidget : ModuleWidget {
 		addChild(createWidget<ScrewUp>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewUp>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addInput(createInputCentered<NutPort>(mm2px(Vec(23.1, 18.05)), module, BusRoute::RETURN_INPUTS + 0));
-		addInput(createInputCentered<NutPort>(mm2px(Vec(23.1, 28.2)), module, BusRoute::RETURN_INPUTS + 1));
-		addInput(createInputCentered<NutPort>(mm2px(Vec(23.1, 43.85)), module, BusRoute::RETURN_INPUTS + 2));
-		addInput(createInputCentered<NutPort>(mm2px(Vec(23.1, 54.0)), module, BusRoute::RETURN_INPUTS + 3));
-		addInput(createInputCentered<NutPort>(mm2px(Vec(23.1, 69.85)), module, BusRoute::RETURN_INPUTS + 4));
-		addInput(createInputCentered<NutPort>(mm2px(Vec(23.1, 80.0)), module, BusRoute::RETURN_INPUTS + 5));
+		addInput(createInputCentered<NutPort>(mm2px(Vec(23.1, 21.05)), module, BusRoute::RETURN_INPUTS + 0));
+		addInput(createInputCentered<NutPort>(mm2px(Vec(23.1, 31.2)), module, BusRoute::RETURN_INPUTS + 1));
+		addInput(createInputCentered<NutPort>(mm2px(Vec(23.1, 46.85)), module, BusRoute::RETURN_INPUTS + 2));
+		addInput(createInputCentered<NutPort>(mm2px(Vec(23.1, 57.0)), module, BusRoute::RETURN_INPUTS + 3));
+		addInput(createInputCentered<NutPort>(mm2px(Vec(23.1, 72.85)), module, BusRoute::RETURN_INPUTS + 4));
+		addInput(createInputCentered<NutPort>(mm2px(Vec(23.1, 83.0)), module, BusRoute::RETURN_INPUTS + 5));
 		addInput(createInputCentered<NutPort>(mm2px(Vec(7.75, 114.1)), module, BusRoute::BUS_INPUT));
 
-		addOutput(createOutputCentered<NutPort>(mm2px(Vec(7.75, 18.05)), module, BusRoute::SEND_OUTPUTS + 0));
-		addOutput(createOutputCentered<NutPort>(mm2px(Vec(7.75, 28.2)), module, BusRoute::SEND_OUTPUTS + 1));
-		addOutput(createOutputCentered<NutPort>(mm2px(Vec(7.75, 43.85)), module, BusRoute::SEND_OUTPUTS + 2));
-		addOutput(createOutputCentered<NutPort>(mm2px(Vec(7.75, 54.0)), module, BusRoute::SEND_OUTPUTS + 3));
-		addOutput(createOutputCentered<NutPort>(mm2px(Vec(7.75, 69.85)), module, BusRoute::SEND_OUTPUTS + 4));
-		addOutput(createOutputCentered<NutPort>(mm2px(Vec(7.75, 80.0)), module, BusRoute::SEND_OUTPUTS + 5));
+		addOutput(createOutputCentered<NutPort>(mm2px(Vec(7.75, 21.05)), module, BusRoute::SEND_OUTPUTS + 0));
+		addOutput(createOutputCentered<NutPort>(mm2px(Vec(7.75, 31.2)), module, BusRoute::SEND_OUTPUTS + 1));
+		addOutput(createOutputCentered<NutPort>(mm2px(Vec(7.75, 46.85)), module, BusRoute::SEND_OUTPUTS + 2));
+		addOutput(createOutputCentered<NutPort>(mm2px(Vec(7.75, 57.0)), module, BusRoute::SEND_OUTPUTS + 3));
+		addOutput(createOutputCentered<NutPort>(mm2px(Vec(7.75, 72.85)), module, BusRoute::SEND_OUTPUTS + 4));
+		addOutput(createOutputCentered<NutPort>(mm2px(Vec(7.75, 83.0)), module, BusRoute::SEND_OUTPUTS + 5));
 		addOutput(createOutputCentered<NutPort>(mm2px(Vec(23.1, 114.1)), module, BusRoute::BUS_OUTPUT));
 	}
 };

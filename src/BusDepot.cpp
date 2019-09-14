@@ -150,7 +150,7 @@ struct BusDepotWidget : ModuleWidget {
 
 		addParam(createParamCentered<BlackButton>(mm2px(Vec(15.24, 15.20)), module, BusDepot::ON_PARAM));
 		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(15.24, 15.20)), module, BusDepot::ON_LIGHT));
-		addParam(createParamCentered<BlackTinyKnob>(mm2px(Vec(23.1, 30.95)), module, BusDepot::AUX_PARAM));
+		addParam(createParamCentered<BlackTinyKnob>(mm2px(Vec(23.1, 31.2)), module, BusDepot::AUX_PARAM));
 		addParam(createParamCentered<BlackKnob>(mm2px(Vec(15.24, 80.65)), module, BusDepot::LEVEL_PARAM));
 
 		addInput(createInputCentered<KeyPort>(mm2px(Vec(23.1, 21.1)), module, BusDepot::ON_CV_INPUT));
