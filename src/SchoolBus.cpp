@@ -99,8 +99,7 @@ struct SchoolBus : Module {
 		float new_pan_pos = params[PAN_PARAM].getValue() + (((inputs[PAN_CV_INPUT].getNormalVoltage(0.0) * 2) * params[PAN_ATT_PARAM].getValue()) * 0.1);
 		if (new_pan_pos != pan_pos) {   // calculate pan only if position has changed
 			pan_pos = new_pan_pos;
-			float pan_angle = (pan_pos + 1) * 0.5;
-			if (pan_angle < 0) pan_angle = abs(pan_angle); else if (pan_angle > 1) pan_angle = (pan_angle - 2) * -1;   // with CV pan can go to edge and back
+			float pan_angle = (pan_pos + 1) * 0.5;   // allow pan to roll without a clamp
 			pan_levels[0] = sin((1 - pan_angle) * M_PI_2) * M_SQRT2;   // constant power panning law
 			pan_levels[1] = sin(pan_angle * M_PI_2) * M_SQRT2;
 		}
