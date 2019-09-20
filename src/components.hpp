@@ -90,7 +90,7 @@ struct NutPort : app::SvgPort {
 	NutPort() {
 		setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/NutPort.svg")));
 		shadow->box.size = shadow->box.size.div(1.07);   // slight improvement on huge round shadow
-		shadow->box.pos = Vec(box.size.x * 0.028, box.size.y * 0.08);
+		shadow->box.pos = Vec(box.size.x * 0.028, box.size.y * 0.094);
 	}
 };
 
