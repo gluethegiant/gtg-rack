@@ -36,6 +36,7 @@ struct SchoolBus : Module {
 	dsp::SchmittTrigger on_cv_trigger;
 	dsp::SchmittTrigger blue_post_trigger;
 	dsp::SchmittTrigger orange_post_trigger;
+	dsp::ClockDivider pan_divider;
 
 	bool input_on = true;
 	float onramp = 0.0;
@@ -53,10 +54,11 @@ struct SchoolBus : Module {
 		configParam(LEVEL_PARAMS + 2, 0.f, 1.f, 1.f, "Level to red stereo bus");
 		configParam(BLUE_POST_PARAM, 0.f, 1.f, 0.f, "Post red fader send");
 		configParam(ORANGE_POST_PARAM, 0.f, 1.f, 0.f, "Post red fader send");
+		pan_divider.setDivision(3);
 	}
 
 	void process(const ProcessArgs &args) override {
-		// on off button with fader onramp to filter pops
+		// on off button with fader pop filter
 		if (on_trigger.process(params[ON_PARAM].getValue()) + on_cv_trigger.process(inputs[ON_CV_INPUT].getVoltage())) {
 			if (input_on) {
 				input_on = false;
@@ -96,12 +98,14 @@ struct SchoolBus : Module {
 		}
 
 		// get stereo pan levels
-		float new_pan_pos = params[PAN_PARAM].getValue() + (((inputs[PAN_CV_INPUT].getNormalVoltage(0.0) * 2) * params[PAN_ATT_PARAM].getValue()) * 0.1);
-		if (new_pan_pos != pan_pos) {   // calculate pan only if position has changed
-			pan_pos = new_pan_pos;
-			float pan_angle = (pan_pos + 1) * 0.5;   // allow pan to roll without a clamp
-			pan_levels[0] = sin((1 - pan_angle) * M_PI_2) * M_SQRT2;   // constant power panning law
-			pan_levels[1] = sin(pan_angle * M_PI_2) * M_SQRT2;
+		if (pan_divider.process()) {   // calculate pan infrequently, useful for auto panning
+			float new_pan_pos = params[PAN_PARAM].getValue() + (((inputs[PAN_CV_INPUT].getNormalVoltage(0.0) * 2) * params[PAN_ATT_PARAM].getValue()) * 0.1);
+			if (new_pan_pos != pan_pos) {   // calculate pan only if position has changed
+				pan_pos = new_pan_pos;
+				float pan_angle = (pan_pos + 1) * 0.5;   // allow pan to roll without clamp
+				pan_levels[0] = sin((1 - pan_angle) * M_PI_2) * M_SQRT2;   // constant power panning law
+				pan_levels[1] = sin(pan_angle * M_PI_2) * M_SQRT2;
+			}
 		}
 
 		// process inputs
