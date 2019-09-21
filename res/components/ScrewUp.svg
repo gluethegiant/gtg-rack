@@ -26,14 +26,14 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="11.2"
-     inkscape:cx="-4.727469"
+     inkscape:cx="-20.664969"
      inkscape:cy="-4.2450342"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1920"
+     inkscape:window-width="1887"
      inkscape:window-height="1052"
-     inkscape:window-x="1920"
+     inkscape:window-x="33"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
      units="px" />
@@ -55,11 +55,11 @@
      id="layer1"
      transform="translate(0,-293.03125)">
     <g
-       id="g7339">
+       id="g28213">
       <path
          inkscape:connector-curvature="0"
          id="path278334"
-         style="fill:#fbfbe9;fill-opacity:1;fill-rule:nonzero;stroke:#b3b3b3;stroke-width:0.25108036;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         style="fill:#fafaea;fill-opacity:1;fill-rule:nonzero;stroke:#b3b3b3;stroke-width:0.25108036;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
          d="m 1.9840004,296.61044 c -0.8790813,0 -1.59416419,-0.71501 -1.59416419,-1.59431 0,-0.87929 0.71508189,-1.59456 1.59416419,-1.59456 0.8790804,0 1.5941632,0.71527 1.5941632,1.59456 0,0.8793 -0.7150828,1.59431 -1.5941632,1.59431" />
       <path
          d="m 2.1597339,296.04907 h -0.351469 v -2.06613 h 0.351469 z"

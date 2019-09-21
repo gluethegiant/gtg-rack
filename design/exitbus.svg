@@ -2715,10 +2715,10 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="4.2475511"
-     inkscape:cx="49.763092"
-     inkscape:cy="371.93481"
+     inkscape:cx="7.7388772"
+     inkscape:cy="70.584698"
      inkscape:document-units="mm"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="layer3"
      showgrid="false"
      inkscape:window-width="956"
      inkscape:window-height="998"
@@ -2752,7 +2752,7 @@
      transform="translate(0,-168.5)"
      style="display:inline">
     <rect
-       style="fill:#fbfbe9;fill-opacity:1;stroke:#d0cdb2;stroke-width:0.25;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#fafaea;fill-opacity:1;stroke:#d0cdb2;stroke-width:0.25;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect255539"
        width="14.990005"
        height="128.25"
@@ -3007,7 +3007,7 @@
     </g>
     <path
        d="m 7.6200003,4.3894898 c -1.1005654,0 -1.995813,-0.8949284 -1.995813,-1.9954976 0,-1.1005566 0.8952463,-1.9958118 1.995813,-1.9958118 1.1005642,0 1.9958119,0.8952552 1.9958119,1.9958118 0,1.1005692 -0.8952477,1.9954976 -1.9958119,1.9954976"
-       style="fill:#fbfbe9;fill-opacity:1;fill-rule:nonzero;stroke:#b3b3b3;stroke-width:0.25;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#fafaea;fill-opacity:1;fill-rule:nonzero;stroke:#b3b3b3;stroke-width:0.25;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="path4729"
        inkscape:connector-curvature="0" />
     <path
@@ -3063,7 +3063,7 @@
     <path
        inkscape:connector-curvature="0"
        id="path1602"
-       style="fill:#fbfbe9;fill-opacity:1;fill-rule:nonzero;stroke:#b3b3b3;stroke-width:0.25;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#fafaea;fill-opacity:1;fill-rule:nonzero;stroke:#b3b3b3;stroke-width:0.25;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 7.6200003,128.13949 c -1.1005654,0 -1.995813,-0.89493 -1.995813,-1.9955 0,-1.10055 0.8952463,-1.99581 1.995813,-1.99581 1.1005642,0 1.9958119,0.89526 1.9958119,1.99581 0,1.10057 -0.8952477,1.9955 -1.9958119,1.9955" />
     <path
        d="m 7.8199998,127.43686 h -0.4 v -2.58605 h 0.4 z"
