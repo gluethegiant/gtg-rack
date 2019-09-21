@@ -30,8 +30,8 @@ struct GigBus : Module {
 	dsp::ClockDivider pan_divider;
 
 	bool input_on = true;
-	float onramp = 0.0;
-	float pan_pos = 0.0;
+	float onramp = 0.f;
+	float pan_pos = 0.f;
 	float pan_levels[2] = {1.f, 1.f};
 
 	GigBus() {
@@ -57,9 +57,9 @@ struct GigBus : Module {
 		}
 
 		if (input_on) {   // calculate pop filter speed with current sampleRate
-			if (onramp < 1) onramp += 50 / args.sampleRate;
+			if (onramp < 1) onramp += 50.f / args.sampleRate;
 		} else {
-			if (onramp > 0) onramp -= 50 / args.sampleRate;
+			if (onramp > 0) onramp -= 50.f / args.sampleRate;
 		}
 
 		lights[ON_LIGHT].value = onramp;
@@ -76,7 +76,7 @@ struct GigBus : Module {
 			float new_pan_pos = params[PAN_PARAM].getValue();
 			if (new_pan_pos != pan_pos) {   // calculate pan only if position has changed
 				pan_pos = new_pan_pos;
-				float pan_angle = (pan_pos + 1) * 0.5;   // allow pan to roll without clamp
+				float pan_angle = (pan_pos + 1) * 0.5f;   // allow pan to roll without clamp
 				pan_levels[0] = sin((1 - pan_angle) * M_PI_2) * M_SQRT2;   // constant power panning law
 				pan_levels[1] = sin(pan_angle * M_PI_2) * M_SQRT2;
 			}

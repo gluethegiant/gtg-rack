@@ -36,9 +36,9 @@ struct BusDepot : Module {
 	dsp::SchmittTrigger on_cv_trigger;
 
 	bool input_on = true;
-	float onramp = 0.0;
-	float peak_left = 0.0;
-	float peak_right = 0.0;
+	float onramp = 0.f;
+	float peak_left = 0;
+	float peak_right = 0;
 
 	BusDepot() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -62,9 +62,9 @@ struct BusDepot : Module {
 			}
 		}
 		if (input_on) {   // calculate pop filter speed with sampleRate
-			if (onramp < 1) onramp += 25 / args.sampleRate;
+			if (onramp < 1) onramp += 25.f / args.sampleRate;
 		} else {
-			if (onramp > 0) onramp -= 25 / args.sampleRate;
+			if (onramp > 0) onramp -= 25.f / args.sampleRate;
 		}
 
 		lights[ON_LIGHT].value = onramp;
@@ -100,8 +100,8 @@ struct BusDepot : Module {
 		}
 
 		// hit peak lights
-		if (summed_out[0] > 10.f) peak_left = 1.0;
-		if (summed_out[1] > 10.f) peak_right = 1.0;
+		if (summed_out[0] > 10.f) peak_left = 1;
+		if (summed_out[1] > 10.f) peak_right = 1;
 
 		// get levels for lights
 		if (vu_divider.process()) {   // check levels infrequently

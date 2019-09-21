@@ -27,7 +27,7 @@ struct MiniBus : Module {
 	dsp::SchmittTrigger on_cv_trigger;
 
 	bool input_on = true;
-	float onramp = 0.0;   // when starts at 0 creates pop filter on startup
+	float onramp = 0.f;   // when starts at 0 creates pop filter on startup
 
 	MiniBus() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -49,9 +49,9 @@ struct MiniBus : Module {
 		}
 
 		if (input_on) {   // calculate pop filter speed with current sampleRate
-			if (onramp < 1) onramp += 50 / args.sampleRate;
+			if (onramp < 1) onramp += 50.f / args.sampleRate;
 		} else {
-			if (onramp > 0) onramp -= 50 / args.sampleRate;
+			if (onramp > 0) onramp -= 50.f / args.sampleRate;
 		}
 
 		lights[ON_LIGHT].value = onramp;
