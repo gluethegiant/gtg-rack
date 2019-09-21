@@ -155,11 +155,12 @@ struct MetroCityBus : Module {
 					} else {
 						follow = hist_i - follow;
 						if (follow < 0) follow = HISTORY_CAP + follow;   // fix follow when buffer resets to 0
-
+						float last_pan = channel_pan[c];
+						float new_pan = pan_history[follow];
 						// smooth pan for dynamic channels and history catch up
-						channel_pan[c] = smooth_pan(channel_pan[c], pan_delta, pan_history[follow]);
+						channel_pan[c] = smooth_pan(last_pan, pan_delta, new_pan);
 
-						pan_angle = (channel_pan[c] + 1.0) * 0.5;
+						pan_angle = (channel_pan[c] + 1) * 0.5f;
 						pan_levels[sc] = get_left(pan_angle);
 						pan_levels[sc + 1] = get_right(pan_angle);
 					}
