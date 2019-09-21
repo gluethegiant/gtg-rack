@@ -87,7 +87,7 @@ struct SchoolBus : Module {
 		// get knob levels
 		float in_levels[3] = {0.f, 0.f, 0.f};
 		for (int sb = 0; sb < 3; sb++) {   // sb = stereo bus
-			in_levels[sb] = clamp(inputs[LEVEL_CV_INPUTS + sb].getNormalVoltage(10.0) * 0.1, 0.f, 1.f) * params[LEVEL_PARAMS + sb].getValue();
+			in_levels[sb] = clamp(inputs[LEVEL_CV_INPUTS + sb].getNormalVoltage(10) * 0.1f, 0.f, 1.f) * params[LEVEL_PARAMS + sb].getValue();
 		}
 
 		// set post fades on levels
@@ -99,7 +99,7 @@ struct SchoolBus : Module {
 
 		// get stereo pan levels
 		if (pan_divider.process()) {   // calculate pan infrequently, useful for auto panning
-			float new_pan_pos = params[PAN_PARAM].getValue() + (((inputs[PAN_CV_INPUT].getNormalVoltage(0.0) * 2) * params[PAN_ATT_PARAM].getValue()) * 0.1);
+			float new_pan_pos = params[PAN_PARAM].getValue() + (((inputs[PAN_CV_INPUT].getNormalVoltage(0) * 2) * params[PAN_ATT_PARAM].getValue()) * 0.1);
 			if (new_pan_pos != pan_pos) {   // calculate pan only if position has changed
 				pan_pos = new_pan_pos;
 				float pan_angle = (pan_pos + 1) * 0.5f;   // allow pan to roll without clamp

@@ -49,12 +49,12 @@ struct MetroCityBus : Module {
 	long hist_i = 0;
 	long hist_size = 0;
 	bool input_on = true;
-	float onramp = 0.0;
+	float onramp = 0.f;
 	bool reverse_poly = false;
 	bool post_fades[2] = {false, false};
-	float pan_pos = 0.0;
+	float pan_pos = 0.f;
 	float pan_levels[32] = {};
-	float spread_pos = 0.0;
+	float spread_pos = 0.f;
 	int channel_no = 0;
 	float channel_pan[16] = {};
 	float light_brights[9] = {};
@@ -90,9 +90,9 @@ struct MetroCityBus : Module {
 		}
 
 		if (input_on) {   // calculate pop filter speed with current sampleRate
-			if (onramp < 1) onramp += 50 / args.sampleRate;
+			if (onramp < 1) onramp += 50.f / args.sampleRate;
 		} else {
-			if (onramp > 0) onramp -= 50 / args.sampleRate;
+			if (onramp > 0) onramp -= 50.f / args.sampleRate;
 		}
 
 		lights[ON_LIGHT].value = onramp;
@@ -112,7 +112,7 @@ struct MetroCityBus : Module {
 		// get level knobs
 		float in_levels[3] = {0.f, 0.f, 0.f};
 		for (int sb = 0; sb < 3; sb++) {   // sb = stereo bus
-			in_levels[sb] = clamp(inputs[LEVEL_CV_INPUTS + sb].getNormalVoltage(10.0) * 0.1, 0.f, 1.f) * params[LEVEL_PARAMS + sb].getValue();
+			in_levels[sb] = clamp(inputs[LEVEL_CV_INPUTS + sb].getNormalVoltage(10) * 0.1f, 0.f, 1.f) * params[LEVEL_PARAMS + sb].getValue();
 		}
 
 		// set post fades on levels
@@ -126,10 +126,10 @@ struct MetroCityBus : Module {
 		if (pan_divider.process() && input_on) {   // calculate pan every few samples
 
 			if (inputs[PAN_CV_INPUT].isConnected()) {   // create follow pan when CV connected
-				float pan_delta = 25.0 / args.sampleRate;   // for pan smoothing
+				float pan_delta = 25.f / args.sampleRate;   // for pan smoothing
 				// get pan knob with CV and attenuator
 				channel_no = inputs[POLY_INPUT].getChannels();
-				pan_pos = params[PAN_PARAM].getValue() + (((inputs[PAN_CV_INPUT].getNormalVoltage(0.0) * 2) * params[PAN_ATT_PARAM].getValue()) * 0.1);
+				pan_pos = params[PAN_PARAM].getValue() + (((inputs[PAN_CV_INPUT].getNormalVoltage(0) * 2) * params[PAN_ATT_PARAM].getValue()) * 0.1f);
 				spread_pos = std::abs(params[SPREAD_PARAM].getValue());
 
 				// Store pan history
@@ -140,18 +140,18 @@ struct MetroCityBus : Module {
 				f_delay = std::round(spread_pos * (args.sampleRate / pan_divider.getDivision()));   // f_delay * 16 should not be more than HISTORY_CAP
 
 				channel_pan[0] = pan_pos;   // first channel position is current pan position
-				float pan_angle = (channel_pan[0] + 1) * 0.5;
+				float pan_angle = (channel_pan[0] + 1) * 0.5f;
 				pan_levels[0] = get_left(pan_angle);
 				pan_levels[1] = get_right(pan_angle);
 
 				// calculate pan position for other channels
 				for (int c = 1; c < channel_no; c++) {
-					int c_double = c * 2;
+					int sc = c * 2;
 					long follow = c * f_delay;
 					if (follow > hist_size) {   // there is not enough history to follow
 						channel_pan[c] = channel_pan[0];   // follow first channel until history is populated
-						pan_levels[c_double] = pan_levels[0];
-						pan_levels[c_double + 1] = pan_levels[1];
+						pan_levels[sc] = pan_levels[0];
+						pan_levels[sc + 1] = pan_levels[1];
 					} else {
 						follow = hist_i - follow;
 						if (follow < 0) follow = HISTORY_CAP + follow;   // fix follow when buffer resets to 0
@@ -160,8 +160,8 @@ struct MetroCityBus : Module {
 						channel_pan[c] = smooth_pan(channel_pan[c], pan_delta, pan_history[follow]);
 
 						pan_angle = (channel_pan[c] + 1.0) * 0.5;
-						pan_levels[c_double] = get_left(pan_angle);
-						pan_levels[c_double + 1] = get_right(pan_angle);
+						pan_levels[sc] = get_left(pan_angle);
+						pan_levels[sc + 1] = get_right(pan_angle);
 					}
 				}
 
@@ -170,7 +170,7 @@ struct MetroCityBus : Module {
 
 			} else {   // create spread pan when no CV connected
 				hist_size = 0; hist_i = 0;   // reset pan history when CV not connected
-				float pan_delta = 20.0 / args.sampleRate;   // remember pan_divider clock moves pan infrequently
+				float pan_delta = 18.f / args.sampleRate;   // remember pan_divider clock moves pan infrequently
 				int new_channel_no = inputs[POLY_INPUT].getChannels();
 				float new_pan_pos = params[PAN_PARAM].getValue();
 				float new_spread_pos = params[SPREAD_PARAM].getValue();
@@ -183,7 +183,7 @@ struct MetroCityBus : Module {
 					if (spread_pos > 0) pan_spread = -1 * ((pan_pos - 1) * spread_pos);
 
 					channel_pan[0] = pan_pos;   // first channel position is current pan
-					float pan_angle = (channel_pan[0] + 1.0) * 0.5;
+					float pan_angle = (channel_pan[0] + 1) * 0.5f;
 					pan_levels[0] = get_left(pan_angle);
 					pan_levels[1] = get_right(pan_angle);
 
@@ -195,7 +195,7 @@ struct MetroCityBus : Module {
 						// smooth pan for dynamic channels
 						channel_pan[c] = smooth_pan(last_pan, pan_delta, channel_pan[c]);
 
-						pan_angle = (channel_pan[c] + 1.0) * 0.5;
+						pan_angle = (channel_pan[c] + 1) * 0.5f;
 						pan_levels[c * 2] = get_left(pan_angle);
 						pan_levels[(c * 2) + 1] = get_right(pan_angle);
 					}
@@ -212,14 +212,14 @@ struct MetroCityBus : Module {
 			}
 		} else {
 			for (int c = 0; c < channel_no; c++) {
-				int c_double = c * 2;
+				int sc = c * 2;
 				float channel_in = inputs[POLY_INPUT].getPolyVoltage(c);
 				if (reverse_poly) {   // reverses order of levels applied to channels
-					stereo_in[0] += channel_in * pan_levels[(channel_no * 2) - 2 - c_double];
-					stereo_in[1] += channel_in * pan_levels[(channel_no * 2) - 1 - c_double];
+					stereo_in[0] += channel_in * pan_levels[(channel_no * 2) - 2 - sc];
+					stereo_in[1] += channel_in * pan_levels[(channel_no * 2) - 1 - sc];
 				} else {
-					stereo_in[0] += channel_in * pan_levels[c_double];
-					stereo_in[1] += channel_in * pan_levels[c_double + 1];
+					stereo_in[0] += channel_in * pan_levels[sc];
+					stereo_in[1] += channel_in * pan_levels[sc + 1];
 				}
 			}
 			stereo_in[0] *= onramp;
@@ -242,7 +242,7 @@ struct MetroCityBus : Module {
 			for (int c = 0; c < channel_no; c++) {
 				for (int l = 0; l < 9; l++) {
 					float light_delta = 2.f / 8.f;   // 8 divisions because light 1 and 9 are halved by offset
-					float light_pos = (l * light_delta) - 1.0 - (light_delta / 2);
+					float light_pos = (l * light_delta) - 1 - (light_delta / 2.f);
 
 					// roll back lights when out of bounds
 					if (channel_pan[c] > 1) {
@@ -257,10 +257,10 @@ struct MetroCityBus : Module {
 					if (channel_pan[c] >= light_pos && channel_pan[c] < light_pos + light_delta) {
 						int flipper = c;
 						if (reverse_poly) flipper = channel_no - 1 - c;
-						if (inputs[POLY_INPUT].getVoltage(flipper) * 0.1 > light_brights[l]) {
-							light_brights[l] = inputs[POLY_INPUT].getVoltage(flipper) * 0.110;
+						if (inputs[POLY_INPUT].getVoltage(flipper) * 0.1f > light_brights[l]) {
+							light_brights[l] = inputs[POLY_INPUT].getVoltage(flipper) * 0.11f;
 						} else {
-							if (light_brights[l] < 0.25) light_brights[l] = 0.25;   // light visible for quiet channel
+							if (light_brights[l] < 0.25f) light_brights[l] = 0.25f;   // light visible for quiet channel
 						}
 					}
 				}
@@ -268,7 +268,7 @@ struct MetroCityBus : Module {
 
 			// assign light brightness to lights
 			for (int l = 0; l < 9; l++) {
-				if (light_brights[l] > 0.0) {
+				if (light_brights[l] > 0) {
 					lights[PAN_LIGHTS + l].value = light_brights[l];
 					light_brights[l] -= 1000 / args.sampleRate;
 				}
