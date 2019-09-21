@@ -110,7 +110,7 @@ To build these rack modules, see the official [VCV Rack documentation](https://v
 
 ## Release Notes
 
-v. 1.0.1 Metro City Bus Release (TBD)
+v. 1.0.1 Metro City Bus Release (TBD. This master branch is currently for testing. Stable can be found with the release tag or in the VCV Rack Library.)
 
 - Added Metro City Bus Mixer with polyphonic stereo spread
 - Added Gig Bus Mixer for easy, standard mixing
