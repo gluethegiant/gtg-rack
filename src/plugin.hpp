@@ -9,8 +9,10 @@ extern Plugin *pluginInstance;
 // Declare each Model, defined in each module source file
 // extern Model *modelMyModule;
 extern Model *modelMiniBus;
+extern Model *modelGigBus;
 extern Model *modelSchoolBus;
+extern Model *modelMetroCityBus;
 extern Model *modelBusDepot;
-extern Model *modelBusRoute;
 extern Model *modelEnterBus;
 extern Model *modelExitBus;
+extern Model *modelBusRoute;
