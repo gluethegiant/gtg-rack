@@ -124,12 +124,15 @@ struct MetroCityBus : Module {
 
 		// pans
 		if (pan_divider.process() && input_on) {   // calculate pan every few samples
+			channel_no = inputs[POLY_INPUT].getChannels();
 
 			if (inputs[PAN_CV_INPUT].isConnected()) {   // create follow pan when CV connected
 				float pan_delta = 25.f / args.sampleRate;   // for pan smoothing
+
 				// get pan knob with CV and attenuator
-				channel_no = inputs[POLY_INPUT].getChannels();
 				pan_pos = params[PAN_PARAM].getValue() + (((inputs[PAN_CV_INPUT].getNormalVoltage(0) * 2) * params[PAN_ATT_PARAM].getValue()) * 0.1f);
+
+				// follow spread is 0 to 1
 				spread_pos = std::abs(params[SPREAD_PARAM].getValue());
 
 				// Store pan history
@@ -159,6 +162,7 @@ struct MetroCityBus : Module {
 						// smooth pan for dynamic channels and history catch up
 						channel_pan[c] = smooth_pan(pan_history[follow], channel_pan[c], pan_delta);
 
+						// get stereo levels
 						pan_angle = (channel_pan[c] + 1) * 0.5f;
 						pan_levels[sc] = get_left(pan_angle);
 						pan_levels[sc + 1] = get_right(pan_angle);
@@ -170,32 +174,35 @@ struct MetroCityBus : Module {
 
 			} else {   // create spread pan when no CV connected
 				hist_size = 0; hist_i = 0;   // reset pan history when CV not connected
-				float pan_delta = 18.f / args.sampleRate;   // remember pan_divider clock moves pan infrequently
-				int new_channel_no = inputs[POLY_INPUT].getChannels();
-				float new_pan_pos = params[PAN_PARAM].getValue();
-				float new_spread_pos = params[SPREAD_PARAM].getValue();
-				if (new_pan_pos != pan_pos || new_spread_pos != spread_pos || new_channel_no != channel_no) {   // only calculate pan if something has changed
-					pan_pos = new_pan_pos; spread_pos = new_spread_pos; channel_no = new_channel_no;
+				float pan_delta = 15.f / args.sampleRate;   // remember pan_divider clock moves pan infrequently
 
-					// Spread evenly over available stereo field
-					float pan_spread = 0.f;
-					if (spread_pos < 0) pan_spread = (pan_pos + 1) * spread_pos;
-					if (spread_pos > 0) pan_spread = -1 * ((pan_pos - 1) * spread_pos);
+				// Get pan and spread positions
+				pan_pos = params[PAN_PARAM].getValue();
+				spread_pos = params[SPREAD_PARAM].getValue();
 
+				// Spread evenly over available stereo field
+				float pan_spread = 0.f;
+				if (spread_pos < 0) pan_spread = (pan_pos + 1) * spread_pos;
+				if (spread_pos > 0) pan_spread = -1 * ((pan_pos - 1) * spread_pos);
+
+				if (channel_pan[0] != pan_pos) {
 					channel_pan[0] = pan_pos;   // first channel position is current pan
 					float pan_angle = (channel_pan[0] + 1) * 0.5f;
 					pan_levels[0] = get_left(pan_angle);
 					pan_levels[1] = get_right(pan_angle);
+				}
 
-					// calculate polyphonic spread and pan levels for other channels
-					for (int c = 1; c < channel_no; c++) {
-						float last_pan = channel_pan[c];
-						channel_pan[c] = pan_pos + (((float)c / (float)(channel_no - 1)) * pan_spread);
+				// calculate polyphonic spread and pan levels for other channels
+				for (int c = 1; c < channel_no; c++) {
+					float last_pan = channel_pan[c];
+					channel_pan[c] = pan_pos + (((float)c / (float)(channel_no - 1)) * pan_spread);
 
+					if (last_pan != channel_pan[c]) {
 						// smooth pan for dynamic channels
 						channel_pan[c] = smooth_pan(channel_pan[c], last_pan, pan_delta);
 
-						pan_angle = (channel_pan[c] + 1) * 0.5f;
+						// get stereo levels
+						float pan_angle = (channel_pan[c] + 1) * 0.5f;
 						pan_levels[c * 2] = get_left(pan_angle);
 						pan_levels[(c * 2) + 1] = get_right(pan_angle);
 					}
