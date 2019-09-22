@@ -49,8 +49,9 @@ This mixer can take a polyphonic input and spread the channels across the stereo
 The pan knob controls the placement of the first channel from the polyphonic input (or the last channel if the REVERSE CHANNELS button is on).
 The spread knob evenly spaces the other polyphonic channels to the left or to the right.
 The LED indicators give you a visual indication of the stereo spread.
-Pan spread and pan follow are smoothed to allow for dynamic polyphonic channels.
+
 Automate the pan with an LFO on the CV input for a polyphonic pan follow that can be adjusted with the attenuator and spread knobs.
+Pan spread and pan follow are smoothed to allow for dynamic polyphonic channels.
 
 * One polyphonic input
 * Polyphonic stereo spread with LED visuals
