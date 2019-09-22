@@ -155,10 +155,9 @@ struct MetroCityBus : Module {
 					} else {
 						follow = hist_i - follow;
 						if (follow < 0) follow = HISTORY_CAP + follow;   // fix follow when buffer resets to 0
-						float last_pan = channel_pan[c];
-						float new_pan = pan_history[follow];
+
 						// smooth pan for dynamic channels and history catch up
-						channel_pan[c] = smooth_pan(last_pan, pan_delta, new_pan);
+						channel_pan[c] = smooth_pan(pan_history[follow], channel_pan[c], pan_delta);
 
 						pan_angle = (channel_pan[c] + 1) * 0.5f;
 						pan_levels[sc] = get_left(pan_angle);
@@ -194,7 +193,7 @@ struct MetroCityBus : Module {
 						channel_pan[c] = pan_pos + (((float)c / (float)(channel_no - 1)) * pan_spread);
 
 						// smooth pan for dynamic channels
-						channel_pan[c] = smooth_pan(last_pan, pan_delta, channel_pan[c]);
+						channel_pan[c] = smooth_pan(channel_pan[c], last_pan, pan_delta);
 
 						pan_angle = (channel_pan[c] + 1) * 0.5f;
 						pan_levels[c * 2] = get_left(pan_angle);
@@ -242,20 +241,23 @@ struct MetroCityBus : Module {
 		if (light_divider.process() && input_on) {   // set lights infrequently
 			for (int c = 0; c < channel_no; c++) {
 				for (int l = 0; l < 9; l++) {
+					float light_pan[16] = { };
 					float light_delta = 2.f / 8.f;   // 8 divisions because light 1 and 9 are halved by offset
 					float light_pos = (l * light_delta) - 1 - (light_delta / 2.f);
 
+					light_pan[c] = channel_pan[c];
+
 					// roll back lights when out of bounds
-					if (channel_pan[c] > 1) {
-						channel_pan[c] = 1 - (channel_pan[c] - 1);
+					if (light_pan[c] > 1) {
+						light_pan[c] = 1.f - (light_pan[c] - 1.f);
 					} else {
-						if (channel_pan[c] < -1) {
-							channel_pan[c] = std::abs(channel_pan[c] + 1) + -1;
+						if (light_pan[c] < -1) {
+							light_pan[c] = std::abs(light_pan[c] + 1.f) + -1.f;
 						}
 					}
 
 					// set light brightness
-					if (channel_pan[c] >= light_pos && channel_pan[c] < light_pos + light_delta) {
+					if (light_pan[c] >= light_pos && light_pan[c] < light_pos + light_delta) {
 						int flipper = c;
 						if (reverse_poly) flipper = channel_no - 1 - c;
 						if (inputs[POLY_INPUT].getVoltage(flipper) * 0.1f > light_brights[l]) {
@@ -276,11 +278,11 @@ struct MetroCityBus : Module {
 			}
 		}
 	}
-	float smooth_pan(float last, float delta, float pan) {
+	float smooth_pan(float pan, float last, float delta) {
 		if (pan > last) {
-				return std::min(last + delta, pan);
-			} else {
-			return std::max(last - delta, pan);
+			return std::fmin(last + delta, pan);
+		} else {
+			return std::fmax(last - delta, pan);
 		}
 	}
 
