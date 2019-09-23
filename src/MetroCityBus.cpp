@@ -53,10 +53,10 @@ struct MetroCityBus : Module {
 	bool reverse_poly = false;
 	bool post_fades[2] = {false, false};
 	float pan_pos = 0.f;
-	float pan_levels[32] = {};
+	float pan_levels[32] = { 1.f, 1.f };
 	float spread_pos = 0.f;
 	int channel_no = 0;
-	float channel_pan[16] = {};
+	float channel_pan[16] = { };
 	float light_brights[9] = {};
 	long f_delay = 0;
 
@@ -270,7 +270,7 @@ struct MetroCityBus : Module {
 						if (inputs[POLY_INPUT].getVoltage(flipper) * 0.1f > light_brights[l]) {
 							light_brights[l] = inputs[POLY_INPUT].getVoltage(flipper) * 0.11f;
 						} else {
-							if (light_brights[l] < 0.25f) light_brights[l] = 0.25f;   // light visible for quiet channel
+							if (light_brights[l] < 0.18f) light_brights[l] = 0.18f;   // light visible for quiet channel
 						}
 					}
 				}
