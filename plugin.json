@@ -8,7 +8,7 @@
   "authorEmail": "prmerchant@gmail.com",
   "authorUrl": "https://github.com/gluethegiant",
   "pluginUrl": "https://github.com/gluethegiant/gtg-rack",
-  "manualUrl": "https://github.com/gluethegiant/gtg-rack/wiki",
+  "manualUrl": "https://github.com/gluethegiant/gtg-rack/blob/master/README.md",
   "sourceUrl": "https://github.com/gluethegiant/gtg-rack",
   "donateUrl": "",
   "modules": [
@@ -42,7 +42,7 @@
     {
       "slug": "MetroCityBus",
       "name": "Metro City Bus Mixer",
-      "description": "Polyphonic stereo spread to three buses",
+      "description": "Polyphonic stereo spread (and pan follow) to three buses",
       "tags": [
         "Mixer",
         "Polyphonic"

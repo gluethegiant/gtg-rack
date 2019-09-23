@@ -4,7 +4,8 @@ Mixing a VCV Rack patch to stereo output is a common task.
 You can use monolithic rack modules that mimic real-world mixing consoles, but they don't take advantage of the power or flexibility inherent in a modular environment.
 And other modular mixers tend to make it complicated to route multiple sounds to send effects.
 
-The Glue the Giant modular bus mixers turn a polyphonic cable into three stereo mix buses.
+The BUS IN and BUS OUT ports are used to connect the Glue the Giant modular mixers.
+This allows them to route audio along three stereo buses: red, orange, and blue.
 The bus design makes it easy to patch together modules while creating simple or complex effect sends and returns.
 
 ![alt text](https://github.com/gluethegiant/gtg-rack/blob/master/design/screenshot.png)
@@ -64,7 +65,7 @@ Pan spread and pan follow are smoothed to allow for dynamic polyphonic channels.
 
 ### 5. Bus Route
 
-Connects standard effect sends and returns to your buses
+Connects standard effect sends and returns to your buses.
 
 * Three stereo sends for use with modular bus mixers
 * Three stereo returns for use with modular bus mixers
@@ -86,9 +87,9 @@ For advanced routing, this utility module provides stereo outputs from all buses
 
 ### 8. Bus Depot
 
-This module is placed at the end of your bus chains.
-The stereo outputs can be connected to your left and right audio outputs.
-The aux input can be used to chain Bus Depot modules or another mixer.
+This module is placed at the end of your bus mixer chain.
+The stereo outputs are connected to left and right channels on your audio device.
+The aux input can be used to chain Bus Depot modules or another mixer module.
 
 * Sums three stereo buses to the left and right stereo mix
 * Master level control
@@ -96,6 +97,11 @@ The aux input can be used to chain Bus Depot modules or another mixer.
 * Aux level control
 * Left and right peak meters with a brief hold on peaks over 0db
 * Each meter light represents -6db.
+
+## More Information
+
+For usage examples, see the [Wiki](https://github.com/gluethegiant/gtg-rack/wiki).
+You can also open an issue or contact the author on the VCV Rack Community forum.
 
 ## Copyrights, Trademarks, Licenses, Etc.
 
@@ -111,12 +117,12 @@ To build these rack modules, see the official [VCV Rack documentation](https://v
 
 ## Release Notes
 
-v. 1.0.1 Metro City Bus Release (TBD. This master branch is currently for testing. Stable can be found with the release tag or in the VCV Rack Library.)
+v. 1.0.1 Metro City Bus Release (TBD. This master branch is currently for testing Metro City Bus. Stable can be found with the last release tag or in the VCV Rack Library.)
 
 - Added Metro City Bus Mixer with polyphonic stereo spread
 - Added Gig Bus Mixer for easy, standard mixing
 - Minor CPU optimizations
-- Small UI enhancements
+- Small UI enhancements, including a better 70's cream color
 
 v. 1.0.0 Initial VCV Rack Library Release (September 6, 2019)
 
