@@ -100,7 +100,7 @@ The aux input can be used to chain Bus Depot modules or another mixer module.
 
 ## More Information
 
-For usage examples, see the [Wiki](https://github.com/gluethegiant/gtg-rack/wiki).
+For more information about these rack modules, see the [Wiki](https://github.com/gluethegiant/gtg-rack/wiki).
 You can also open an issue or contact the author on the VCV Rack Community forum.
 
 ## Copyrights, Trademarks, Licenses, Etc.
@@ -117,7 +117,7 @@ To build these rack modules, see the official [VCV Rack documentation](https://v
 
 ## Release Notes
 
-v. 1.0.1 Metro City Bus Release (TBD. This master branch is currently for testing Metro City Bus. Stable can be found with the last release tag or in the VCV Rack Library.)
+v. 1.0.1 Metro City Bus Release (September 23, 2019)
 
 - Added Metro City Bus Mixer with polyphonic stereo spread
 - Added Gig Bus Mixer for easy, standard mixing

@@ -136,7 +136,7 @@ struct MetroCityBus : Module {
 				spread_pos = std::abs(params[SPREAD_PARAM].getValue());
 
 				// Store pan history
-				if (hist_i > HISTORY_CAP) hist_i = 0;   // reset history buffer index
+				if (hist_i >= HISTORY_CAP) hist_i = 0;   // reset history buffer index
 				pan_history[hist_i] = pan_pos;
 
 				// Calculate delay for follow
@@ -174,7 +174,7 @@ struct MetroCityBus : Module {
 
 			} else {   // create spread pan when no CV connected
 				hist_size = 0; hist_i = 0;   // reset pan history when CV not connected
-				float pan_delta = 15.f / args.sampleRate;   // remember pan_divider clock moves pan infrequently
+				float pan_delta = 10.f / args.sampleRate;   // accommodate delta for pan_divider clock
 
 				// Get pan and spread positions
 				pan_pos = params[PAN_PARAM].getValue();
