@@ -4,7 +4,7 @@ Mixing a VCV Rack patch to stereo output is a common task.
 You can use monolithic rack modules that mimic real-world mixing consoles, but they don't take advantage of the power or flexibility inherent in a modular environment.
 And other modular mixers tend to make it complicated to route multiple sounds to send effects.
 
-The BUS IN and BUS OUT ports are used to connect the Glue the Giant modular mixers.
+The modular mixers are connected together with the BUS IN and BUS OUT ports.
 This allows them to route audio along three stereo buses: red, orange, and blue.
 The bus design makes it easy to patch together modules while creating simple or complex effect sends and returns.
 
@@ -58,7 +58,7 @@ Pan spread and pan follow are smoothed to allow for dynamic polyphonic channels.
 * Polyphonic stereo spread with LED visuals
 * Constant power pan control with CV input and attenuator
 * Pan CV input expects bi-direction LFO sine wave from -5.0 to 5.0 
-* Reverse channel order in polyphonic spread or pan follow
+* Reverse channel order option for polyphonic spread or pan follow
 * Three level controls, with CV inputs, to three stereo buses
 * Post fader option on two level controls (red becomes master bus)
 * On button with CV input and pop filter
@@ -81,7 +81,7 @@ For advanced routing, this utility module merges audio onto any bus.
 
 ### 7. Exit Bus
 
-For advanced routing, this utility module provides stereo outputs from all buses.
+For advanced routing or a simple extension panel, this utility module provides stereo outputs from all buses.
 
 * Three stereo outputs from three stereo buses
 
