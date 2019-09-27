@@ -1,5 +1,5 @@
 #include "plugin.hpp"
-#include "gtg-components.hpp"
+#include "gtgComponents.hpp"
 
 
 struct BusDepot : Module {

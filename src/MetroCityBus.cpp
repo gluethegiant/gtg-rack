@@ -1,5 +1,5 @@
 #include "plugin.hpp"
-#include "gtg-components.hpp"
+#include "gtgComponents.hpp"
 
 
 #define HISTORY_CAP 512000

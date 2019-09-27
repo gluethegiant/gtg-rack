@@ -1,5 +1,6 @@
 #include "plugin.hpp"
-#include "gtg-components.hpp"
+#include "gtgComponents.hpp"
+#include "gtgDSP.hpp"
 
 
 struct MiniBus : Module {
@@ -25,8 +26,10 @@ struct MiniBus : Module {
 
 	dsp::SchmittTrigger on_trigger;
 	dsp::SchmittTrigger on_cv_trigger;
+	gtgDSP::AutoFader auto_fade;
 
 	bool input_on = true;
+	float ramp_speed = 0.00104f;
 	float onramp = 0.f;   // when starts at 0 creates pop filter on startup
 
 	MiniBus() {
@@ -35,6 +38,10 @@ struct MiniBus : Module {
 		configParam(LEVEL_PARAMS + 0, 0.f, 1.f, 0.f, "Level to blue bus");
 		configParam(LEVEL_PARAMS + 1, 0.f, 1.f, 0.f, "Level to orange bus");
 		configParam(LEVEL_PARAMS + 2, 0.f, 1.f, 1.f, "Level to red bus");
+	}
+
+	void onSampleRateChange() override {
+		ramp_speed = 50.f / APP->engine->getSampleRate();
 	}
 
 	void process(const ProcessArgs &args) override {
@@ -49,9 +56,9 @@ struct MiniBus : Module {
 		}
 
 		if (input_on) {   // calculate pop filter speed with current sampleRate
-			if (onramp < 1) onramp += 50.f / args.sampleRate;
+			if (onramp < 1) onramp += ramp_speed;
 		} else {
-			if (onramp > 0) onramp -= 50.f / args.sampleRate;
+			if (onramp > 0) onramp -= ramp_speed;
 		}
 
 		lights[ON_LIGHT].value = onramp;
@@ -60,7 +67,7 @@ struct MiniBus : Module {
 		outputs[BUS_OUTPUT].setChannels(6);
 
 		// process inputs
-		float mono_in = inputs[MP_INPUT].getVoltageSum() * onramp;
+		float mono_in = inputs[MP_INPUT].getVoltageSum() * auto_fade.getFade();
 
 		// process outputs
 		for (int sb = 0; sb < 3; sb++) {   // sb = stereo bus
