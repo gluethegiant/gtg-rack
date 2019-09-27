@@ -1,5 +1,5 @@
 #include "plugin.hpp"
-#include "components.hpp"
+#include "gtg-components.hpp"
 
 
 struct EnterBus : Module {

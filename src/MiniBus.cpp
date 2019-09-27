@@ -1,5 +1,5 @@
 #include "plugin.hpp"
-#include "components.hpp"
+#include "gtg-components.hpp"
 
 
 struct MiniBus : Module {
@@ -59,8 +59,10 @@ struct MiniBus : Module {
 		// set bus outputs for 3 stereo buses out
 		outputs[BUS_OUTPUT].setChannels(6);
 
-		// process inputs and bus outputs
+		// process inputs
 		float mono_in = inputs[MP_INPUT].getVoltageSum() * onramp;
+
+		// process outputs
 		for (int sb = 0; sb < 3; sb++) {   // sb = stereo bus
 			float in_level = params[LEVEL_PARAMS + sb].getValue();
 			for (int c = 0; c < 2; c++) {
