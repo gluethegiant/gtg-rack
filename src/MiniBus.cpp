@@ -1,6 +1,6 @@
 #include "plugin.hpp"
 #include "gtgComponents.hpp"
-
+#include "gtgDSP.hpp"
 
 struct MiniBus : Module {
 	enum ParamIds {
@@ -25,9 +25,9 @@ struct MiniBus : Module {
 
 	dsp::SchmittTrigger on_trigger;
 	dsp::SchmittTrigger on_cv_trigger;
+	AutoFader mini_fader;
 
-	bool input_on = true;
-	float onramp = 0.f;   // when starts at 0 creates pop filter on startup
+	const int fade_speed = 20;
 
 	MiniBus() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -35,32 +35,22 @@ struct MiniBus : Module {
 		configParam(LEVEL_PARAMS + 0, 0.f, 1.f, 0.f, "Level to blue bus");
 		configParam(LEVEL_PARAMS + 1, 0.f, 1.f, 0.f, "Level to orange bus");
 		configParam(LEVEL_PARAMS + 2, 0.f, 1.f, 1.f, "Level to red bus");
+		mini_fader.setSpeed(fade_speed);
 	}
 
 	void process(const ProcessArgs &args) override {
 
-		// on off button with level ramp to filter pops
+		// on off button with quick fader to filter pops
 		if (on_trigger.process(params[ON_PARAM].getValue()) + on_cv_trigger.process(inputs[ON_CV_INPUT].getVoltage())) {
-			if (input_on) {
-				input_on = false; onramp = 1;
-			} else {
-				input_on = true; onramp = 0;
-			}
+			mini_fader.on = !mini_fader.on;
 		}
 
-		if (input_on) {   // calculate pop filter speed with current sampleRate
-			if (onramp < 1) onramp += 50.f / args.getSampleRate();
-		} else {
-			if (onramp > 0) onramp -= 50.f / args.getSampleRate();
-		}
+		mini_fader.process();
 
-		lights[ON_LIGHT].value = onramp;
-
-		// set bus outputs for 3 stereo buses out
-		outputs[BUS_OUTPUT].setChannels(6);
+		lights[ON_LIGHT].value = mini_fader.getFade();
 
 		// process inputs
-		float mono_in = inputs[MP_INPUT].getVoltageSum() * onramp;
+		float mono_in = inputs[MP_INPUT].getVoltageSum() * mini_fader.getFade();
 
 		// process outputs
 		for (int sb = 0; sb < 3; sb++) {   // sb = stereo bus
@@ -70,22 +60,33 @@ struct MiniBus : Module {
 				outputs[BUS_OUTPUT].setVoltage((mono_in * in_level) + inputs[BUS_INPUT].getPolyVoltage(bus_channel), bus_channel);
 			}
 		}
+
+		// set bus outputs for 3 stereo buses out
+		outputs[BUS_OUTPUT].setChannels(6);
 	}
 
 	// save on button state
 	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
-		json_object_set_new(rootJ, "input_on", json_integer(input_on));
+		json_object_set_new(rootJ, "input_on", json_integer(mini_fader.on));
+		json_object_set_new(rootJ, "gain", json_real(mini_fader.getGain()));
 		return rootJ;
 	}
 
 	void dataFromJson(json_t *rootJ) override {
 		json_t *input_onJ = json_object_get(rootJ, "input_on");
-		if (input_onJ) input_on = json_integer_value(input_onJ);
+		if (input_onJ) mini_fader.on = json_integer_value(input_onJ);
+		json_t *gainJ = json_object_get(rootJ, "gain");
+		if (gainJ) mini_fader.setGain((float)json_real_value(gainJ));
+	}
+
+	void onSampleRateChange() override {
+		mini_fader.setSpeed(fade_speed);
 	}
 
 	void onReset() override {
-		input_on = true;
+		mini_fader.on = true;
+		mini_fader.setGain(false);
 	}
 };
 
@@ -109,6 +110,32 @@ struct MiniBusWidget : ModuleWidget {
 		addInput(createInputCentered<NutPort>(mm2px(Vec(7.62, 103.85)), module, MiniBus::BUS_INPUT));
 
 		addOutput(createOutputCentered<NutPort>(mm2px(Vec(7.62, 114.1)), module, MiniBus::BUS_OUTPUT));
+	}
+
+	// add gainer to context menu
+	void appendContextMenu(Menu* menu) override {
+		MiniBus* module = dynamic_cast<MiniBus*>(this->module);
+
+		menu->addChild(new MenuEntry);
+		menu->addChild(createMenuLabel("Gain Level"));
+
+		struct GainItem : MenuItem {
+			MiniBus* module;
+			float gain;
+			void onAction(const event::Action& e) override {
+				module->mini_fader.setGain(gain);
+			}
+		};
+
+		std::string gainTitles[3] = {"1.0x", "1.5x", "2.0x"};
+		float gainAmounts[3] = {1.f, 1.5f, 2.f};
+		for (int i = 0; i < 3; i++) {
+			GainItem* gainItem = createMenuItem<GainItem>(gainTitles[i]);
+			gainItem->rightText = CHECKMARK(module->mini_fader.getGain() == gainAmounts[i]);
+			gainItem->module = module;
+			gainItem->gain = gainAmounts[i];
+			menu->addChild(gainItem);
+		}
 	}
 };
 
