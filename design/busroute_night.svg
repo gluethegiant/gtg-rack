@@ -2769,14 +2769,14 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.4142136"
-     inkscape:cx="54.568851"
+     inkscape:cx="41.487376"
      inkscape:cy="238.3562"
      inkscape:document-units="mm"
      inkscape:current-layer="layer3"
      showgrid="false"
-     inkscape:window-width="956"
+     inkscape:window-width="939"
      inkscape:window-height="1050"
-     inkscape:window-x="960"
+     inkscape:window-x="33"
      inkscape:window-y="0"
      inkscape:window-maximized="0"
      objecttolerance="1"
@@ -3792,7 +3792,7 @@
        rx="0.69156271" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222223px;line-height:1.25;font-family:monospace;-inkscape-font-specification:monospace;letter-spacing:0px;word-spacing:0px;display:inline;opacity:1;fill:#00ff00;fill-opacity:1;stroke:none;stroke-width:0.26458332;enable-background:new"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222223px;line-height:1.25;font-family:monospace;-inkscape-font-specification:monospace;letter-spacing:0px;word-spacing:0px;display:inline;opacity:1;fill:#cccccc;fill-opacity:1;stroke:none;stroke-width:0.26458332;enable-background:new;"
        x="12.613459"
        y="18.087038"
        id="text8128"><tspan
@@ -3800,10 +3800,10 @@
          id="tspan8126"
          x="12.613459"
          y="18.087038"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222223px;font-family:monospace;-inkscape-font-specification:monospace;fill:#00ff00;stroke-width:0.26458332">100</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222223px;font-family:monospace;-inkscape-font-specification:monospace;fill:#cccccc;stroke-width:0.26458332;">100</tspan></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222223px;line-height:1.25;font-family:monospace;-inkscape-font-specification:monospace;letter-spacing:0px;word-spacing:0px;display:inline;opacity:1;fill:#00ff00;fill-opacity:1;stroke:none;stroke-width:0.26458332;enable-background:new"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222223px;line-height:1.25;font-family:monospace;-inkscape-font-specification:monospace;letter-spacing:0px;word-spacing:0px;display:inline;opacity:1;fill:#cccccc;fill-opacity:1;stroke:none;stroke-width:0.26458332;enable-background:new;"
        x="12.613459"
        y="48.835781"
        id="text8128-9"><tspan
@@ -3811,10 +3811,10 @@
          id="tspan8126-2"
          x="12.613459"
          y="48.835781"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222223px;font-family:monospace;-inkscape-font-specification:monospace;fill:#00ff00;stroke-width:0.26458332">100</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222223px;font-family:monospace;-inkscape-font-specification:monospace;fill:#cccccc;stroke-width:0.26458332;">100</tspan></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222223px;line-height:1.25;font-family:monospace;-inkscape-font-specification:monospace;letter-spacing:0px;word-spacing:0px;display:inline;opacity:1;fill:#00ff00;fill-opacity:1;stroke:none;stroke-width:0.26458332;enable-background:new"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222223px;line-height:1.25;font-family:monospace;-inkscape-font-specification:monospace;letter-spacing:0px;word-spacing:0px;display:inline;opacity:1;fill:#cccccc;fill-opacity:1;stroke:none;stroke-width:0.26458332;enable-background:new;"
        x="12.613459"
        y="79.774902"
        id="text8128-2"><tspan
@@ -3822,7 +3822,7 @@
          id="tspan8126-4"
          x="12.613459"
          y="79.774902"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222223px;font-family:monospace;-inkscape-font-specification:monospace;fill:#00ff00;stroke-width:0.26458332">100</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222223px;font-family:monospace;-inkscape-font-specification:monospace;fill:#cccccc;stroke-width:0.26458332;">100</tspan></text>
     <circle
        style="fill:#b3b3b3;fill-opacity:1;stroke:none;stroke-width:0.22326328;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.56593407"
        id="circle13557"
