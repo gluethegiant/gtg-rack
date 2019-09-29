@@ -95,21 +95,24 @@ struct GigBus : Module {
 	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
 		json_object_set_new(rootJ, "input_on", json_integer(gig_fader.on));
+		json_object_set_new(rootJ, "gain", json_real(gig_fader.getGain()));
 		return rootJ;
 	}
 
 	void dataFromJson(json_t *rootJ) override {
 		json_t *input_onJ = json_object_get(rootJ, "input_on");
 		if (input_onJ) gig_fader.on = json_integer_value(input_onJ);
+		json_t *gainJ = json_object_get(rootJ, "gain");
+		if (gainJ) gig_fader.setGain((float)json_real_value(gainJ));
 	}
 
 	void onSampleRateChange() override {
-		school_fader.setSpeed(fade_speed);
+		gig_fader.setSpeed(fade_speed);
 	}
 
 	void onReset() override {
-		school_fader.on = true;
-		school_fader.setGain(false);
+		gig_fader.on = true;
+		gig_fader.setGain(false);
 	}
 };
 
