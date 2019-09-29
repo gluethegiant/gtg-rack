@@ -2715,10 +2715,10 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.5017361"
-     inkscape:cx="-21.781161"
-     inkscape:cy="257.98931"
+     inkscape:cx="8.5734343"
+     inkscape:cy="213.02733"
      inkscape:document-units="mm"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="layer3"
      showgrid="false"
      inkscape:window-width="956"
      inkscape:window-height="1050"
@@ -3283,34 +3283,31 @@
        d="M 8.0202505,63.857762 8.5758611,66.80674 7.6202146,67.643739 6.664568,66.80674 7.2201786,63.86136 c -2.0088369,0.20486 -3.5374718,1.895531 -3.5395879,3.914785 -4.65e-5,2.175648 1.7636763,3.93937 3.9393239,3.939323 2.175648,4.8e-5 3.9393714,-1.763675 3.9393244,-3.939323 -2.4e-4,-2.020425 -1.52902,-3.713097 -3.5389885,-3.918383 z"
        style="fill:#d96610;fill-opacity:1;stroke:none;stroke-width:0.24667272;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        sodipodi:nodetypes="ccccccccc" />
-    <g
-       id="g4517">
-      <path
-         d="m 10.639999,15.23952 c 0,1.66777 -1.3524735,3.01978 -3.0202224,3.01978 -1.6675245,0 -3.0197772,-1.35201 -3.0197772,-3.01978 0,-1.66844 1.3522527,-3.02022 3.0197772,-3.02022 1.6677489,0 3.0202224,1.35178 3.0202224,3.02022"
-         style="display:inline;fill:#1a1a1a;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.28764027"
-         id="path5961-3-1"
-         inkscape:connector-curvature="0" />
-      <ellipse
-         ry="2.5651505"
-         rx="2.7316473"
-         style="display:inline;opacity:1;vector-effect:none;fill:#6c6c6c;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.30365208;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-         id="circle12436-7"
-         cx="7.6318116"
-         cy="15.428548" />
-      <ellipse
-         ry="2.6187232"
-         rx="2.7375531"
-         cy="15.085896"
-         cx="7.6377177"
-         id="path12411-8"
-         style="display:inline;opacity:1;vector-effect:none;fill:#4c4c4c;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.30713803;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
-      <circle
-         r="1.6261851"
-         cy="15.239296"
-         cx="7.6199994"
-         id="path3998"
-         style="fill:#8dd35f;fill-opacity:1;stroke:none;stroke-width:0.53507173;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.31360952" />
-    </g>
+    <path
+       inkscape:connector-curvature="0"
+       id="path5961-3-1"
+       style="display:inline;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.28764027"
+       d="m 10.639999,15.23952 c 0,1.66777 -1.3524735,3.01978 -3.0202224,3.01978 -1.6675245,0 -3.0197772,-1.35201 -3.0197772,-3.01978 0,-1.66844 1.3522527,-3.02022 3.0197772,-3.02022 1.6677489,0 3.0202224,1.35178 3.0202224,3.02022" />
+    <ellipse
+       cy="15.428548"
+       cx="7.6318116"
+       id="circle12436-7"
+       style="display:inline;opacity:1;vector-effect:none;fill:#666666;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.30365208;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       rx="2.7316473"
+       ry="2.5651505" />
+    <ellipse
+       style="display:inline;opacity:1;vector-effect:none;fill:#1a1a1a;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.30713803;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path12411-8"
+       cx="7.6377177"
+       cy="15.085896"
+       rx="2.7375531"
+       ry="2.6187232" />
+    <circle
+       style="fill:#8dd35f;fill-opacity:1;stroke:none;stroke-width:0.53507173;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.31360952"
+       id="path3998"
+       cx="7.6199994"
+       cy="15.239296"
+       r="1.6261851" />
     <path
        inkscape:connector-curvature="0"
        id="path7007"
