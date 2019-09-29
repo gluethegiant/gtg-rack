@@ -102,6 +102,15 @@ struct GigBus : Module {
 		json_t *input_onJ = json_object_get(rootJ, "input_on");
 		if (input_onJ) gig_fader.on = json_integer_value(input_onJ);
 	}
+
+	void onSampleRateChange() override {
+		school_fader.setSpeed(fade_speed);
+	}
+
+	void onReset() override {
+		school_fader.on = true;
+		school_fader.setGain(false);
+	}
 };
 
 
