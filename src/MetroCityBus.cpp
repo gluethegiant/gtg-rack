@@ -314,6 +314,15 @@ struct MetroCityBus : Module {
 		json_t *orange_post_fadeJ = json_object_get(rootJ, "orange_post_fade");
 		if (orange_post_fadeJ) post_fades[1] = json_integer_value(orange_post_fadeJ);
 	}
+
+	void onSampleRateChange() override {
+		metro_fader.setSpeed(fade_speed);
+	}
+
+	void onReset() override {
+		metro_fader.on = true;
+		metro_fader.setGain(1.f);
+	}
 };
 
 
