@@ -30,10 +30,9 @@ struct GigBus : Module {
 	dsp::SchmittTrigger on_cv_trigger;
 	dsp::ClockDivider pan_divider;
 	AutoFader gig_fader;
+	ConstantPanner gig_panner;
 
 	const int fade_speed = 20;
-	float pan_pos = 0.f;
-	float pan_levels[2] = {1.f, 1.f};
 
 	GigBus() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -65,24 +64,18 @@ struct GigBus : Module {
 
 		// get stereo pan levels
 		if (pan_divider.process()) {   // optimization
-			float new_pan_pos = params[PAN_PARAM].getValue();
-			if (new_pan_pos != pan_pos) {   // calculate pan only if position has changed
-				pan_pos = new_pan_pos;
-				float pan_angle = (pan_pos + 1) * 0.5f;   // allow pan to roll without clamp
-				pan_levels[0] = sin((1 - pan_angle) * M_PI_2) * M_SQRT2;   // constant power panning law
-				pan_levels[1] = sin(pan_angle * M_PI_2) * M_SQRT2;
-			}
+			gig_panner.setPan(params[PAN_PARAM].getValue());
 		}
 
 		// process inputs
 		float stereo_in[2] = {0.f, 0.f};
 		if (inputs[R_INPUT].isConnected()) {   // get a channel from each cable input
-			stereo_in[0] = inputs[LMP_INPUT].getVoltage() * pan_levels[0] * gig_fader.getFade();
-			stereo_in[1] = inputs[R_INPUT].getVoltage() * pan_levels[1] * gig_fader.getFade();
+			stereo_in[0] = inputs[LMP_INPUT].getVoltage() * gig_panner.getLevel(1) * gig_fader.getFade();
+			stereo_in[1] = inputs[R_INPUT].getVoltage() * gig_panner.getLevel(2) * gig_fader.getFade();
 		} else {   // split mono or sum of polyphonic cable on LMP
 			float lmp_in = inputs[LMP_INPUT].getVoltageSum();
 			for (int c = 0; c < 2; c++) {
-				stereo_in[c] = lmp_in * pan_levels[c] * gig_fader.getFade();
+				stereo_in[c] = lmp_in * gig_panner.getLevel(c) * gig_fader.getFade();
 			}
 		}
 
