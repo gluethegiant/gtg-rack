@@ -2,7 +2,7 @@
 #include "gtgComponents.hpp"
 
 
-#define HISTORY_CAP 512000
+const long HISTORY_CAP = 512000;
 
 struct MetroCityBus : Module {
 	enum ParamIds {
