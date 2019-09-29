@@ -2,6 +2,7 @@
 #include "gtgComponents.hpp"
 #include "gtgDSP.hpp"
 
+
 struct MiniBus : Module {
 	enum ParamIds {
 		ON_PARAM,

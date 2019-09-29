@@ -1,5 +1,6 @@
 #include "plugin.hpp"
 #include "gtgComponents.hpp"
+#include "gtgDSP.hpp"
 
 
 struct GigBus : Module {
@@ -28,9 +29,9 @@ struct GigBus : Module {
 	dsp::SchmittTrigger on_trigger;
 	dsp::SchmittTrigger on_cv_trigger;
 	dsp::ClockDivider pan_divider;
+	AutoFader gig_fader;
 
-	bool input_on = true;
-	float onramp = 0.f;
+	const int fade_speed = 20;
 	float pan_pos = 0.f;
 	float pan_levels[2] = {1.f, 1.f};
 
@@ -47,24 +48,14 @@ struct GigBus : Module {
 	void process(const ProcessArgs &args) override {
 		// on off button with fader onramp to filter pops
 		if (on_trigger.process(params[ON_PARAM].getValue()) + on_cv_trigger.process(inputs[ON_CV_INPUT].getVoltage())) {
-			if (input_on) {
-				input_on = false;
-				onramp = 1;
-			} else {
-				input_on = true;
-				onramp = 0;
-			}
+			gig_fader.on = !gig_fader.on;
 		}
 
-		if (input_on) {   // calculate pop filter speed with current sampleRate
-			if (onramp < 1) onramp += 50.f / args.sampleRate;
-		} else {
-			if (onramp > 0) onramp -= 50.f / args.sampleRate;
-		}
+		gig_fader.process();
 
-		lights[ON_LIGHT].value = onramp;
+		lights[ON_LIGHT].value = gig_fader.getFade();
 
-		// get knob levels
+		// get input levels
 		float in_levels[3] = {0.f, 0.f, 0.f};
 		in_levels[2] = params[LEVEL_PARAMS + 2].getValue();   // master level
 		for (int sb = 0; sb < 2; sb++) {   // send levels
@@ -85,17 +76,14 @@ struct GigBus : Module {
 		// process inputs
 		float stereo_in[2] = {0.f, 0.f};
 		if (inputs[R_INPUT].isConnected()) {   // get a channel from each cable input
-			stereo_in[0] = inputs[LMP_INPUT].getVoltage() * pan_levels[0] * onramp;
-			stereo_in[1] = inputs[R_INPUT].getVoltage() * pan_levels[1] * onramp;
+			stereo_in[0] = inputs[LMP_INPUT].getVoltage() * pan_levels[0] * gig_fader.getFade();
+			stereo_in[1] = inputs[R_INPUT].getVoltage() * pan_levels[1] * gig_fader.getFade();
 		} else {   // split mono or sum of polyphonic cable on LMP
 			float lmp_in = inputs[LMP_INPUT].getVoltageSum();
 			for (int c = 0; c < 2; c++) {
-				stereo_in[c] = lmp_in * pan_levels[c] * onramp;
+				stereo_in[c] = lmp_in * pan_levels[c] * gig_fader.getFade();
 			}
 		}
-
-		// set bus outputs for 3 stereo buses out
-		outputs[BUS_OUTPUT].setChannels(6);
 
 		// process outputs
 		for (int sb = 0; sb < 3; sb++) {   // sb = stereo bus
@@ -105,19 +93,20 @@ struct GigBus : Module {
 			}
 		}
 
-
+		// set bus outputs for 3 stereo buses out
+		outputs[BUS_OUTPUT].setChannels(6);
 	}
 
 	// save on send button states
 	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
-		json_object_set_new(rootJ, "input_on", json_integer(input_on));
+		json_object_set_new(rootJ, "input_on", json_integer(gig_fader.on));
 		return rootJ;
 	}
 
 	void dataFromJson(json_t *rootJ) override {
 		json_t *input_onJ = json_object_get(rootJ, "input_on");
-		if (input_onJ) input_on = json_integer_value(input_onJ);
+		if (input_onJ) gig_fader.on = json_integer_value(input_onJ);
 	}
 };
 
