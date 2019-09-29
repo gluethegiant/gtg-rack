@@ -128,6 +128,7 @@ struct SchoolBus : Module {
 		json_object_set_new(rootJ, "input_on", json_integer(school_fader.on));
 		json_object_set_new(rootJ, "blue_post_fade", json_integer(post_fades[0]));
 		json_object_set_new(rootJ, "orange_post_fade", json_integer(post_fades[1]));
+		json_object_set_new(rootJ, "gain", json_real(school_fader.getGain()));
 		return rootJ;
 	}
 
@@ -138,6 +139,8 @@ struct SchoolBus : Module {
 		if (blue_post_fadeJ) post_fades[0] = json_integer_value(blue_post_fadeJ);
 		json_t *orange_post_fadeJ = json_object_get(rootJ, "orange_post_fade");
 		if (orange_post_fadeJ) post_fades[1] = json_integer_value(orange_post_fadeJ);
+		json_t *gainJ = json_object_get(rootJ, "gain");
+		if (gainJ) school_fader.setGain((float)json_real_value(gainJ));
 	}
 };
 
@@ -174,6 +177,32 @@ struct SchoolBusWidget : ModuleWidget {
 		addInput(createInputCentered<NutPort>(mm2px(Vec(7.45, 114.1)), module, SchoolBus::BUS_INPUT));
 
 		addOutput(createOutputCentered<NutPort>(mm2px(Vec(23.1, 114.1)), module, SchoolBus::BUS_OUTPUT));
+	}
+
+	// add gain levels to context menu
+	void appendContextMenu(Menu* menu) override {
+		SchoolBus* module = dynamic_cast<SchoolBus*>(this->module);
+
+		menu->addChild(new MenuEntry);
+		menu->addChild(createMenuLabel("Gain Level"));
+
+		struct GainItem : MenuItem {
+			SchoolBus* module;
+			float gain;
+			void onAction(const event::Action& e) override {
+				module->school_fader.setGain(gain);
+			}
+		};
+
+		std::string gainTitles[3] = {"1.0x", "1.5x", "2.0x"};
+		float gainAmounts[3] = {1.f, 1.5f, 2.f};
+		for (int i = 0; i < 3; i++) {
+			GainItem* gainItem = createMenuItem<GainItem>(gainTitles[i]);
+			gainItem->rightText = CHECKMARK(module->school_fader.getGain() == gainAmounts[i]);
+			gainItem->module = module;
+			gainItem->gain = gainAmounts[i];
+			menu->addChild(gainItem);
+		}
 	}
 };
 
