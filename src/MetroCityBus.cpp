@@ -46,6 +46,7 @@ struct MetroCityBus : Module {
 	dsp::ClockDivider pan_divider;
 	dsp::ClockDivider light_divider;
 	AutoFader metro_fader;
+	ConstantPan metro_pan[16];
 
 	const int fade_speed = 20;
 	float pan_history[HISTORY_CAP] = {};
@@ -53,11 +54,8 @@ struct MetroCityBus : Module {
 	long hist_size = 0;
 	bool reverse_poly = false;
 	bool post_fades[2] = {false, false};
-	float pan_pos = 0.f;
-	float pan_levels[32] = { 1.f, 1.f };
 	float spread_pos = 0.f;
 	int channel_no = 0;
-	float channel_pan[16] = { };
 	float light_brights[9] = {};
 	long f_delay = 0;
 
@@ -121,82 +119,60 @@ struct MetroCityBus : Module {
 				float pan_delta = 25.f / args.sampleRate;   // for pan smoothing
 
 				// get pan knob with CV and attenuator
-				pan_pos = params[PAN_PARAM].getValue() + (((inputs[PAN_CV_INPUT].getNormalVoltage(0) * 2) * params[PAN_ATT_PARAM].getValue()) * 0.1f);
+				float pan_pos = params[PAN_PARAM].getValue() + (((inputs[PAN_CV_INPUT].getNormalVoltage(0) * 2) * params[PAN_ATT_PARAM].getValue()) * 0.1f);
+				metro_pan[0].setPan(pan_pos);
 
 				// follow spread is 0 to 1
 				spread_pos = std::abs(params[SPREAD_PARAM].getValue());
 
 				// Store pan history
 				if (hist_i >= HISTORY_CAP) hist_i = 0;   // reset history buffer index
-				pan_history[hist_i] = pan_pos;
+				pan_history[hist_i] = metro_pan[0].position;
 
 				// Calculate delay for follow
 				f_delay = std::round(spread_pos * (args.sampleRate / pan_divider.getDivision()));   // f_delay * 16 should not be more than HISTORY_CAP
 
-				channel_pan[0] = pan_pos;   // first channel position is current pan position
-				float pan_angle = (channel_pan[0] + 1) * 0.5f;
-				pan_levels[0] = get_left(pan_angle);
-				pan_levels[1] = get_right(pan_angle);
-
 				// calculate pan position for other channels
 				for (int c = 1; c < channel_no; c++) {
-					int sc = c * 2;
 					long follow = c * f_delay;
 					if (follow > hist_size) {   // there is not enough history to follow
-						channel_pan[c] = channel_pan[0];   // follow first channel until history is populated
-						pan_levels[sc] = pan_levels[0];
-						pan_levels[sc + 1] = pan_levels[1];
+						metro_pan[c].position = 0.f;   // stay centered until history is populated
+						metro_pan[c].levels[0] = 1.f;
+						metro_pan[c].levels[1] = 1.f;
 					} else {
 						follow = hist_i - follow;
 						if (follow < 0) follow = HISTORY_CAP + follow;   // fix follow when buffer resets to 0
 
 						// smooth pan for dynamic channels and history catch up
-						channel_pan[c] = smooth_pan(pan_history[follow], channel_pan[c], pan_delta);
-
-						// get stereo levels
-						pan_angle = (channel_pan[c] + 1) * 0.5f;
-						pan_levels[sc] = get_left(pan_angle);
-						pan_levels[sc + 1] = get_right(pan_angle);
+						metro_pan[c].setPan(smooth_pan(pan_history[follow], metro_pan[c].position, pan_delta));
 					}
 				}
 
 				hist_i++;   // Keep history buffer rolling
 				if (hist_size < HISTORY_CAP) hist_size++;
 
-			} else {   // create spread pan when no CV connected
+			} else {
+
+				// create spread pan when no CV connected
 				hist_size = 0; hist_i = 0;   // reset pan history when CV not connected
 				float pan_delta = 10.f / args.sampleRate;   // accommodate delta for pan_divider clock
 
 				// Get pan and spread positions
-				pan_pos = params[PAN_PARAM].getValue();
+				metro_pan[0].setPan(params[PAN_PARAM].getValue());   // first channel is pan knob position
 				spread_pos = params[SPREAD_PARAM].getValue();
 
 				// Spread evenly over available stereo field
 				float pan_spread = 0.f;
-				if (spread_pos < 0) pan_spread = (pan_pos + 1) * spread_pos;
-				if (spread_pos > 0) pan_spread = -1 * ((pan_pos - 1) * spread_pos);
-
-				if (channel_pan[0] != pan_pos) {
-					channel_pan[0] = pan_pos;   // first channel position is current pan
-					float pan_angle = (channel_pan[0] + 1) * 0.5f;
-					pan_levels[0] = get_left(pan_angle);
-					pan_levels[1] = get_right(pan_angle);
-				}
+				if (spread_pos < 0) pan_spread = (metro_pan[0].position + 1) * spread_pos;
+				if (spread_pos > 0) pan_spread = -1 * ((metro_pan[0].position - 1) * spread_pos);
 
 				// calculate polyphonic spread and pan levels for other channels
 				for (int c = 1; c < channel_no; c++) {
-					float last_pan = channel_pan[c];
-					channel_pan[c] = pan_pos + (((float)c / (float)(channel_no - 1)) * pan_spread);
 
-					if (last_pan != channel_pan[c]) {
-						// smooth pan for dynamic channels
-						channel_pan[c] = smooth_pan(channel_pan[c], last_pan, pan_delta);
+					float last_pan = metro_pan[c].position;
+					float channel_pos = metro_pan[0].position + (((float)c / (float)(channel_no - 1)) * pan_spread);
 
-						// get stereo levels
-						float pan_angle = (channel_pan[c] + 1) * 0.5f;
-						pan_levels[c * 2] = get_left(pan_angle);
-						pan_levels[(c * 2) + 1] = get_right(pan_angle);
-					}
+					metro_pan[c].setPan(smooth_pan(channel_pos, last_pan, pan_delta));
 				}
 			}
 		}   // end pan_divider.process()
@@ -206,26 +182,24 @@ struct MetroCityBus : Module {
 		if (spread_pos == 0) {   // sum channels if no spread
 			float sum_in = inputs[POLY_INPUT].getVoltageSum();
 			for (int c = 0; c < 2; c++) {
-				stereo_in[c] = sum_in * pan_levels[c] * metro_fader.getFade();
+				stereo_in[c] = sum_in * metro_pan[0].levels[c] * metro_fader.getFade();
 			}
 		} else {
 			for (int c = 0; c < channel_no; c++) {
-				int sc = c * 2;
 				float channel_in = inputs[POLY_INPUT].getPolyVoltage(c);
-				if (reverse_poly) {   // reverses order of levels applied to channels
-					stereo_in[0] += channel_in * pan_levels[(channel_no * 2) - 2 - sc];
-					stereo_in[1] += channel_in * pan_levels[(channel_no * 2) - 1 - sc];
+				if (reverse_poly) {   // reverses order of pan levels applied to channels
+					stereo_in[0] += channel_in * metro_pan[channel_no - c - 1].levels[0];
+					stereo_in[1] += channel_in * metro_pan[channel_no - c - 1].levels[1];
 				} else {
-					stereo_in[0] += channel_in * pan_levels[sc];
-					stereo_in[1] += channel_in * pan_levels[sc + 1];
+					stereo_in[0] += channel_in * metro_pan[c].levels[0];
+					stereo_in[1] += channel_in * metro_pan[c].levels[1];
 				}
 			}
+
+			// Apply fade after summing
 			stereo_in[0] *= metro_fader.getFade();
 			stereo_in[1] *= metro_fader.getFade();
 		}
-
-		// set bus outputs for 3 stereo buses out
-		outputs[BUS_OUTPUT].setChannels(6);
 
 		// process bus outputs
 		for (int sb = 0; sb < 3; sb++) {   // sb = stereo bus
@@ -235,6 +209,9 @@ struct MetroCityBus : Module {
 			}
 		}
 
+		// set bus outputs for 3 stereo buses out
+		outputs[BUS_OUTPUT].setChannels(6);
+
 		// set pan lights
 		if (light_divider.process() && metro_fader.on) {   // set lights infrequently
 			for (int c = 0; c < channel_no; c++) {
@@ -243,7 +220,7 @@ struct MetroCityBus : Module {
 					float light_delta = 2.f / 8.f;   // 8 divisions because light 1 and 9 are halved by offset
 					float light_pos = (l * light_delta) - 1 - (light_delta / 2.f);
 
-					light_pan[c] = channel_pan[c];
+					light_pan[c] = metro_pan[c].position;
 
 					// roll back lights when out of bounds
 					if (light_pan[c] > 1) {
@@ -286,14 +263,6 @@ struct MetroCityBus : Module {
 		} else {
 			return std::fmax(last - delta, pan);
 		}
-	}
-
-	float get_left(float angle) {
-		return sin((1 - angle) * M_PI_2) * M_SQRT2;
-	}
-
-	float get_right(float angle) {
-		return sin(angle * M_PI_2) * M_SQRT2;
 	}
 
 	// save on and post_fade send button states
