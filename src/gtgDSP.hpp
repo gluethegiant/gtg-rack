@@ -49,7 +49,7 @@ private:
 
 };
 
-struct ConstantPanner {
+struct ConstantPan {
 
 	float position = 0.f;
 	float levels[2] = {1.f, 1.f};

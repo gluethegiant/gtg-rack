@@ -39,7 +39,7 @@ struct SchoolBus : Module {
 	dsp::SchmittTrigger orange_post_trigger;
 	dsp::ClockDivider pan_divider;
 	AutoFader school_fader;
-	ConstantPanner school_pan;
+	ConstantPan school_pan;
 
 	const int fade_speed = 20;
 	bool post_fades[2] = {false, false};
