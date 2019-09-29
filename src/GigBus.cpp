@@ -128,7 +128,7 @@ struct GigBusWidget : ModuleWidget {
 		addOutput(createOutputCentered<NutPort>(mm2px(Vec(10.16, 114.108)), module, GigBus::BUS_OUTPUT));
 	}
 
-	// add gainer to context menu
+	// add gain levels to context menu
 	void appendContextMenu(Menu* menu) override {
 		GigBus* module = dynamic_cast<GigBus*>(this->module);
 

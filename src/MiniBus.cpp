@@ -113,7 +113,7 @@ struct MiniBusWidget : ModuleWidget {
 		addOutput(createOutputCentered<NutPort>(mm2px(Vec(7.62, 114.1)), module, MiniBus::BUS_OUTPUT));
 	}
 
-	// add gainer to context menu
+	// add gain levels to context menu
 	void appendContextMenu(Menu* menu) override {
 		MiniBus* module = dynamic_cast<MiniBus*>(this->module);
 
