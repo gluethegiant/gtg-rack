@@ -46,7 +46,8 @@ struct GigBus : Module {
 	}
 
 	void process(const ProcessArgs &args) override {
-		// on off button with fader onramp to filter pops
+
+		// on off button with fader as a pop filter
 		if (on_trigger.process(params[ON_PARAM].getValue()) + on_cv_trigger.process(inputs[ON_CV_INPUT].getVoltage())) {
 			gig_fader.on = !gig_fader.on;
 		}
@@ -59,7 +60,7 @@ struct GigBus : Module {
 		float in_levels[3] = {0.f, 0.f, 0.f};
 		in_levels[2] = params[LEVEL_PARAMS + 2].getValue();   // master level
 		for (int sb = 0; sb < 2; sb++) {   // send levels
-			in_levels[sb] = params[LEVEL_PARAMS + sb].getValue() * in_levels[2];
+			in_levels[sb] = params[LEVEL_PARAMS + sb].getValue() * in_levels[2];   // multiply by red for post levels
 		}
 
 		// get stereo pan levels
@@ -97,7 +98,7 @@ struct GigBus : Module {
 		outputs[BUS_OUTPUT].setChannels(6);
 	}
 
-	// save on send button states
+	// save on button states
 	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
 		json_object_set_new(rootJ, "input_on", json_integer(gig_fader.on));
@@ -132,6 +133,32 @@ struct GigBusWidget : ModuleWidget {
 		addInput(createInputCentered<NutPort>(mm2px(Vec(10.16, 103.863)), module, GigBus::BUS_INPUT));
 
 		addOutput(createOutputCentered<NutPort>(mm2px(Vec(10.16, 114.108)), module, GigBus::BUS_OUTPUT));
+	}
+
+	// add gainer to context menu
+	void appendContextMenu(Menu* menu) override {
+		GigBus* module = dynamic_cast<GigBus*>(this->module);
+
+		menu->addChild(new MenuEntry);
+		menu->addChild(createMenuLabel("Gain Level"));
+
+		struct GainItem : MenuItem {
+			GigBus* module;
+			float gain;
+			void onAction(const event::Action& e) override {
+				module->gig_fader.setGain(gain);
+			}
+		};
+
+		std::string gainTitles[3] = {"1.0x", "1.5x", "2.0x"};
+		float gainAmounts[3] = {1.f, 1.5f, 2.f};
+		for (int i = 0; i < 3; i++) {
+			GainItem* gainItem = createMenuItem<GainItem>(gainTitles[i]);
+			gainItem->rightText = CHECKMARK(module->gig_fader.getGain() == gainAmounts[i]);
+			gainItem->module = module;
+			gainItem->gain = gainAmounts[i];
+			menu->addChild(gainItem);
+		}
 	}
 };
 
