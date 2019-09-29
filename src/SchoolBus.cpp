@@ -55,6 +55,7 @@ struct SchoolBus : Module {
 		configParam(BLUE_POST_PARAM, 0.f, 1.f, 0.f, "Post red fader send");
 		configParam(ORANGE_POST_PARAM, 0.f, 1.f, 0.f, "Post red fader send");
 		pan_divider.setDivision(3);
+		school_fader.setSpeed(fade_speed);
 	}
 
 	void process(const ProcessArgs &args) override {

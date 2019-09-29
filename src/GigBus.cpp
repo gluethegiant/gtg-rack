@@ -42,6 +42,7 @@ struct GigBus : Module {
 		configParam(LEVEL_PARAMS + 1, 0.f, 1.f, 0.f, "Post red level to orange stereo bus");
 		configParam(LEVEL_PARAMS + 2, 0.f, 1.f, 1.f, "Master level to red stereo bus");
 		pan_divider.setDivision(3);
+		gig_fader.setSpeed(fade_speed);
 	}
 
 	void process(const ProcessArgs &args) override {
