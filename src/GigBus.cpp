@@ -112,7 +112,7 @@ struct GigBus : Module {
 
 	void onReset() override {
 		gig_fader.on = true;
-		gig_fader.setGain(false);
+		gig_fader.setGain(1.f);
 	}
 };
 

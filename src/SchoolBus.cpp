@@ -142,6 +142,15 @@ struct SchoolBus : Module {
 		json_t *gainJ = json_object_get(rootJ, "gain");
 		if (gainJ) school_fader.setGain((float)json_real_value(gainJ));
 	}
+
+	void onSampleRateChange() override {
+		school_fader.setSpeed(fade_speed);
+	}
+
+	void onReset() override {
+		school_fader.on = true;
+		school_fader.setGain(1.f);
+	}
 };
 
 

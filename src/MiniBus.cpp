@@ -87,7 +87,7 @@ struct MiniBus : Module {
 
 	void onReset() override {
 		mini_fader.on = true;
-		mini_fader.setGain(false);
+		mini_fader.setGain(1.f);
 	}
 };
 
