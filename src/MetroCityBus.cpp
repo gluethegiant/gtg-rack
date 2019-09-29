@@ -1,5 +1,6 @@
 #include "plugin.hpp"
 #include "gtgComponents.hpp"
+#include "gtgDSP.hpp"
 
 
 const long HISTORY_CAP = 512000;
@@ -44,12 +45,11 @@ struct MetroCityBus : Module {
 	dsp::SchmittTrigger orange_post_trigger;
 	dsp::ClockDivider pan_divider;
 	dsp::ClockDivider light_divider;
+	AutoFader metro_fader;
 
 	float pan_history[HISTORY_CAP] = {};
 	long hist_i = 0;
 	long hist_size = 0;
-	bool input_on = true;
-	float onramp = 0.f;
 	bool reverse_poly = false;
 	bool post_fades[2] = {false, false};
 	float pan_pos = 0.f;
@@ -79,23 +79,12 @@ struct MetroCityBus : Module {
 	void process(const ProcessArgs &args) override {
 		// on off button with pop filter
 		if (on_trigger.process(params[ON_PARAM].getValue()) + on_cv_trigger.process(inputs[ON_CV_INPUT].getVoltage())) {
-			if (input_on) {
-				input_on = false;
-				onramp = 1;
-				for (int l = 0; l < 9; l++) lights[PAN_LIGHTS + l].value = 0;   // turn off pan lights
-			} else {
-				input_on = true;
-				onramp = 0;
-			}
+			metro_fader.on = !metro_fader.on;
 		}
 
-		if (input_on) {   // calculate pop filter speed with current sampleRate
-			if (onramp < 1) onramp += 50.f / args.sampleRate;
-		} else {
-			if (onramp > 0) onramp -= 50.f / args.sampleRate;
-		}
+		metro_fader.process();
 
-		lights[ON_LIGHT].value = onramp;
+		lights[ON_LIGHT].value = metro_fader.getFade();
 
 		// get button click to reverse polyphonic pan order
 		if (reverse_poly_trigger.process(params[REVERSE_PARAM].getValue())) reverse_poly = !reverse_poly;
@@ -123,7 +112,7 @@ struct MetroCityBus : Module {
 		}
 
 		// pans
-		if (pan_divider.process() && input_on) {   // calculate pan every few samples
+		if (pan_divider.process() && metro_fader.on) {   // calculate pan every few samples
 			channel_no = inputs[POLY_INPUT].getChannels();
 
 			if (inputs[PAN_CV_INPUT].isConnected()) {   // create follow pan when CV connected
@@ -215,7 +204,7 @@ struct MetroCityBus : Module {
 		if (spread_pos == 0) {   // sum channels if no spread
 			float sum_in = inputs[POLY_INPUT].getVoltageSum();
 			for (int c = 0; c < 2; c++) {
-				stereo_in[c] = sum_in * pan_levels[c] * onramp;
+				stereo_in[c] = sum_in * pan_levels[c] * metro_fader.getFade();
 			}
 		} else {
 			for (int c = 0; c < channel_no; c++) {
@@ -229,8 +218,8 @@ struct MetroCityBus : Module {
 					stereo_in[1] += channel_in * pan_levels[sc + 1];
 				}
 			}
-			stereo_in[0] *= onramp;
-			stereo_in[1] *= onramp;
+			stereo_in[0] *= metro_fader.getFade();
+			stereo_in[1] *= metro_fader.getFade();
 		}
 
 		// set bus outputs for 3 stereo buses out
@@ -245,7 +234,7 @@ struct MetroCityBus : Module {
 		}
 
 		// set pan lights
-		if (light_divider.process() && input_on) {   // set lights infrequently
+		if (light_divider.process() && metro_fader.on) {   // set lights infrequently
 			for (int c = 0; c < channel_no; c++) {
 				for (int l = 0; l < 9; l++) {
 					float light_pan[16] = { };
@@ -283,6 +272,10 @@ struct MetroCityBus : Module {
 					light_brights[l] -= 1000 / args.sampleRate;
 				}
 			}
+		} else {
+			if (!metro_fader.on) {
+				for (int l = 0; l < 9; l++) lights[PAN_LIGHTS + l].value = 0;   // turn off pan lights
+			}
 		}
 	}
 	float smooth_pan(float pan, float last, float delta) {
@@ -304,7 +297,7 @@ struct MetroCityBus : Module {
 	// save on and post_fade send button states
 	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
-		json_object_set_new(rootJ, "input_on", json_integer(input_on));
+		json_object_set_new(rootJ, "input_on", json_integer(metro_fader.on));
 		json_object_set_new(rootJ, "reverse_poly", json_integer(reverse_poly));
 		json_object_set_new(rootJ, "blue_post_fade", json_integer(post_fades[0]));
 		json_object_set_new(rootJ, "orange_post_fade", json_integer(post_fades[1]));
@@ -313,7 +306,7 @@ struct MetroCityBus : Module {
 
 	void dataFromJson(json_t *rootJ) override {
 		json_t *input_onJ = json_object_get(rootJ, "input_on");
-		if (input_onJ) input_on = json_integer_value(input_onJ);
+		if (input_onJ) metro_fader.on = json_integer_value(input_onJ);
 		json_t *reverse_polyJ = json_object_get(rootJ, "reverse_poly");
 		if (reverse_polyJ) reverse_poly = json_integer_value(reverse_polyJ);
 		json_t *blue_post_fadeJ = json_object_get(rootJ, "blue_post_fade");
