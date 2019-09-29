@@ -4,7 +4,7 @@ Mixing a VCV Rack patch to stereo output is a common task.
 You can use monolithic rack modules that mimic real-world mixing consoles, but they don't take advantage of the power or flexibility inherent in a modular environment.
 And other modular mixers tend to make it complicated to route multiple sounds to send effects.
 
-The modular mixers are connected together with the BUS IN and BUS OUT ports.
+Each bus mixer connects together with the BUS IN and BUS OUT ports.
 This allows them to route audio along three stereo buses: red, orange, and blue.
 The bus design makes it easy to patch together modules while creating simple or complex effect sends and returns.
 
