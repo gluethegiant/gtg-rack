@@ -47,6 +47,7 @@ struct MetroCityBus : Module {
 	dsp::ClockDivider light_divider;
 	AutoFader metro_fader;
 
+	const int fade_speed = 20;
 	float pan_history[HISTORY_CAP] = {};
 	long hist_i = 0;
 	long hist_size = 0;
@@ -74,6 +75,7 @@ struct MetroCityBus : Module {
 		configParam(ORANGE_POST_PARAM, 0.f, 1.f, 0.f, "Post red fader send");
 		pan_divider.setDivision(3);
 		light_divider.setDivision(64);
+		metro_fader.setSpeed(fade_speed);
 	}
 
 	void process(const ProcessArgs &args) override {
@@ -301,6 +303,7 @@ struct MetroCityBus : Module {
 		json_object_set_new(rootJ, "reverse_poly", json_integer(reverse_poly));
 		json_object_set_new(rootJ, "blue_post_fade", json_integer(post_fades[0]));
 		json_object_set_new(rootJ, "orange_post_fade", json_integer(post_fades[1]));
+		json_object_set_new(rootJ, "gain", json_real(metro_fader.getGain()));
 		return rootJ;
 	}
 
@@ -313,6 +316,8 @@ struct MetroCityBus : Module {
 		if (blue_post_fadeJ) post_fades[0] = json_integer_value(blue_post_fadeJ);
 		json_t *orange_post_fadeJ = json_object_get(rootJ, "orange_post_fade");
 		if (orange_post_fadeJ) post_fades[1] = json_integer_value(orange_post_fadeJ);
+		json_t *gainJ = json_object_get(rootJ, "gain");
+		if (gainJ) metro_fader.setGain((float)json_real_value(gainJ));
 	}
 
 	void onSampleRateChange() override {
@@ -370,6 +375,32 @@ struct MetroCityBusWidget : ModuleWidget {
 		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(28.292, 31.341)), module, MetroCityBus::PAN_LIGHTS + 6));
 		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(32.27, 32.341)), module, MetroCityBus::PAN_LIGHTS + 7));
 		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(36.248, 33.841)), module, MetroCityBus::PAN_LIGHTS + 8));
+	}
+
+	// add gain levels to context menu
+	void appendContextMenu(Menu* menu) override {
+		MetroCityBus* module = dynamic_cast<MetroCityBus*>(this->module);
+
+		menu->addChild(new MenuEntry);
+		menu->addChild(createMenuLabel("Gain Level"));
+
+		struct GainItem : MenuItem {
+			MetroCityBus* module;
+			float gain;
+			void onAction(const event::Action& e) override {
+				module->metro_fader.setGain(gain);
+			}
+		};
+
+		std::string gainTitles[3] = {"1.0x", "1.5x", "2.0x"};
+		float gainAmounts[3] = {1.f, 1.5f, 2.f};
+		for (int i = 0; i < 3; i++) {
+			GainItem* gainItem = createMenuItem<GainItem>(gainTitles[i]);
+			gainItem->rightText = CHECKMARK(module->metro_fader.getGain() == gainAmounts[i]);
+			gainItem->module = module;
+			gainItem->gain = gainAmounts[i];
+			menu->addChild(gainItem);
+		}
 	}
 };
 
