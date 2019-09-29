@@ -1,5 +1,6 @@
 #include "plugin.hpp"
 #include "gtgComponents.hpp"
+#include "gtgDSP.hpp"
 
 
 struct SchoolBus : Module {
@@ -37,12 +38,11 @@ struct SchoolBus : Module {
 	dsp::SchmittTrigger blue_post_trigger;
 	dsp::SchmittTrigger orange_post_trigger;
 	dsp::ClockDivider pan_divider;
+	AutoFader school_fader;
+	ConstantPanner school_pan;
 
-	bool input_on = true;
-	float onramp = 0.f;
+	const int fade_speed = 20;
 	bool post_fades[2] = {false, false};
-	float pan_pos = 0.f;
-	float pan_levels[2] = {1.f, 1.f};
 
 	SchoolBus() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -58,24 +58,15 @@ struct SchoolBus : Module {
 	}
 
 	void process(const ProcessArgs &args) override {
+
 		// on off button with fader pop filter
 		if (on_trigger.process(params[ON_PARAM].getValue()) + on_cv_trigger.process(inputs[ON_CV_INPUT].getVoltage())) {
-			if (input_on) {
-				input_on = false;
-				onramp = 1;
-			} else {
-				input_on = true;
-				onramp = 0;
-			}
+			school_fader.on = !school_fader.on;
 		}
 
-		if (input_on) {   // calculate pop filter speed with current sampleRate
-			if (onramp < 1) onramp += 50.f / args.sampleRate;
-		} else {
-			if (onramp > 0) onramp -= 50.f / args.sampleRate;
-		}
+		school_fader.process();
 
-		lights[ON_LIGHT].value = onramp;
+		lights[ON_LIGHT].value = school_fader.getFade();
 
 		// post fader send buttons
 		if (blue_post_trigger.process(params[BLUE_POST_PARAM].getValue())) post_fades[0] = !post_fades[0];
@@ -84,7 +75,7 @@ struct SchoolBus : Module {
 		lights[BLUE_POST_LIGHT].value = post_fades[0];
 		lights[ORANGE_POST_LIGHT].value = post_fades[1];
 
-		// get knob levels
+		// get input levels
 		float in_levels[3] = {0.f, 0.f, 0.f};
 		for (int sb = 0; sb < 3; sb++) {   // sb = stereo bus
 			in_levels[sb] = clamp(inputs[LEVEL_CV_INPUTS + sb].getNormalVoltage(10) * 0.1f, 0.f, 1.f) * params[LEVEL_PARAMS + sb].getValue();
@@ -99,29 +90,25 @@ struct SchoolBus : Module {
 
 		// get stereo pan levels
 		if (pan_divider.process()) {   // calculate pan infrequently, useful for auto panning
-			float new_pan_pos = params[PAN_PARAM].getValue() + (((inputs[PAN_CV_INPUT].getNormalVoltage(0) * 2) * params[PAN_ATT_PARAM].getValue()) * 0.1);
-			if (new_pan_pos != pan_pos) {   // calculate pan only if position has changed
-				pan_pos = new_pan_pos;
-				float pan_angle = (pan_pos + 1) * 0.5f;   // allow pan to roll without clamp
-				pan_levels[0] = sin((1 - pan_angle) * M_PI_2) * M_SQRT2;   // constant power panning law
-				pan_levels[1] = sin(pan_angle * M_PI_2) * M_SQRT2;
+			if (inputs[PAN_CV_INPUT].isConnected()) {
+				float pan_pos = params[PAN_PARAM].getValue() + (((inputs[PAN_CV_INPUT].getNormalVoltage(0) * 2) * params[PAN_ATT_PARAM].getValue()) * 0.1);
+				school_pan.setPan(pan_pos);
+			} else {
+				school_pan.setPan(params[PAN_PARAM].getValue());
 			}
 		}
 
 		// process inputs
 		float stereo_in[2] = {0.f, 0.f};
 		if (inputs[R_INPUT].isConnected()) {   // get a channel from each cable input
-			stereo_in[0] = inputs[LMP_INPUT].getVoltage() * pan_levels[0] * onramp;
-			stereo_in[1] = inputs[R_INPUT].getVoltage() * pan_levels[1] * onramp;
+			stereo_in[0] = inputs[LMP_INPUT].getVoltage() * school_pan.getLevel(0) * school_fader.getFade();
+			stereo_in[1] = inputs[R_INPUT].getVoltage() * school_pan.getLevel(1) * school_fader.getFade();
 		} else {   // split mono or sum of polyphonic cable on LMP
 			float lmp_in = inputs[LMP_INPUT].getVoltageSum();
 			for (int c = 0; c < 2; c++) {
-				stereo_in[c] = lmp_in * pan_levels[c] * onramp;
+				stereo_in[c] = lmp_in * school_pan.getLevel(c) * school_fader.getFade();
 			}
 		}
-
-		// set bus outputs for 3 stereo buses out
-		outputs[BUS_OUTPUT].setChannels(6);
 
 		// process outputs
 		for (int sb = 0; sb < 3; sb++) {   // sb = stereo bus
@@ -130,12 +117,15 @@ struct SchoolBus : Module {
 				outputs[BUS_OUTPUT].setVoltage((stereo_in[c] * in_levels[sb]) + inputs[BUS_INPUT].getPolyVoltage(bus_channel), bus_channel);
 			}
 		}
+
+		// set bus outputs for 3 stereo buses out
+		outputs[BUS_OUTPUT].setChannels(6);
 	}
 
 	// save on and post_fade send button states
 	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
-		json_object_set_new(rootJ, "input_on", json_integer(input_on));
+		json_object_set_new(rootJ, "input_on", json_integer(school_fader.on));
 		json_object_set_new(rootJ, "blue_post_fade", json_integer(post_fades[0]));
 		json_object_set_new(rootJ, "orange_post_fade", json_integer(post_fades[1]));
 		return rootJ;
@@ -143,7 +133,7 @@ struct SchoolBus : Module {
 
 	void dataFromJson(json_t *rootJ) override {
 		json_t *input_onJ = json_object_get(rootJ, "input_on");
-		if (input_onJ) input_on = json_integer_value(input_onJ);
+		if (input_onJ) school_fader.on = json_integer_value(input_onJ);
 		json_t *blue_post_fadeJ = json_object_get(rootJ, "blue_post_fade");
 		if (blue_post_fadeJ) post_fades[0] = json_integer_value(blue_post_fadeJ);
 		json_t *orange_post_fadeJ = json_object_get(rootJ, "orange_post_fade");
