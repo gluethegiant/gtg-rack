@@ -1,6 +1,6 @@
 #include "plugin.hpp"
 #include "gtgComponents.hpp"
-
+#include "gtgDSP.hpp"
 
 struct BusDepot : Module {
 	enum ParamIds {
@@ -34,9 +34,9 @@ struct BusDepot : Module {
 	dsp::ClockDivider light_divider;
 	dsp::SchmittTrigger on_trigger;
 	dsp::SchmittTrigger on_cv_trigger;
+	AutoFader depot_fader;
 
-	bool input_on = true;
-	float onramp = 0.f;
+	const int fade_speed = 50;
 	float peak_left = 0;
 	float peak_right = 0;
 
@@ -45,33 +45,26 @@ struct BusDepot : Module {
 		configParam(ON_PARAM, 0.f, 1.f, 0.f, "Output on");
 		configParam(AUX_PARAM, 0.f, 1.f, 1.f, "Aux level in");
 		configParam(LEVEL_PARAM, 0.f, 1.f, 1.f, "Master level");
-		for (int i = 0; i < 2; i++) {vu_meters[i].lambda = 15.f;}
+		vu_meters[0].lambda = 15.f;
+		vu_meters[1].lambda = 15.f;
 		vu_divider.setDivision(512);
 		light_divider.setDivision(64);
+		depot_fader.setSpeed(fade_speed);
 	}
 
 	void process(const ProcessArgs &args) override {
 		// on off button with fader onramp to filter pops
 		if (on_trigger.process(params[ON_PARAM].getValue()) + on_cv_trigger.process(inputs[ON_CV_INPUT].getVoltage())) {
-			if (input_on) {
-				input_on = false;
-				onramp = 1;
-			} else {
-				input_on = true;
-				onramp = 0;
-			}
-		}
-		if (input_on) {   // calculate pop filter speed with sampleRate
-			if (onramp < 1) onramp += 25.f / args.sampleRate;
-		} else {
-			if (onramp > 0) onramp -= 25.f / args.sampleRate;
+			depot_fader.on = !depot_fader.on;
 		}
 
-		lights[ON_LIGHT].value = onramp;
+		depot_fader.process();
+
+		lights[ON_LIGHT].value = depot_fader.getFade();
 
 		// process sound
 		float summed_out[2] = {0.f, 0.f};
-		if (onramp > 0) {   // process only when sound is playing
+		if (depot_fader.getFade() > 0) {   // process only when sound is playing
 
 			float stereo_in[2] = {0.f, 0.f};
 
@@ -92,7 +85,7 @@ struct BusDepot : Module {
 
 			// calculate stereo mix from three stereo buses on bus input
 			for (int c = 0; c < 2; c++) {
-				summed_out[c] = (stereo_in[c] + inputs[BUS_INPUT].getPolyVoltage(c) + inputs[BUS_INPUT].getPolyVoltage(c + 2) + inputs[BUS_INPUT].getPolyVoltage(c + 4)) * master_level * onramp;
+				summed_out[c] = (stereo_in[c] + inputs[BUS_INPUT].getPolyVoltage(c) + inputs[BUS_INPUT].getPolyVoltage(c + 2) + inputs[BUS_INPUT].getPolyVoltage(c + 4)) * master_level * depot_fader.getFade();
 			}
 
 			outputs[LEFT_OUTPUT].setVoltage(summed_out[0]);
@@ -127,13 +120,21 @@ struct BusDepot : Module {
 	// save on button state
 	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
-		json_object_set_new(rootJ, "input_on", json_integer(input_on));
+		json_object_set_new(rootJ, "input_on", json_integer(depot_fader.on));
 		return rootJ;
 	}
 
 	void dataFromJson(json_t *rootJ) override {
 		json_t *input_onJ = json_object_get(rootJ, "input_on");
-		if (input_onJ) input_on = json_integer_value(input_onJ);
+		if (input_onJ) depot_fader.on = json_integer_value(input_onJ);
+	}
+
+	void onSampleRateChange() override {
+		depot_fader.setSpeed(fade_speed);
+	}
+
+	void onReset() override {
+		depot_fader.on = true;
 	}
 };
 
