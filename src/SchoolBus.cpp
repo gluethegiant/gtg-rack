@@ -60,21 +60,16 @@ struct SchoolBus : Module {
 
 	void process(const ProcessArgs &args) override {
 
-		// on off button with fader pop filter
+		// on off button uses auto fader to filter pops
 		if (on_trigger.process(params[ON_PARAM].getValue()) + on_cv_trigger.process(inputs[ON_CV_INPUT].getVoltage())) {
 			school_fader.on = !school_fader.on;
 		}
 
 		school_fader.process();
 
-		lights[ON_LIGHT].value = school_fader.getFade();
-
 		// post fader send buttons
 		if (blue_post_trigger.process(params[BLUE_POST_PARAM].getValue())) post_fades[0] = !post_fades[0];
 		if (orange_post_trigger.process(params[ORANGE_POST_PARAM].getValue())) post_fades[1] = !post_fades[1];
-
-		lights[BLUE_POST_LIGHT].value = post_fades[0];
-		lights[ORANGE_POST_LIGHT].value = post_fades[1];
 
 		// get input levels
 		float in_levels[3] = {0.f, 0.f, 0.f};
@@ -89,7 +84,7 @@ struct SchoolBus : Module {
 			}
 		}
 
-		// get stereo pan levels
+		// get stereo pan levels and set lights
 		if (pan_divider.process()) {   // calculate pan infrequently, useful for auto panning
 			if (inputs[PAN_CV_INPUT].isConnected()) {
 				float pan_pos = params[PAN_PARAM].getValue() + (((inputs[PAN_CV_INPUT].getNormalVoltage(0) * 2) * params[PAN_ATT_PARAM].getValue()) * 0.1);
@@ -97,6 +92,10 @@ struct SchoolBus : Module {
 			} else {
 				school_pan.setPan(params[PAN_PARAM].getValue());
 			}
+
+			lights[ON_LIGHT].value = school_fader.getFade();   // sets lights less frequently
+			lights[BLUE_POST_LIGHT].value = post_fades[0];
+			lights[ORANGE_POST_LIGHT].value = post_fades[1];
 		}
 
 		// process inputs
@@ -123,7 +122,7 @@ struct SchoolBus : Module {
 		outputs[BUS_OUTPUT].setChannels(6);
 	}
 
-	// save on and post_fade send button states
+	// load on, post fades, and gain states
 	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
 		json_object_set_new(rootJ, "input_on", json_integer(school_fader.on));
@@ -133,6 +132,7 @@ struct SchoolBus : Module {
 		return rootJ;
 	}
 
+	// load on, post fades, and gain states
 	void dataFromJson(json_t *rootJ) override {
 		json_t *input_onJ = json_object_get(rootJ, "input_on");
 		if (input_onJ) school_fader.on = json_integer_value(input_onJ);
@@ -144,13 +144,17 @@ struct SchoolBus : Module {
 		if (gainJ) school_fader.setGain((float)json_real_value(gainJ));
 	}
 
+	// reset fader speed on sample rate change
 	void onSampleRateChange() override {
 		school_fader.setSpeed(fade_speed);
 	}
 
+	// Initialize on state and post fades
 	void onReset() override {
 		school_fader.on = true;
 		school_fader.setGain(1.f);
+		post_fades[0] = false;
+		post_fades[1] = false;
 	}
 };
 
@@ -160,33 +164,33 @@ struct SchoolBusWidget : ModuleWidget {
 		setModule(module);
 		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/SchoolBus.svg")));
 
-		addChild(createWidget<ScrewUp>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewUp>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewUp>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewUp>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<gtgScrewUp>(Vec(RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<gtgScrewUp>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<gtgScrewUp>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<gtgScrewUp>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addParam(createParamCentered<BlackButton>(mm2px(Vec(15.24, 15.20)), module, SchoolBus::ON_PARAM));
+		addParam(createParamCentered<gtgBlackButton>(mm2px(Vec(15.24, 15.20)), module, SchoolBus::ON_PARAM));
 		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(15.24, 15.20)), module, SchoolBus::ON_LIGHT));
-		addParam(createParamCentered<GrayTinyKnob>(mm2px(Vec(15.24, 25.9)), module, SchoolBus::PAN_ATT_PARAM));
-		addParam(createParamCentered<GrayKnob>(mm2px(Vec(15.24, 41.0)), module, SchoolBus::PAN_PARAM));
-		addParam(createParamCentered<BlueKnob>(mm2px(Vec(15.24, 59.2)), module, SchoolBus::LEVEL_PARAMS + 0));
-		addParam(createParamCentered<OrangeKnob>(mm2px(Vec(15.24, 77.4)), module, SchoolBus::LEVEL_PARAMS + 1));
-		addParam(createParamCentered<RedKnob>(mm2px(Vec(15.24, 95.55)), module, SchoolBus::LEVEL_PARAMS + 2));
-		addParam(createParamCentered<BlackButton>(mm2px(Vec(5.3, 59.2)), module, SchoolBus::BLUE_POST_PARAM));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(5.3, 59.2)), module, SchoolBus::BLUE_POST_LIGHT));
-		addParam(createParamCentered<BlackButton>(mm2px(Vec(5.3, 77.4)), module, SchoolBus::ORANGE_POST_PARAM));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(5.3, 77.4)), module, SchoolBus::ORANGE_POST_LIGHT));
+		addParam(createParamCentered<gtgGrayTinyKnob>(mm2px(Vec(15.24, 25.9)), module, SchoolBus::PAN_ATT_PARAM));
+		addParam(createParamCentered<gtgGrayKnob>(mm2px(Vec(15.24, 43.0)), module, SchoolBus::PAN_PARAM));
+		addParam(createParamCentered<gtgBlueKnob>(mm2px(Vec(15.24, 61.0)), module, SchoolBus::LEVEL_PARAMS + 0));
+		addParam(createParamCentered<gtgOrangeKnob>(mm2px(Vec(15.24, 79.13)), module, SchoolBus::LEVEL_PARAMS + 1));
+		addParam(createParamCentered<gtgRedKnob>(mm2px(Vec(15.24, 97.29)), module, SchoolBus::LEVEL_PARAMS + 2));
+		addParam(createParamCentered<gtgBlackButton>(mm2px(Vec(4.58, 61.0)), module, SchoolBus::BLUE_POST_PARAM));
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(4.58, 61.0)), module, SchoolBus::BLUE_POST_LIGHT));
+		addParam(createParamCentered<gtgBlackButton>(mm2px(Vec(4.58, 79.13)), module, SchoolBus::ORANGE_POST_PARAM));
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(4.58, 79.13)), module, SchoolBus::ORANGE_POST_LIGHT));
 
-		addInput(createInputCentered<NutPort>(mm2px(Vec(7.45, 21.1)), module, SchoolBus::LMP_INPUT));
-		addInput(createInputCentered<NutPort>(mm2px(Vec(7.45, 31.2)), module, SchoolBus::R_INPUT));
-		addInput(createInputCentered<KeyPort>(mm2px(Vec(23.1, 21.1)), module, SchoolBus::ON_CV_INPUT));
-		addInput(createInputCentered<KeyPort>(mm2px(Vec(23.1, 31.2)), module, SchoolBus::PAN_CV_INPUT));
-		addInput(createInputCentered<KeyPort>(mm2px(Vec(24.6, 51.1)), module, SchoolBus::LEVEL_CV_INPUTS + 0));
-		addInput(createInputCentered<KeyPort>(mm2px(Vec(24.6, 69.3)), module, SchoolBus::LEVEL_CV_INPUTS + 1));
-		addInput(createInputCentered<KeyPort>(mm2px(Vec(24.6, 87.5)), module, SchoolBus::LEVEL_CV_INPUTS + 2));
-		addInput(createInputCentered<NutPort>(mm2px(Vec(7.45, 114.1)), module, SchoolBus::BUS_INPUT));
+		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(6.95, 21.1)), module, SchoolBus::LMP_INPUT));
+		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(6.95, 31.23)), module, SchoolBus::R_INPUT));
+		addInput(createInputCentered<gtgKeyPort>(mm2px(Vec(23.6, 21.1)), module, SchoolBus::ON_CV_INPUT));
+		addInput(createInputCentered<gtgKeyPort>(mm2px(Vec(23.6, 31.23)), module, SchoolBus::PAN_CV_INPUT));
+		addInput(createInputCentered<gtgKeyPort>(mm2px(Vec(25.07, 52.63)), module, SchoolBus::LEVEL_CV_INPUTS + 0));
+		addInput(createInputCentered<gtgKeyPort>(mm2px(Vec(25.07, 70.79)), module, SchoolBus::LEVEL_CV_INPUTS + 1));
+		addInput(createInputCentered<gtgKeyPort>(mm2px(Vec(25.07, 89.0)), module, SchoolBus::LEVEL_CV_INPUTS + 2));
+		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(7.45, 114.1)), module, SchoolBus::BUS_INPUT));
 
-		addOutput(createOutputCentered<NutPort>(mm2px(Vec(23.1, 114.1)), module, SchoolBus::BUS_OUTPUT));
+		addOutput(createOutputCentered<gtgNutPort>(mm2px(Vec(23.1, 114.1)), module, SchoolBus::BUS_OUTPUT));
 	}
 
 	// add gain levels to context menu
@@ -194,7 +198,7 @@ struct SchoolBusWidget : ModuleWidget {
 		SchoolBus* module = dynamic_cast<SchoolBus*>(this->module);
 
 		menu->addChild(new MenuEntry);
-		menu->addChild(createMenuLabel("Gain Level"));
+		menu->addChild(createMenuLabel("Input Gain"));
 
 		struct GainItem : MenuItem {
 			SchoolBus* module;
@@ -204,7 +208,7 @@ struct SchoolBusWidget : ModuleWidget {
 			}
 		};
 
-		std::string gainTitles[3] = {"1.0x", "1.5x", "2.0x"};
+		std::string gainTitles[3] = {"100% (default)", "150%", "200%"};
 		float gainAmounts[3] = {1.f, 1.5f, 2.f};
 		for (int i = 0; i < 3; i++) {
 			GainItem* gainItem = createMenuItem<GainItem>(gainTitles[i]);
