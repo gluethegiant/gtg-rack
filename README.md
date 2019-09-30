@@ -124,6 +124,10 @@ v. 1.0.1 Metro City Bus Release (September 23, 2019)
 - Minor CPU optimizations
 - Small UI enhancements, including a better 70's cream color
 
+Note: Some VCV patches saved with version 1.0.0 of the modular bus mixers will need to have levels reset.
+The developer thought parameters were being saved by their names.
+He now knows parameters are saved by their order.
+
 v. 1.0.0 Initial VCV Rack Library Release (September 6, 2019)
 
 - Peak indicators on Bus Depot are now sample accurate
