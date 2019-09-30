@@ -41,7 +41,7 @@ struct MiniBus : Module {
 
 	void process(const ProcessArgs &args) override {
 
-		// on off button with quick fader to filter pops
+		// on off button controls auto fader to prevent pops
 		if (on_trigger.process(params[ON_PARAM].getValue()) + on_cv_trigger.process(inputs[ON_CV_INPUT].getVoltage())) {
 			mini_fader.on = !mini_fader.on;
 		}
@@ -66,7 +66,7 @@ struct MiniBus : Module {
 		outputs[BUS_OUTPUT].setChannels(6);
 	}
 
-	// save on button state
+	// save on button and gain states
 	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
 		json_object_set_new(rootJ, "input_on", json_integer(mini_fader.on));
@@ -74,6 +74,7 @@ struct MiniBus : Module {
 		return rootJ;
 	}
 
+	// load on button and gain states
 	void dataFromJson(json_t *rootJ) override {
 		json_t *input_onJ = json_object_get(rootJ, "input_on");
 		if (input_onJ) mini_fader.on = json_integer_value(input_onJ);
@@ -81,10 +82,12 @@ struct MiniBus : Module {
 		if (gainJ) mini_fader.setGain((float)json_real_value(gainJ));
 	}
 
+	// reset fader speed
 	void onSampleRateChange() override {
 		mini_fader.setSpeed(fade_speed);
 	}
 
+	// reset fader on state when initialized
 	void onReset() override {
 		mini_fader.on = true;
 		mini_fader.setGain(1.f);
@@ -97,38 +100,38 @@ struct MiniBusWidget : ModuleWidget {
 		setModule(module);
 		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/MiniBus.svg")));
 
-		addChild(createWidget<ScrewUp>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewUp>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<gtgScrewUp>(Vec(RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<gtgScrewUp>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addParam(createParamCentered<BlackButton>(mm2px(Vec(7.62, 15.20)), module, MiniBus::ON_PARAM));
+		addParam(createParamCentered<gtgBlackButton>(mm2px(Vec(7.62, 15.20)), module, MiniBus::ON_PARAM));
 		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(7.62, 15.20)), module, MiniBus::ON_LIGHT));
-		addParam(createParamCentered<BlueKnob>(mm2px(Vec(7.62, 51.5)), module, MiniBus::LEVEL_PARAMS + 0));
-		addParam(createParamCentered<OrangeKnob>(mm2px(Vec(7.62, 67.25)), module, MiniBus::LEVEL_PARAMS + 1));
-		addParam(createParamCentered<RedKnob>(mm2px(Vec(7.62, 83.0)), module, MiniBus::LEVEL_PARAMS + 2));
+		addParam(createParamCentered<gtgBlueKnob>(mm2px(Vec(7.62, 51.0)), module, MiniBus::LEVEL_PARAMS + 0));
+		addParam(createParamCentered<gtgOrangeKnob>(mm2px(Vec(7.62, 67.75)), module, MiniBus::LEVEL_PARAMS + 1));
+		addParam(createParamCentered<gtgRedKnob>(mm2px(Vec(7.62, 84.5)), module, MiniBus::LEVEL_PARAMS + 2));
 
-		addInput(createInputCentered<KeyPort>(mm2px(Vec(7.62, 23.20)), module, MiniBus::ON_CV_INPUT));
-		addInput(createInputCentered<NutPort>(mm2px(Vec(7.62, 35.4)), module, MiniBus::MP_INPUT));
-		addInput(createInputCentered<NutPort>(mm2px(Vec(7.62, 103.85)), module, MiniBus::BUS_INPUT));
+		addInput(createInputCentered<gtgKeyPort>(mm2px(Vec(7.62, 23.20)), module, MiniBus::ON_CV_INPUT));
+		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(7.62, 35.4)), module, MiniBus::MP_INPUT));
+		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(7.62, 103.85)), module, MiniBus::BUS_INPUT));
 
-		addOutput(createOutputCentered<NutPort>(mm2px(Vec(7.62, 114.1)), module, MiniBus::BUS_OUTPUT));
+		addOutput(createOutputCentered<gtgNutPort>(mm2px(Vec(7.62, 114.1)), module, MiniBus::BUS_OUTPUT));
 	}
 
 	// add gain levels to context menu
+	struct GainItem : MenuItem {
+		MiniBus* module;
+		float gain;
+		void onAction(const event::Action& e) override {
+			module->mini_fader.setGain(gain);
+		}
+	};
+
 	void appendContextMenu(Menu* menu) override {
 		MiniBus* module = dynamic_cast<MiniBus*>(this->module);
 
 		menu->addChild(new MenuEntry);
-		menu->addChild(createMenuLabel("Gain Level"));
+		menu->addChild(createMenuLabel("Input Gain"));
 
-		struct GainItem : MenuItem {
-			MiniBus* module;
-			float gain;
-			void onAction(const event::Action& e) override {
-				module->mini_fader.setGain(gain);
-			}
-		};
-
-		std::string gainTitles[3] = {"1.0x", "1.5x", "2.0x"};
+		std::string gainTitles[3] = {"100% (default)", "150%", "200%"};
 		float gainAmounts[3] = {1.f, 1.5f, 2.f};
 		for (int i = 0; i < 3; i++) {
 			GainItem* gainItem = createMenuItem<GainItem>(gainTitles[i]);
