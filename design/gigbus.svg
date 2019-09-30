@@ -2707,17 +2707,17 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.0618878"
-     inkscape:cx="-201.37263"
-     inkscape:cy="257.71793"
+     inkscape:zoom="3.0034722"
+     inkscape:cx="-4.2880777"
+     inkscape:cy="195.17062"
      inkscape:document-units="mm"
      inkscape:current-layer="layer3"
      showgrid="false"
-     inkscape:window-width="1887"
-     inkscape:window-height="1052"
-     inkscape:window-x="33"
+     inkscape:window-width="956"
+     inkscape:window-height="1050"
+     inkscape:window-x="1920"
      inkscape:window-y="0"
-     inkscape:window-maximized="1"
+     inkscape:window-maximized="0"
      objecttolerance="1"
      guidetolerance="1"
      gridtolerance="1"
@@ -2794,12 +2794,12 @@
          sodipodi:role="line">R</tspan></text>
     <text
        id="text5546"
-       y="237.67987"
+       y="237.42987"
        x="8.0271244"
        style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;line-height:1.25;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';letter-spacing:0px;word-spacing:0px;fill:#333333;fill-opacity:1;stroke:none;stroke-width:0.26458332"
        xml:space="preserve"><tspan
          style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';fill:#333333;stroke-width:0.26458332"
-         y="237.67987"
+         y="237.42987"
          x="8.0271244"
          id="tspan5544"
          sodipodi:role="line">PAN</tspan></text>
@@ -3227,7 +3227,7 @@
        r="3.0391908" />
     <g
        id="g825"
-       transform="translate(7.1371626,-278.7382)">
+       transform="rotate(180,6.59108,154.6084)">
       <path
          d="m 6.0425,293.97772 c 0,1.66777 -1.3524739,3.01978 -3.0202228,3.01978 -1.6675245,0 -3.01977723,-1.35201 -3.01977723,-3.01978 0,-1.66844 1.35225273,-3.02022 3.01977723,-3.02022 1.6677489,0 3.0202228,1.35178 3.0202228,3.02022"
          style="display:inline;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.28764027"
@@ -3379,12 +3379,12 @@
     </g>
     <circle
        r="5.7505164"
-       cy="62.20871"
+       cy="61.95871"
        cx="10.127304"
        id="circle7117"
        style="display:inline;fill:#000000;fill-opacity:0.09803922;stroke:none;stroke-width:1.07013404;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.56593407" />
     <g
-       transform="matrix(1.0964639,0,0,1.0964639,4.0967544,-258.79953)"
+       transform="matrix(1.0736263,0,0,1.0736263,4.2223614,-252.14236)"
        id="g7960">
       <path
          inkscape:connector-curvature="0"
@@ -3411,7 +3411,7 @@
        id="circle7117-3"
        style="display:inline;fill:#000000;fill-opacity:0.09803922;stroke:none;stroke-width:1.08172596;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.56593407" />
     <g
-       transform="matrix(1.0964639,0,0,1.0964639,4.1571588,-233.57997)"
+       transform="matrix(1.0736263,0,0,1.0736263,4.2827658,-226.9228)"
        id="g9808">
       <path
          inkscape:connector-curvature="0"
