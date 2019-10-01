@@ -69,12 +69,14 @@ struct ConstantPan {
 	}
 
 	void setSmoothPan(float new_position) {
-		if (new_position > position)  {
-			position = std::fmin(position + delta, new_position);
-		} else {
-			position = std::fmax(position - delta, new_position);
+		if (new_position != position) {
+			if (new_position > position)  {
+				position = std::fmin(position + delta, new_position);
+			} else {
+				position = std::fmax(position - delta, new_position);
+			}
+			setLevels(position);
 		}
-		setLevels(position);
 	}
 
 	float getLevel(int index) {
