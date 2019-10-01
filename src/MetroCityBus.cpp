@@ -57,6 +57,8 @@ struct MetroCityBus : Module {
 	bool post_fades[2] = {false, false};
 	float spread_pos = 0.f;
 	int channel_no = 0;
+	float light_pan[16] = {};
+	float light_delta = 2.f / 8.f;   // 8 divisions because light 1 and 9 are halved by offset
 	float light_brights[9] = {};
 	long f_delay = 0;   // follow delay
 	float pan_rate = APP->engine->getSampleRate() / 3.f;   // sample rate divided by pan clock divider
@@ -76,9 +78,7 @@ struct MetroCityBus : Module {
 		pan_divider.setDivision(3);
 		light_divider.setDivision(64);
 		metro_fader.setSpeed(fade_speed);
-		for (int i = 0; i < 16; i++) {
-			metro_pan[i].setSmoothSpeed(smooth_speed);
-		}
+		initializePanObjects();
 	}
 
 	void process(const ProcessArgs &args) override {
@@ -120,6 +120,7 @@ struct MetroCityBus : Module {
 				// get pan knob with CV and attenuator
 				float pan_pos = params[PAN_PARAM].getValue() + (((inputs[PAN_CV_INPUT].getNormalVoltage(0) * 2) * params[PAN_ATT_PARAM].getValue()) * 0.1f);
 				metro_pan[0].setPan(pan_pos);   // no smoothing on first channel's pan
+				light_pan[0] = metro_pan[0].position;   // pan position for lights
 
 				// spread is only 0 to 1 for pan follow
 				spread_pos = std::abs(params[SPREAD_PARAM].getValue());
@@ -134,16 +135,17 @@ struct MetroCityBus : Module {
 				// calculate pan position for other channels
 				for (int c = 1; c < channel_no; c++) {
 					long follow = c * f_delay;
-					if (follow > hist_size) {   // there is not enough history to follow
-						metro_pan[c].position = 0.f;   // stay centered until history is populated
-						metro_pan[c].levels[0] = 1.f;
-						metro_pan[c].levels[1] = 1.f;
-					} else {
+					if (follow <= hist_size) {   // stay put until there is enough history to follow
 						follow = hist_i - follow;
 						if (follow < 0) follow = HISTORY_CAP + follow;   // fix follow when buffer resets to 0
 
 						// smooth pan for dynamic channels and history catch up
-						metro_pan[c].setSmoothPan(pan_history[follow]);
+						if (inputs[POLY_INPUT].getPolyVoltage(c) > 0.f) {
+							metro_pan[c].setSmoothPan(pan_history[follow]);   // full pan calculation if there is sound
+							light_pan[c] = metro_pan[c].position;
+						} else {
+							light_pan[c] = pan_history[follow];   // set only lights on silent channels
+						}
 					}
 				}
 
@@ -156,6 +158,8 @@ struct MetroCityBus : Module {
 
 				// Get pan and spread positions
 				metro_pan[0].setPan(params[PAN_PARAM].getValue());   // first channel is pan knob position
+				light_pan[0] = metro_pan[0].position;   // pan position for lights
+
 				spread_pos = params[SPREAD_PARAM].getValue();
 
 				// Calculate spread as portion of field between pan knob and hard left or hard right
@@ -167,13 +171,14 @@ struct MetroCityBus : Module {
 				for (int c = 1; c < channel_no; c++) {
 					float channel_pos = metro_pan[0].position + (((float)c / (float)(channel_no - 1)) * pan_spread);
 					metro_pan[c].setSmoothPan(channel_pos);
+					light_pan[c] = metro_pan[c].position;
 				}
 			}
 		}   // end pan_divider.process()
 
 		// process inputs
 		float stereo_in[2] = {0.f, 0.f};
-		if (spread_pos == 0) {   // sum channels if no spread
+		if (spread_pos == 0 && metro_pan[channel_no - 1].position == params[PAN_PARAM].getValue()) {   // sum channels if no spread
 			float sum_in = inputs[POLY_INPUT].getVoltageSum();
 			for (int c = 0; c < 2; c++) {
 				stereo_in[c] = sum_in * metro_pan[0].levels[c] * metro_fader.getFade();
@@ -218,11 +223,7 @@ struct MetroCityBus : Module {
 			if (metro_fader.on) {   // only process pan lights if input is on
 				for (int c = 0; c < channel_no; c++) {
 					for (int l = 0; l < 9; l++) {
-						float light_pan[16] = { };
-						float light_delta = 2.f / 8.f;   // 8 divisions because light 1 and 9 are halved by offset
 						float light_pos = (l * light_delta) - 1 - (light_delta / 2.f);
-
-						light_pan[c] = metro_pan[c].position;
 
 						// roll back lights when out of bounds
 						if (light_pan[c] > 1) {
@@ -300,7 +301,19 @@ struct MetroCityBus : Module {
 		reverse_poly = false;
 		post_fades[0] = false;
 		post_fades[1] = false;
+		initializePanObjects();
 	}
+
+	// initialize pan objects
+	void initializePanObjects () {
+		for (int i = 0; i < 16; i++) {
+			metro_pan[i].position = 0.f;
+			metro_pan[i].levels[0] = 1.f;
+			metro_pan[i].levels[1] = 1.f;
+			metro_pan[i].setSmoothSpeed(smooth_speed);
+		}
+	}
+
 };
 
 
