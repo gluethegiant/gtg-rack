@@ -2707,17 +2707,17 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.0618878"
-     inkscape:cx="75.537935"
-     inkscape:cy="259.60008"
+     inkscape:zoom="1.5017361"
+     inkscape:cx="97.143361"
+     inkscape:cy="248.87475"
      inkscape:document-units="mm"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="layer3"
      showgrid="false"
-     inkscape:window-width="940"
-     inkscape:window-height="1050"
-     inkscape:window-x="976"
+     inkscape:window-width="1887"
+     inkscape:window-height="1052"
+     inkscape:window-x="33"
      inkscape:window-y="0"
-     inkscape:window-maximized="0"
+     inkscape:window-maximized="1"
      objecttolerance="1"
      guidetolerance="1"
      gridtolerance="1"
@@ -3327,7 +3327,7 @@
        r="3.8320231" />
     <g
        id="g5373"
-       transform="translate(11.638663,21.556401)">
+       transform="translate(11.638663,21.809971)">
       <path
          style="fill:#999999;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.25;stroke-miterlimit:4;stroke-dasharray:none"
          d="m 18.288334,28.215189 c 0,-2.100056 1.703593,-3.803663 3.803654,-3.803663 2.100061,0 3.803654,1.703607 3.803654,3.803663 0,2.101411 -1.703593,3.803631 -3.803654,3.803631 -2.100061,0 -3.803654,-1.70222 -3.803654,-3.803631"
@@ -3363,7 +3363,7 @@
        r="3.0391908" />
     <g
        id="g1579"
-       transform="translate(5.0800587)">
+       transform="rotate(180,17.78003,15.2393)">
       <g
          transform="translate(12.217501,-278.7382)"
          id="g825">
@@ -3522,7 +3522,7 @@
        cy="51.3601"
        r="5.8065467" />
     <g
-       transform="matrix(1.0964639,0,0,1.0964639,24.222597,-267.4076)"
+       transform="matrix(1.0736263,0,0,1.0736263,24.141313,-260.79597)"
        id="g7960">
       <g
          id="g1677"
@@ -3553,7 +3553,7 @@
        id="circle7117-3"
        style="display:inline;fill:#000000;fill-opacity:0.09803922;stroke:none;stroke-width:1.0777483;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.56593407" />
     <g
-       transform="matrix(1.0964639,0,0,1.0964639,14.289508,-220.30413)"
+       transform="matrix(1.0736263,0,0,1.0736263,14.415115,-213.64696)"
        id="g9808">
       <path
          inkscape:connector-curvature="0"
@@ -3617,7 +3617,7 @@
        cy="83.974709"
        r="5.7033401" />
     <g
-       transform="matrix(1.0964639,0,0,1.0964639,14.289508,-236.73273)"
+       transform="matrix(1.0736263,0,0,1.0736263,14.415115,-230.07556)"
        id="g9192">
       <path
          inkscape:connector-curvature="0"
@@ -3809,7 +3809,7 @@
        id="circle5183"
        style="display:inline;fill:#000000;fill-opacity:0.09803922;stroke:none;stroke-width:1.0777483;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.56593407" />
     <g
-       transform="matrix(1.0964639,0,0,1.0964639,14.289508,-253.16133)"
+       transform="matrix(1.0736263,0,0,1.0736263,14.415115,-246.50416)"
        id="g8576">
       <path
          inkscape:connector-curvature="0"
@@ -3874,7 +3874,7 @@
        r="3.0391908" />
     <g
        id="g9839"
-       transform="translate(1.6166829,0.66069)">
+       transform="rotate(180,6.1445605,66.127575)">
       <g
          transform="translate(2.3137193,-228.18027)"
          id="g825-3">
@@ -3913,7 +3913,7 @@
        style="display:inline;fill:#000000;fill-opacity:0.09890113;stroke:none;stroke-width:0.56557375;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.56593407" />
     <g
        id="g9846"
-       transform="translate(1.6166829,1.33929)">
+       transform="rotate(180,6.1445605,82.216875)">
       <g
          id="g7366"
          transform="translate(2.3137193,-212.43027)">
@@ -4035,7 +4035,7 @@
     <g
        style="display:inline"
        id="g9839-5"
-       transform="translate(1.6166829,-15.77209)">
+       transform="rotate(180,6.1445606,57.911185)">
       <g
          transform="translate(2.3137193,-228.18027)"
          id="g825-3-3">

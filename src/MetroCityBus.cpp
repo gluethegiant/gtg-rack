@@ -48,7 +48,8 @@ struct MetroCityBus : Module {
 	AutoFader metro_fader;
 	ConstantPan metro_pan[16];
 
-	const int fade_speed = 20;
+	const int fade_speed = 20;   // milliseconds from 0 to gain
+	const int smooth_speed = 100;   // milliseconds from full left to full right
 	float pan_history[HISTORY_CAP] = {};
 	long hist_i = 0;
 	long hist_size = 0;
@@ -57,7 +58,8 @@ struct MetroCityBus : Module {
 	float spread_pos = 0.f;
 	int channel_no = 0;
 	float light_brights[9] = {};
-	long f_delay = 0;
+	long f_delay = 0;   // follow delay
+	float pan_rate = APP->engine->getSampleRate() / 3.f;   // sample rate divided by pan clock divider
 
 	MetroCityBus() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -74,29 +76,25 @@ struct MetroCityBus : Module {
 		pan_divider.setDivision(3);
 		light_divider.setDivision(64);
 		metro_fader.setSpeed(fade_speed);
+		for (int i = 0; i < 16; i++) {
+			metro_pan[i].setSmoothSpeed(smooth_speed);
+		}
 	}
 
 	void process(const ProcessArgs &args) override {
-		// on off button with pop filter
+		// on off button controls auto fader to avoid pops
 		if (on_trigger.process(params[ON_PARAM].getValue()) + on_cv_trigger.process(inputs[ON_CV_INPUT].getVoltage())) {
 			metro_fader.on = !metro_fader.on;
 		}
 
 		metro_fader.process();
 
-		lights[ON_LIGHT].value = metro_fader.getFade();
-
-		// get button click to reverse polyphonic pan order
+		// button to reverse polyphonic pan order
 		if (reverse_poly_trigger.process(params[REVERSE_PARAM].getValue())) reverse_poly = !reverse_poly;
-
-		lights[REVERSE_LIGHT].value = reverse_poly;
 
 		// post fader send buttons
 		if (blue_post_trigger.process(params[BLUE_POST_PARAM].getValue())) post_fades[0] = !post_fades[0];
 		if (orange_post_trigger.process(params[ORANGE_POST_PARAM].getValue())) post_fades[1] = !post_fades[1];
-
-		lights[BLUE_POST_LIGHT].value = post_fades[0];
-		lights[ORANGE_POST_LIGHT].value = post_fades[1];
 
 		// get level knobs
 		float in_levels[3] = {0.f, 0.f, 0.f};
@@ -111,26 +109,27 @@ struct MetroCityBus : Module {
 			}
 		}
 
+		// get number of channels
+		channel_no = inputs[POLY_INPUT].getChannels();
+
 		// pans
-		if (pan_divider.process() && metro_fader.on) {   // calculate pan every few samples
-			channel_no = inputs[POLY_INPUT].getChannels();
+		if (pan_divider.process() && metro_fader.on) {   // calculate pan every few samples when input is on
 
 			if (inputs[PAN_CV_INPUT].isConnected()) {   // create follow pan when CV connected
-				float pan_delta = 25.f / args.sampleRate;   // for pan smoothing
 
 				// get pan knob with CV and attenuator
 				float pan_pos = params[PAN_PARAM].getValue() + (((inputs[PAN_CV_INPUT].getNormalVoltage(0) * 2) * params[PAN_ATT_PARAM].getValue()) * 0.1f);
-				metro_pan[0].setPan(pan_pos);
+				metro_pan[0].setPan(pan_pos);   // no smoothing on first channel's pan
 
-				// follow spread is 0 to 1
+				// spread is only 0 to 1 for pan follow
 				spread_pos = std::abs(params[SPREAD_PARAM].getValue());
 
-				// Store pan history
+				// Store pan history of first channel
 				if (hist_i >= HISTORY_CAP) hist_i = 0;   // reset history buffer index
 				pan_history[hist_i] = metro_pan[0].position;
 
-				// Calculate delay for follow
-				f_delay = std::round(spread_pos * (args.sampleRate / pan_divider.getDivision()));   // f_delay * 16 should not be more than HISTORY_CAP
+				// Calculate delay for pan
+				f_delay = std::round(spread_pos * pan_rate);   // f_delay * 16 should not be more than HISTORY_CAP
 
 				// calculate pan position for other channels
 				for (int c = 1; c < channel_no; c++) {
@@ -144,35 +143,30 @@ struct MetroCityBus : Module {
 						if (follow < 0) follow = HISTORY_CAP + follow;   // fix follow when buffer resets to 0
 
 						// smooth pan for dynamic channels and history catch up
-						metro_pan[c].setPan(smooth_pan(pan_history[follow], metro_pan[c].position, pan_delta));
+						metro_pan[c].setSmoothPan(pan_history[follow]);
 					}
 				}
 
 				hist_i++;   // Keep history buffer rolling
 				if (hist_size < HISTORY_CAP) hist_size++;
 
-			} else {
+			} else {   // create spread pan when no CV connected
 
-				// create spread pan when no CV connected
 				hist_size = 0; hist_i = 0;   // reset pan history when CV not connected
-				float pan_delta = 10.f / args.sampleRate;   // accommodate delta for pan_divider clock
 
 				// Get pan and spread positions
 				metro_pan[0].setPan(params[PAN_PARAM].getValue());   // first channel is pan knob position
 				spread_pos = params[SPREAD_PARAM].getValue();
 
-				// Spread evenly over available stereo field
+				// Calculate spread as portion of field between pan knob and hard left or hard right
 				float pan_spread = 0.f;
 				if (spread_pos < 0) pan_spread = (metro_pan[0].position + 1) * spread_pos;
 				if (spread_pos > 0) pan_spread = -1 * ((metro_pan[0].position - 1) * spread_pos);
 
 				// calculate polyphonic spread and pan levels for other channels
 				for (int c = 1; c < channel_no; c++) {
-
-					float last_pan = metro_pan[c].position;
 					float channel_pos = metro_pan[0].position + (((float)c / (float)(channel_no - 1)) * pan_spread);
-
-					metro_pan[c].setPan(smooth_pan(channel_pos, last_pan, pan_delta));
+					metro_pan[c].setSmoothPan(channel_pos);
 				}
 			}
 		}   // end pan_divider.process()
@@ -212,60 +206,60 @@ struct MetroCityBus : Module {
 		// set bus outputs for 3 stereo buses out
 		outputs[BUS_OUTPUT].setChannels(6);
 
-		// set pan lights
-		if (light_divider.process() && metro_fader.on) {   // set lights infrequently
-			for (int c = 0; c < channel_no; c++) {
-				for (int l = 0; l < 9; l++) {
-					float light_pan[16] = { };
-					float light_delta = 2.f / 8.f;   // 8 divisions because light 1 and 9 are halved by offset
-					float light_pos = (l * light_delta) - 1 - (light_delta / 2.f);
+		// set lights
+		if (light_divider.process()) {   // set lights infrequently
 
-					light_pan[c] = metro_pan[c].position;
+			// button light states
+			lights[ON_LIGHT].value = metro_fader.getFade();
+			lights[REVERSE_LIGHT].value = reverse_poly;
+			lights[BLUE_POST_LIGHT].value = post_fades[0];
+			lights[ORANGE_POST_LIGHT].value = post_fades[1];
 
-					// roll back lights when out of bounds
-					if (light_pan[c] > 1) {
-						light_pan[c] = 1.f - (light_pan[c] - 1.f);
-					} else {
-						if (light_pan[c] < -1) {
-							light_pan[c] = std::abs(light_pan[c] + 1.f) + -1.f;
-						}
-					}
+			if (metro_fader.on) {   // only process pan lights if input is on
+				for (int c = 0; c < channel_no; c++) {
+					for (int l = 0; l < 9; l++) {
+						float light_pan[16] = { };
+						float light_delta = 2.f / 8.f;   // 8 divisions because light 1 and 9 are halved by offset
+						float light_pos = (l * light_delta) - 1 - (light_delta / 2.f);
 
-					// set light brightness
-					if (light_pan[c] >= light_pos && light_pan[c] < light_pos + light_delta) {
-						int flipper = c;
-						if (reverse_poly) flipper = channel_no - 1 - c;
-						if (inputs[POLY_INPUT].getVoltage(flipper) * 0.1f > light_brights[l]) {
-							light_brights[l] = inputs[POLY_INPUT].getVoltage(flipper) * 0.11f;
+						light_pan[c] = metro_pan[c].position;
+
+						// roll back lights when out of bounds
+						if (light_pan[c] > 1) {
+							light_pan[c] = 1.f - (light_pan[c] - 1.f);
 						} else {
-							if (light_brights[l] < 0.18f) light_brights[l] = 0.18f;   // light visible for quiet channel
+							if (light_pan[c] < -1) {
+								light_pan[c] = std::abs(light_pan[c] + 1.f) + -1.f;
+							}
 						}
+
+						// set initial pan light brightness
+						if (light_pan[c] >= light_pos && light_pan[c] < light_pos + light_delta) {
+							int flipper = c;   // used to flip lights when reverse channel button is on
+							if (reverse_poly) flipper = channel_no - 1 - c;   // channel flipping for reverse poly
+							if (inputs[POLY_INPUT].getVoltage(flipper) * 0.1f > light_brights[l]) {
+								light_brights[l] = inputs[POLY_INPUT].getVoltage(flipper) * 0.12f; 
+							} else {
+								if (light_brights[l] < 0.18f) light_brights[l] = 0.18f;   // light visible for quiet channel
+							}
+						}
+					}   // for l lights
+				}   // for c channels
+
+				// process changes to pan light brightness
+				for (int l = 0; l < 9; l++) {
+					if (light_brights[l] > 0) {
+						lights[PAN_LIGHTS + l].value = light_brights[l];
+						light_brights[l] -= 1000 / args.sampleRate;
 					}
 				}
+			} else {   // turn off pan lights if input is off
+				for (int l = 0; l < 9; l++) lights[PAN_LIGHTS + l].value = 0;
 			}
-
-			// assign light brightness to lights
-			for (int l = 0; l < 9; l++) {
-				if (light_brights[l] > 0) {
-					lights[PAN_LIGHTS + l].value = light_brights[l];
-					light_brights[l] -= 1000 / args.sampleRate;
-				}
-			}
-		} else {
-			if (!metro_fader.on) {
-				for (int l = 0; l < 9; l++) lights[PAN_LIGHTS + l].value = 0;   // turn off pan lights
-			}
-		}
-	}
-	float smooth_pan(float pan, float last, float delta) {
-		if (pan > last) {
-			return std::fmin(last + delta, pan);
-		} else {
-			return std::fmax(last - delta, pan);
-		}
+		}   // light divider
 	}
 
-	// save on and post_fade send button states
+	// save on, post and reverse buttons, and gain states
 	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
 		json_object_set_new(rootJ, "input_on", json_integer(metro_fader.on));
@@ -276,6 +270,7 @@ struct MetroCityBus : Module {
 		return rootJ;
 	}
 
+	// load on, post and reverse buttons, and gain states
 	void dataFromJson(json_t *rootJ) override {
 		json_t *input_onJ = json_object_get(rootJ, "input_on");
 		if (input_onJ) metro_fader.on = json_integer_value(input_onJ);
@@ -289,13 +284,22 @@ struct MetroCityBus : Module {
 		if (gainJ) metro_fader.setGain((float)json_real_value(gainJ));
 	}
 
+	// recalculate fader, pan smoothing, and pan_rate (used by pan follow)
 	void onSampleRateChange() override {
 		metro_fader.setSpeed(fade_speed);
+		for (int i = 0; i < 16; i++) {
+			metro_pan[i].setSmoothSpeed(smooth_speed);
+		}
+		pan_rate = (APP->engine->getSampleRate() / 3.f);   // used by pan follow, should match pan clock divider
 	}
 
+	// Initialize on state and buttons
 	void onReset() override {
 		metro_fader.on = true;
 		metro_fader.setGain(1.f);
+		reverse_poly = false;
+		post_fades[0] = false;
+		post_fades[1] = false;
 	}
 };
 
@@ -310,48 +314,48 @@ struct MetroCityBusWidget : ModuleWidget {
 		addChild(createWidget<ScrewUp>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewUp>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addParam(createParamCentered<BlackButton>(mm2px(Vec(20.32, 15.20)), module, MetroCityBus::ON_PARAM));
+		addParam(createParamCentered<gtgBlackButton>(mm2px(Vec(20.32, 15.20)), module, MetroCityBus::ON_PARAM));
 		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(20.32, 15.20)), module, MetroCityBus::ON_LIGHT));
-		addParam(createParamCentered<GrayTinyKnob>(mm2px(Vec(12.379, 39.983)), module, MetroCityBus::SPREAD_PARAM));
-		addParam(createParamCentered<GrayTinyKnob>(mm2px(Vec(28.072, 39.983)), module, MetroCityBus::PAN_ATT_PARAM));
-		addParam(createParamCentered<BlackButton>(mm2px(Vec(7.453, 50.025)), module, MetroCityBus::REVERSE_PARAM));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(7.453, 50.025)), module, MetroCityBus::REVERSE_LIGHT));
-		addParam(createParamCentered<GrayKnob>(mm2px(Vec(20.32, 50.025)), module, MetroCityBus::PAN_PARAM));
-		addParam(createParamCentered<BlackButton>(mm2px(Vec(7.453, 66.208)), module, MetroCityBus::BLUE_POST_PARAM));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(7.453, 66.208)), module, MetroCityBus::BLUE_POST_LIGHT));
-		addParam(createParamCentered<BlueKnob>(mm2px(Vec(20.32, 66.208)), module, MetroCityBus::LEVEL_PARAMS + 0));
-		addParam(createParamCentered<BlackButton>(mm2px(Vec(7.453, 82.387)), module, MetroCityBus::ORANGE_POST_PARAM));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(7.453, 82.387)), module, MetroCityBus::ORANGE_POST_LIGHT));
-		addParam(createParamCentered<OrangeKnob>(mm2px(Vec(20.32, 82.387)), module, MetroCityBus::LEVEL_PARAMS + 1));
-		addParam(createParamCentered<RedKnob>(mm2px(Vec(20.32, 98.565)), module, MetroCityBus::LEVEL_PARAMS + 2));
+		addParam(createParamCentered<gtgGrayTinyKnob>(mm2px(Vec(11.379, 39.74)), module, MetroCityBus::SPREAD_PARAM));
+		addParam(createParamCentered<gtgGrayTinyKnob>(mm2px(Vec(29.06, 39.74)), module, MetroCityBus::PAN_ATT_PARAM));
+		addParam(createParamCentered<gtgBlackButton>(mm2px(Vec(6.95, 50.01)), module, MetroCityBus::REVERSE_PARAM));
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(6.95, 50.01)), module, MetroCityBus::REVERSE_LIGHT));
+		addParam(createParamCentered<gtgGrayKnob>(mm2px(Vec(20.32, 50.01)), module, MetroCityBus::PAN_PARAM));
+		addParam(createParamCentered<gtgBlackButton>(mm2px(Vec(6.95, 66.46)), module, MetroCityBus::BLUE_POST_PARAM));
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(6.95, 66.46)), module, MetroCityBus::BLUE_POST_LIGHT));
+		addParam(createParamCentered<gtgBlueKnob>(mm2px(Vec(20.32, 66.46)), module, MetroCityBus::LEVEL_PARAMS + 0));
+		addParam(createParamCentered<gtgBlackButton>(mm2px(Vec(6.95, 82.87)), module, MetroCityBus::ORANGE_POST_PARAM));
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(6.95, 82.87)), module, MetroCityBus::ORANGE_POST_LIGHT));
+		addParam(createParamCentered<gtgOrangeKnob>(mm2px(Vec(20.32, 82.87)), module, MetroCityBus::LEVEL_PARAMS + 1));
+		addParam(createParamCentered<gtgRedKnob>(mm2px(Vec(20.32, 99.32)), module, MetroCityBus::LEVEL_PARAMS + 2));
 
-		addInput(createInputCentered<NutPort>(mm2px(Vec(7.453, 21.083)), module, MetroCityBus::POLY_INPUT));
-		addInput(createInputCentered<KeyPort>(mm2px(Vec(33.231, 21.083)), module, MetroCityBus::ON_CV_INPUT));
-		addInput(createInputCentered<KeyPort>(mm2px(Vec(33.231, 50.025)), module, MetroCityBus::PAN_CV_INPUT));
-		addInput(createInputCentered<KeyPort>(mm2px(Vec(33.231, 66.208)), module, MetroCityBus::LEVEL_CV_INPUTS + 0));
-		addInput(createInputCentered<KeyPort>(mm2px(Vec(33.231, 82.387)), module, MetroCityBus::LEVEL_CV_INPUTS + 1));
-		addInput(createInputCentered<KeyPort>(mm2px(Vec(33.231, 98.565)), module, MetroCityBus::LEVEL_CV_INPUTS + 2));
-		addInput(createInputCentered<NutPort>(mm2px(Vec(7.457, 114.107)), module, MetroCityBus::BUS_INPUT));
+		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(7.44, 21.083)), module, MetroCityBus::POLY_INPUT));
+		addInput(createInputCentered<gtgKeyPort>(mm2px(Vec(33.231, 21.083)), module, MetroCityBus::ON_CV_INPUT));
+		addInput(createInputCentered<gtgKeyPort>(mm2px(Vec(33.73, 50.01)), module, MetroCityBus::PAN_CV_INPUT));
+		addInput(createInputCentered<gtgKeyPort>(mm2px(Vec(33.73, 66.46)), module, MetroCityBus::LEVEL_CV_INPUTS + 0));
+		addInput(createInputCentered<gtgKeyPort>(mm2px(Vec(33.73, 82.87)), module, MetroCityBus::LEVEL_CV_INPUTS + 1));
+		addInput(createInputCentered<gtgKeyPort>(mm2px(Vec(33.73, 99.32)), module, MetroCityBus::LEVEL_CV_INPUTS + 2));
+		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(7.44, 114.107)), module, MetroCityBus::BUS_INPUT));
 
-		addOutput(createOutputCentered<NutPort>(mm2px(Vec(33.231, 114.107)), module, MetroCityBus::BUS_OUTPUT));
+		addOutput(createOutputCentered<gtgNutPort>(mm2px(Vec(33.231, 114.107)), module, MetroCityBus::BUS_OUTPUT));
 
-		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(4.423, 33.841)), module, MetroCityBus::PAN_LIGHTS + 0));
-		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(8.401, 32.341)), module, MetroCityBus::PAN_LIGHTS + 1));
-		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(12.379, 31.341)), module, MetroCityBus::PAN_LIGHTS + 2));
-		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(16.357, 30.841)), module, MetroCityBus::PAN_LIGHTS + 3));
-		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(20.335, 30.591)), module, MetroCityBus::PAN_LIGHTS + 4));
-		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(24.313, 30.841)), module, MetroCityBus::PAN_LIGHTS + 5));
-		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(28.292, 31.341)), module, MetroCityBus::PAN_LIGHTS + 6));
-		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(32.27, 32.341)), module, MetroCityBus::PAN_LIGHTS + 7));
-		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(36.248, 33.841)), module, MetroCityBus::PAN_LIGHTS + 8));
+		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(4.423, 33.341)), module, MetroCityBus::PAN_LIGHTS + 0));
+		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(8.401, 31.86)), module, MetroCityBus::PAN_LIGHTS + 1));
+		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(12.379, 30.83)), module, MetroCityBus::PAN_LIGHTS + 2));
+		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(16.357, 30.33)), module, MetroCityBus::PAN_LIGHTS + 3));
+		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(20.335, 30.08)), module, MetroCityBus::PAN_LIGHTS + 4));
+		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(24.313, 30.33)), module, MetroCityBus::PAN_LIGHTS + 5));
+		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(28.292, 30.83)), module, MetroCityBus::PAN_LIGHTS + 6));
+		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(32.27, 31.86)), module, MetroCityBus::PAN_LIGHTS + 7));
+		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(36.248, 33.341)), module, MetroCityBus::PAN_LIGHTS + 8));
 	}
 
-	// add gain levels to context menu
+	// add gain options to context menu
 	void appendContextMenu(Menu* menu) override {
 		MetroCityBus* module = dynamic_cast<MetroCityBus*>(this->module);
 
 		menu->addChild(new MenuEntry);
-		menu->addChild(createMenuLabel("Gain Level"));
+		menu->addChild(createMenuLabel("Input Gain"));
 
 		struct GainItem : MenuItem {
 			MetroCityBus* module;
@@ -361,7 +365,7 @@ struct MetroCityBusWidget : ModuleWidget {
 			}
 		};
 
-		std::string gainTitles[3] = {"1.0x", "1.5x", "2.0x"};
+		std::string gainTitles[3] = {"100% (default)", "150%", "200%"};
 		float gainAmounts[3] = {1.f, 1.5f, 2.f};
 		for (int i = 0; i < 3; i++) {
 			GainItem* gainItem = createMenuItem<GainItem>(gainTitles[i]);
