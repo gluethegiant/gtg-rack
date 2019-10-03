@@ -2769,15 +2769,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.4142136"
-     inkscape:cx="50.224082"
-     inkscape:cy="223.0466"
+     inkscape:cx="76.770456"
+     inkscape:cy="223.3663"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="939"
      inkscape:window-height="1050"
-     inkscape:window-x="33"
-     inkscape:window-y="0"
+     inkscape:window-x="2660"
+     inkscape:window-y="80"
      inkscape:window-maximized="0"
      objecttolerance="1"
      guidetolerance="1"
@@ -3136,12 +3136,12 @@
          y="184.70799"
          x="15.24088"
          id="tspan8138"
-         sodipodi:role="line">SAMPLES</tspan><tspan
+         sodipodi:role="line">SAMPLE</tspan><tspan
          style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:1.76388884px;line-height:1;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';text-align:center;text-anchor:middle;fill:#ececec;stroke-width:0.26458332"
          y="186.47188"
          x="15.24088"
          sodipodi:role="line"
-         id="tspan6790">LATE</tspan></text>
+         id="tspan6790">DELAY</tspan></text>
     <text
        id="text19334"
        y="238.09006"
@@ -3226,12 +3226,12 @@
          id="tspan6792"
          x="15.24088"
          y="215.70799"
-         style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:1.76388884px;line-height:1;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';text-align:center;text-anchor:middle;fill:#ececec;stroke-width:0.26458332">SAMPLES</tspan><tspan
+         style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:1.76388884px;line-height:1;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';text-align:center;text-anchor:middle;fill:#ececec;stroke-width:0.26458332">SAMPLE</tspan><tspan
          id="tspan6794"
          sodipodi:role="line"
          x="15.24088"
          y="217.47188"
-         style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:1.76388884px;line-height:1;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';text-align:center;text-anchor:middle;fill:#ececec;stroke-width:0.26458332">LATE</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:1.76388884px;line-height:1;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';text-align:center;text-anchor:middle;fill:#ececec;stroke-width:0.26458332">DELAY</tspan></text>
     <text
        id="text6802"
        y="246.70799"
@@ -3242,12 +3242,12 @@
          y="246.70799"
          x="15.240879"
          id="tspan6798"
-         sodipodi:role="line">SAMPLES</tspan><tspan
+         sodipodi:role="line">SAMPLE</tspan><tspan
          style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:1.76388884px;line-height:1;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';text-align:center;text-anchor:middle;fill:#ececec;stroke-width:0.26458332"
          y="248.47188"
          x="15.240879"
          sodipodi:role="line"
-         id="tspan6800">LATE</tspan></text>
+         id="tspan6800">DELAY</tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"
