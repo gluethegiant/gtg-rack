@@ -241,7 +241,7 @@ struct MetroCityBus : Module {
 							if (inputs[POLY_INPUT].getVoltage(flipper) * 0.1f > light_brights[l]) {
 								light_brights[l] = inputs[POLY_INPUT].getVoltage(flipper) * 0.12f; 
 							} else {
-								if (light_brights[l] < 0.18f) light_brights[l] = 0.18f;   // light visible for quiet channel
+								if (light_brights[l] < 0.12f) light_brights[l] = 0.12f;   // light visible for quiet channel
 							}
 						}
 					}   // for l lights
