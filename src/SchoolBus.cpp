@@ -194,22 +194,22 @@ struct SchoolBusWidget : ModuleWidget {
 	}
 
 	// add gain levels to context menu
+	struct GainItem : MenuItem {
+		SchoolBus* module;
+		float gain;
+		void onAction(const event::Action& e) override {
+			module->school_fader.setGain(gain);
+		}
+	};
+
 	void appendContextMenu(Menu* menu) override {
 		SchoolBus* module = dynamic_cast<SchoolBus*>(this->module);
 
 		menu->addChild(new MenuEntry);
-		menu->addChild(createMenuLabel("Input Gain"));
+		menu->addChild(createMenuLabel("Preamp on L/M/P/R Inputs"));
 
-		struct GainItem : MenuItem {
-			SchoolBus* module;
-			float gain;
-			void onAction(const event::Action& e) override {
-				module->school_fader.setGain(gain);
-			}
-		};
-
-		std::string gainTitles[3] = {"100% (default)", "150%", "200%"};
-		float gainAmounts[3] = {1.f, 1.5f, 2.f};
+		std::string gainTitles[3] = {"No gain (default)", "2x gain", "4x gain"};
+		float gainAmounts[3] = {1.f, 2.f, 4.f};
 		for (int i = 0; i < 3; i++) {
 			GainItem* gainItem = createMenuItem<GainItem>(gainTitles[i]);
 			gainItem->rightText = CHECKMARK(module->school_fader.getGain() == gainAmounts[i]);

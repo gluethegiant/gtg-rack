@@ -291,7 +291,7 @@ struct MetroCityBus : Module {
 		for (int i = 0; i < 16; i++) {
 			metro_pan[i].setSmoothSpeed(smooth_speed);
 		}
-		pan_rate = (APP->engine->getSampleRate() / 3.f);   // used by pan follow, should match pan clock divider
+		pan_rate = (APP->engine->getSampleRate() / 3.f);   // used by pan follow, denominator matches pan clock divider
 	}
 
 	// Initialize on state and buttons
@@ -364,22 +364,22 @@ struct MetroCityBusWidget : ModuleWidget {
 	}
 
 	// add gain options to context menu
+	struct GainItem : MenuItem {
+		MetroCityBus* module;
+		float gain;
+		void onAction(const event::Action& e) override {
+			module->metro_fader.setGain(gain);
+		}
+	};
+
 	void appendContextMenu(Menu* menu) override {
 		MetroCityBus* module = dynamic_cast<MetroCityBus*>(this->module);
 
 		menu->addChild(new MenuEntry);
-		menu->addChild(createMenuLabel("Input Gain"));
+		menu->addChild(createMenuLabel("Preamp on Polyphonic Input"));
 
-		struct GainItem : MenuItem {
-			MetroCityBus* module;
-			float gain;
-			void onAction(const event::Action& e) override {
-				module->metro_fader.setGain(gain);
-			}
-		};
-
-		std::string gainTitles[3] = {"100% (default)", "150%", "200%"};
-		float gainAmounts[3] = {1.f, 1.5f, 2.f};
+		std::string gainTitles[3] = {"No gain (default)", "2x gain", "4x gain"};
+		float gainAmounts[3] = {1.f, 2.f, 4.f};
 		for (int i = 0; i < 3; i++) {
 			GainItem* gainItem = createMenuItem<GainItem>(gainTitles[i]);
 			gainItem->rightText = CHECKMARK(module->metro_fader.getGain() == gainAmounts[i]);

@@ -129,10 +129,10 @@ struct MiniBusWidget : ModuleWidget {
 		MiniBus* module = dynamic_cast<MiniBus*>(this->module);
 
 		menu->addChild(new MenuEntry);
-		menu->addChild(createMenuLabel("Input Gain"));
+		menu->addChild(createMenuLabel("Preamp on M/P Input"));
 
-		std::string gainTitles[3] = {"100% (default)", "150%", "200%"};
-		float gainAmounts[3] = {1.f, 1.5f, 2.f};
+		std::string gainTitles[3] = {"No gain (default)", "2x gain", "4x gain"};
+		float gainAmounts[3] = {1.f, 2.f, 4.f};
 		for (int i = 0; i < 3; i++) {
 			GainItem* gainItem = createMenuItem<GainItem>(gainTitles[i]);
 			gainItem->rightText = CHECKMARK(module->mini_fader.getGain() == gainAmounts[i]);
