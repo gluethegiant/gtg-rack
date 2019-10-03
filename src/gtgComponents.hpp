@@ -85,6 +85,30 @@ struct gtgRedTinyKnob : app::SvgKnob {
 	}
 };
 
+struct gtgBlueTinySnapKnob : RoundBlackSnapKnob {
+	gtgBlueTinySnapKnob() {
+		setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlueTinyKnob.svg")));
+		minAngle = -0.83 * M_PI;
+		maxAngle = 0.83 * M_PI;
+	}
+};
+
+struct gtgOrangeTinySnapKnob : RoundBlackSnapKnob {
+	gtgOrangeTinySnapKnob() {
+		setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/OrangeTinyKnob.svg")));
+		minAngle = -0.83 * M_PI;
+		maxAngle = 0.83 * M_PI;
+	}
+};
+
+struct gtgRedTinySnapKnob : RoundBlackSnapKnob {
+	gtgRedTinySnapKnob() {
+		setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/RedTinyKnob.svg")));
+		minAngle = -0.83 * M_PI;
+		maxAngle = 0.83 * M_PI;
+	}
+};
+
 struct gtgNutPort : app::SvgPort {
 	gtgNutPort() {
 		setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/NutPort.svg")));
