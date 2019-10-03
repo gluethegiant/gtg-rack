@@ -4,6 +4,7 @@
 
 
 const long HISTORY_CAP = 512000;
+const float pan_division = 3.f;
 
 struct MetroCityBus : Module {
 	enum ParamIds {
@@ -61,7 +62,7 @@ struct MetroCityBus : Module {
 	float light_delta = 2.f / 8.f;   // 8 divisions because light 1 and 9 are halved by offset
 	float light_brights[9] = {};
 	long f_delay = 0;   // follow delay
-	float pan_rate = APP->engine->getSampleRate() / 3.f;   // sample rate divided by pan clock divider
+	float pan_rate = APP->engine->getSampleRate() / pan_division;   // to work with pan clock divider
 
 	MetroCityBus() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -75,7 +76,7 @@ struct MetroCityBus : Module {
 		configParam(LEVEL_PARAMS + 2, 0.f, 1.f, 1.f, "Level to red stereo bus");
 		configParam(BLUE_POST_PARAM, 0.f, 1.f, 0.f, "Post red fader send");
 		configParam(ORANGE_POST_PARAM, 0.f, 1.f, 0.f, "Post red fader send");
-		pan_divider.setDivision(3);
+		pan_divider.setDivision(pan_division);
 		light_divider.setDivision(64);
 		metro_fader.setSpeed(fade_speed);
 		initializePanObjects();
@@ -291,7 +292,7 @@ struct MetroCityBus : Module {
 		for (int i = 0; i < 16; i++) {
 			metro_pan[i].setSmoothSpeed(smooth_speed);
 		}
-		pan_rate = (APP->engine->getSampleRate() / 3.f);   // used by pan follow, denominator matches pan clock divider
+		pan_rate = (APP->engine->getSampleRate() / pan_division);   // used by pan follow, accounts for pan clock divider
 	}
 
 	// Initialize on state and buttons
