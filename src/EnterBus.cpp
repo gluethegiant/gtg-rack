@@ -40,18 +40,18 @@ struct EnterBusWidget : ModuleWidget {
 		setModule(module);
 		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/EnterBus.svg")));
 
-		addChild(createWidget<ScrewUp>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewUp>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<gtgScrewUp>(Vec(RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<gtgScrewUp>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addInput(createInputCentered<NutPort>(mm2px(Vec(7.62, 21.05)), module, EnterBus::ENTER_INPUTS + 0));
-		addInput(createInputCentered<NutPort>(mm2px(Vec(7.62, 31.2)), module, EnterBus::ENTER_INPUTS + 1));
-		addInput(createInputCentered<NutPort>(mm2px(Vec(7.62, 46.85)), module, EnterBus::ENTER_INPUTS + 2));
-		addInput(createInputCentered<NutPort>(mm2px(Vec(7.62, 57.0)), module, EnterBus::ENTER_INPUTS + 3));
-		addInput(createInputCentered<NutPort>(mm2px(Vec(7.62, 72.85)), module, EnterBus::ENTER_INPUTS + 4));
-		addInput(createInputCentered<NutPort>(mm2px(Vec(7.62, 83.0)), module, EnterBus::ENTER_INPUTS + 5));
-		addInput(createInputCentered<NutPort>(mm2px(Vec(7.62, 103.85)), module, EnterBus::BUS_INPUT));
+		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(7.62, 21.05)), module, EnterBus::ENTER_INPUTS + 0));
+		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(7.62, 31.2)), module, EnterBus::ENTER_INPUTS + 1));
+		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(7.62, 46.85)), module, EnterBus::ENTER_INPUTS + 2));
+		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(7.62, 57.0)), module, EnterBus::ENTER_INPUTS + 3));
+		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(7.62, 72.85)), module, EnterBus::ENTER_INPUTS + 4));
+		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(7.62, 83.0)), module, EnterBus::ENTER_INPUTS + 5));
+		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(7.62, 103.85)), module, EnterBus::BUS_INPUT));
 
-		addOutput(createOutputCentered<NutPort>(mm2px(Vec(7.62, 114.1)), module, EnterBus::BUS_OUTPUT));
+		addOutput(createOutputCentered<gtgNutPort>(mm2px(Vec(7.62, 114.1)), module, EnterBus::BUS_OUTPUT));
 	}
 };
 

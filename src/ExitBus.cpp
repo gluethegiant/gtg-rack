@@ -41,18 +41,18 @@ struct ExitBusWidget : ModuleWidget {
 		setModule(module);
 		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/ExitBus.svg")));
 
-		addChild(createWidget<ScrewUp>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewUp>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<gtgScrewUp>(Vec(RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<gtgScrewUp>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addInput(createInputCentered<NutPort>(mm2px(Vec(7.62, 103.85)), module, ExitBus::BUS_INPUT));
+		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(7.62, 103.85)), module, ExitBus::BUS_INPUT));
 
-		addOutput(createOutputCentered<NutPort>(mm2px(Vec(7.62, 21.05)), module, ExitBus::EXIT_OUTPUTS + 0));
-		addOutput(createOutputCentered<NutPort>(mm2px(Vec(7.62, 31.2)), module, ExitBus::EXIT_OUTPUTS + 1));
-		addOutput(createOutputCentered<NutPort>(mm2px(Vec(7.62, 46.85)), module, ExitBus::EXIT_OUTPUTS + 2));
-		addOutput(createOutputCentered<NutPort>(mm2px(Vec(7.62, 57.0)), module, ExitBus::EXIT_OUTPUTS + 3));
-		addOutput(createOutputCentered<NutPort>(mm2px(Vec(7.62, 72.85)), module, ExitBus::EXIT_OUTPUTS + 4));
-		addOutput(createOutputCentered<NutPort>(mm2px(Vec(7.62, 83.1)), module, ExitBus::EXIT_OUTPUTS + 5));
-		addOutput(createOutputCentered<NutPort>(mm2px(Vec(7.62, 114.1)), module, ExitBus::BUS_OUTPUT));
+		addOutput(createOutputCentered<gtgNutPort>(mm2px(Vec(7.62, 21.05)), module, ExitBus::EXIT_OUTPUTS + 0));
+		addOutput(createOutputCentered<gtgNutPort>(mm2px(Vec(7.62, 31.2)), module, ExitBus::EXIT_OUTPUTS + 1));
+		addOutput(createOutputCentered<gtgNutPort>(mm2px(Vec(7.62, 46.85)), module, ExitBus::EXIT_OUTPUTS + 2));
+		addOutput(createOutputCentered<gtgNutPort>(mm2px(Vec(7.62, 57.0)), module, ExitBus::EXIT_OUTPUTS + 3));
+		addOutput(createOutputCentered<gtgNutPort>(mm2px(Vec(7.62, 72.85)), module, ExitBus::EXIT_OUTPUTS + 4));
+		addOutput(createOutputCentered<gtgNutPort>(mm2px(Vec(7.62, 83.1)), module, ExitBus::EXIT_OUTPUTS + 5));
+		addOutput(createOutputCentered<gtgNutPort>(mm2px(Vec(7.62, 114.1)), module, ExitBus::BUS_OUTPUT));
 	}
 };
 
