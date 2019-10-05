@@ -6,6 +6,7 @@ struct AutoFader {
 
 	bool on = true;
 	float fade = 0.f;
+	int last_speed = 20;
 
 	void setSpeed(int speed) {   // uses sampleRate and gain to keep time consistent
 		last_speed = speed;
@@ -44,7 +45,6 @@ struct AutoFader {
 
 private:
 
-	int last_speed = 20;
 	float delta = 0.001f;
 	float gain = 1.f;
 };
