@@ -113,6 +113,8 @@ struct BusRoute : Module {
 	}
 };
 
+// TODO use a single display widget object
+
 // blue display widget
 struct BlueDisplay : TransparentWidget {
 	BusRoute *module;
