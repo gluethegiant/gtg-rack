@@ -27,6 +27,9 @@ struct BusRoute : Module {
 	int blue_i = 0;
 	int orange_i = 0;
 	int red_i = 0;
+	int blue_delay = 0;
+	int orange_delay = 0;
+	int red_delay = 0;
 
 	BusRoute() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -49,7 +52,7 @@ struct BusRoute : Module {
 		blue_buf[blue_i][1] = inputs[RETURN_INPUTS + 1].getVoltage();
 
 		// get knob
-		int blue_delay = params[DELAY_PARAMS + 0].getValue();
+		blue_delay = params[DELAY_PARAMS + 0].getValue();
 
 		// get delay index
 		int delay_i = blue_i - blue_delay;
@@ -70,7 +73,7 @@ struct BusRoute : Module {
 		orange_buf[orange_i][1] = inputs[RETURN_INPUTS + 3].getVoltage();
 
 		// get knob
-		int orange_delay = params[DELAY_PARAMS + 1].getValue();
+		orange_delay = params[DELAY_PARAMS + 1].getValue();
 
 		// get delay index
 		delay_i = orange_i - orange_delay;
@@ -91,7 +94,7 @@ struct BusRoute : Module {
 		red_buf[red_i][1] = inputs[RETURN_INPUTS + 5].getVoltage();
 
 		// get knob
-		int red_delay = params[DELAY_PARAMS + 2].getValue();
+		red_delay = params[DELAY_PARAMS + 2].getValue();
 
 		// get delay index
 		delay_i = red_i - red_delay;
@@ -110,11 +113,121 @@ struct BusRoute : Module {
 	}
 };
 
+// blue display widget
+struct BlueDisplay : TransparentWidget {
+	BusRoute *module;
+	std::shared_ptr<Font> font;
+
+	BlueDisplay() {
+		box.size = mm2px(Vec(6.519, 4.0));
+		font = APP->window->loadFont(asset::plugin(pluginInstance, "res/fonts/DSEG7-Classic-MINI/DSEG7ClassicMini-Bold.ttf"));
+	}
+
+	void draw(const DrawArgs &args) override {
+		int value = module ? module->blue_delay : 0;
+		std::string text = string::f("%03d", value);
+
+		// background
+		NVGcolor backgroundColor = nvgRGB(77, 77, 77);
+		nvgBeginPath(args.vg);
+		nvgRoundedRect(args.vg, 0.0, 0.0, box.size.x, box.size.y, 1.5);
+		nvgFillColor(args.vg, backgroundColor);
+		nvgFill(args.vg);
+
+		// display text text
+		nvgFontSize(args.vg, 6);
+		nvgFontFaceId(args.vg, font->handle);
+		nvgTextLetterSpacing(args.vg, 0.5);
+		nvgTextAlign(args.vg, NVG_ALIGN_RIGHT);
+		Vec textPos = mm2px(Vec(6.05, 3.1));
+		NVGcolor textColor = nvgRGB(250, 250, 223);
+		nvgFillColor(args.vg, textColor);
+		nvgText(args.vg, textPos.x, textPos.y, text.c_str(), NULL);
+	}
+};
+
+// orange display widget
+struct OrangeDisplay : TransparentWidget {
+	BusRoute *module;
+	std::shared_ptr<Font> font;
+
+	OrangeDisplay() {
+		box.size = mm2px(Vec(6.519, 4.0));
+		font = APP->window->loadFont(asset::plugin(pluginInstance, "res/fonts/DSEG7-Classic-MINI/DSEG7ClassicMini-Bold.ttf"));
+	}
+
+	void draw(const DrawArgs &args) override {
+		int value = module ? module->orange_delay : 0;
+		std::string text = string::f("%03d", value);
+
+		// background
+		NVGcolor backgroundColor = nvgRGB(77, 77, 77);
+		nvgBeginPath(args.vg);
+		nvgRoundedRect(args.vg, 0.0, 0.0, box.size.x, box.size.y, 1.5);
+		nvgFillColor(args.vg, backgroundColor);
+		nvgFill(args.vg);
+
+		// display text text
+		nvgFontSize(args.vg, 6);
+		nvgFontFaceId(args.vg, font->handle);
+		nvgTextLetterSpacing(args.vg, 0.5);
+		nvgTextAlign(args.vg, NVG_ALIGN_RIGHT);
+		Vec textPos = mm2px(Vec(6.05, 3.1));
+		NVGcolor textColor = nvgRGB(250, 250, 223);
+		nvgFillColor(args.vg, textColor);
+		nvgText(args.vg, textPos.x, textPos.y, text.c_str(), NULL);
+	}
+};
+
+// red display widget
+struct RedDisplay : TransparentWidget {
+	BusRoute *module;
+	std::shared_ptr<Font> font;
+
+	RedDisplay() {
+		box.size = mm2px(Vec(6.519, 4.0));
+		font = APP->window->loadFont(asset::plugin(pluginInstance, "res/fonts/DSEG7-Classic-MINI/DSEG7ClassicMini-Bold.ttf"));
+	}
+
+	void draw(const DrawArgs &args) override {
+		int value = module ? module->red_delay : 0;
+		std::string text = string::f("%03d", value);
+
+		// background
+		NVGcolor backgroundColor = nvgRGB(77, 77, 77);
+		nvgBeginPath(args.vg);
+		nvgRoundedRect(args.vg, 0.0, 0.0, box.size.x, box.size.y, 1.5);
+		nvgFillColor(args.vg, backgroundColor);
+		nvgFill(args.vg);
+
+		// display text text
+		nvgFontSize(args.vg, 6);
+		nvgFontFaceId(args.vg, font->handle);
+		nvgTextLetterSpacing(args.vg, 0.5);
+		nvgTextAlign(args.vg, NVG_ALIGN_RIGHT);
+		Vec textPos = mm2px(Vec(6.05, 3.1));
+		NVGcolor textColor = nvgRGB(250, 250, 223);
+		nvgFillColor(args.vg, textColor);
+		nvgText(args.vg, textPos.x, textPos.y, text.c_str(), NULL);
+	}
+};
 
 struct BusRouteWidget : ModuleWidget {
 	BusRouteWidget(BusRoute *module) {
 		setModule(module);
 		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/BusRoute.svg")));
+
+		DelayDisplay *blueDisplay = createWidgetCentered<DelayDisplay>(mm2px(Vec(15.25, 12.12)));
+		blueDisplay->module = module;
+		addChild(blueDisplay);
+
+		OrangeDisplay *orangeDisplay = createWidgetCentered<OrangeDisplay>(mm2px(Vec(15.25, 43.18)));
+		orangeDisplay->module = module;
+		addChild(orangeDisplay);
+
+		RedDisplay *redDisplay = createWidgetCentered<RedDisplay>(mm2px(Vec(15.25, 74.33)));
+		redDisplay->module = module;
+		addChild(redDisplay);
 
 		addChild(createWidget<gtgScrewUp>(Vec(RACK_GRID_WIDTH, 0)));
 		addChild(createWidget<gtgScrewUp>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
