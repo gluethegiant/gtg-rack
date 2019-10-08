@@ -217,7 +217,7 @@ struct BusRouteWidget : ModuleWidget {
 		setModule(module);
 		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/BusRoute.svg")));
 
-		DelayDisplay *blueDisplay = createWidgetCentered<DelayDisplay>(mm2px(Vec(15.25, 12.12)));
+		BlueDisplay *blueDisplay = createWidgetCentered<BlueDisplay>(mm2px(Vec(15.25, 12.12)));
 		blueDisplay->module = module;
 		addChild(blueDisplay);
 
