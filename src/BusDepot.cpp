@@ -43,7 +43,7 @@ struct BusDepot : Module {
 
 	BusDepot() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-		configParam(ON_PARAM, 0.f, 1.f, 0.f, "Output on");   // depot_fader defaults to on create a quick fade up
+		configParam(ON_PARAM, 0.f, 1.f, 0.f, "Output on");   // depot_fader defaults to on and creates a quick fade up
 		configParam(AUX_PARAM, 0.f, 1.f, 1.f, "Aux level in");
 		configParam(LEVEL_PARAM, 0.f, 1.f, 1.f, "Master level");
 		configParam(FADE_PARAM, 20, 17000, 20, "Auto fader milliseconds");
