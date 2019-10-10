@@ -21,9 +21,9 @@ struct BusRoute : Module {
 		NUM_LIGHTS
 	};
 
-	float blue_buf[201][2] = {};
-	float orange_buf[201][2] = {};
-	float red_buf[201][2] = {};
+	float blue_buf[1000][2] = {};
+	float orange_buf[1000][2] = {};
+	float red_buf[1000][2] = {};
 	int blue_i = 0;
 	int orange_i = 0;
 	int red_i = 0;
@@ -33,9 +33,9 @@ struct BusRoute : Module {
 
 	BusRoute() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-		configParam(DELAY_PARAMS + 0, 0, 200, 0, "Sample delay on blue bus return");
-		configParam(DELAY_PARAMS + 1, 0, 200, 0, "Sample delay on orange bus return");
-		configParam(DELAY_PARAMS + 2, 0, 200, 0, "Sample delay on red bus return");
+		configParam(DELAY_PARAMS + 0, 0, 999, 0, "Sample delay on blue bus return");
+		configParam(DELAY_PARAMS + 1, 0, 999, 0, "Sample delay on orange bus return");
+		configParam(DELAY_PARAMS + 2, 0, 999, 0, "Sample delay on red bus return");
 	}
 
 	void process(const ProcessArgs &args) override {
@@ -56,7 +56,7 @@ struct BusRoute : Module {
 
 		// get delay index
 		int delay_i = blue_i - blue_delay;
-		if (delay_i < 0) delay_i = 201 + delay_i;   // adjust delay index when buffer rolls
+		if (delay_i < 0) delay_i = 1000 + delay_i;   // adjust delay index when buffer rolls
 
 		// get outputs from buffer
 		outputs[BUS_OUTPUT].setVoltage(blue_buf[delay_i][0], 0);
@@ -64,7 +64,7 @@ struct BusRoute : Module {
 
 		// roll buffer
 		blue_i++;
-		if (blue_i >= 201) blue_i = 0;
+		if (blue_i >= 1000) blue_i = 0;
 
 		// orange bus returns
 
@@ -77,7 +77,7 @@ struct BusRoute : Module {
 
 		// get delay index
 		delay_i = orange_i - orange_delay;
-		if (delay_i < 0) delay_i = 201 + delay_i;   // adjust delay index when buffer rolls
+		if (delay_i < 0) delay_i = 1000 + delay_i;   // adjust delay index when buffer rolls
 
 		// get outputs from buffer
 		outputs[BUS_OUTPUT].setVoltage(orange_buf[delay_i][0], 2);
@@ -85,7 +85,7 @@ struct BusRoute : Module {
 
 		// roll buffer
 		orange_i++;
-		if (orange_i >= 201) orange_i = 0;
+		if (orange_i >= 1000) orange_i = 0;
 
 		// red bus returns
 
@@ -98,7 +98,7 @@ struct BusRoute : Module {
 
 		// get delay index
 		delay_i = red_i - red_delay;
-		if (delay_i < 0) delay_i = 201 + delay_i;   // adjust delay index when buffer rolls
+		if (delay_i < 0) delay_i = 1000 + delay_i;   // adjust delay index when buffer rolls
 
 		// get outputs from buffer
 		outputs[BUS_OUTPUT].setVoltage(red_buf[delay_i][0], 4);
@@ -106,7 +106,7 @@ struct BusRoute : Module {
 
 		// roll buffer
 		red_i++;
-		if (red_i >= 201) red_i = 0;
+		if (red_i >= 1000) red_i = 0;
 
 		// set output to 3 stereo buses
 		outputs[BUS_OUTPUT].setChannels(6);
