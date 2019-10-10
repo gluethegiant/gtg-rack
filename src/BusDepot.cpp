@@ -174,12 +174,12 @@ struct BusDepotWidget : ModuleWidget {
 		addParam(createParamCentered<gtgBlackKnob>(mm2px(Vec(15.24, 83.13)), module, BusDepot::LEVEL_PARAM));
 		addParam(createParamCentered<gtgGrayTinySnapKnob>(mm2px(Vec(15.24, 42.54)), module, BusDepot::FADE_PARAM));
 
-		addInput(createInputCentered<gtgKeyPort>(mm2px(Vec(23.1, 21.1)), module, BusDepot::ON_CV_INPUT));
+		addInput(createInputCentered<gtgKeyPort>(mm2px(Vec(23.6, 21.1)), module, BusDepot::ON_CV_INPUT));
 		addInput(createInputCentered<gtgKeyPort>(mm2px(Vec(15.24, 71.15)), module, BusDepot::LEVEL_CV_INPUT));
-		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(7.45, 21.1)), module, BusDepot::LMP_INPUT));
-		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(7.45, 31.2)), module, BusDepot::R_INPUT));
+		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(6.95, 21.1)), module, BusDepot::LMP_INPUT));
+		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(6.95, 31.2)), module, BusDepot::R_INPUT));
 		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(7.45, 114.1)), module, BusDepot::BUS_INPUT));
-		addInput(createInputCentered<gtgKeyPort>(mm2px(Vec(23.1, 31.2)), module, BusDepot::FADE_CV_INPUT));
+		addInput(createInputCentered<gtgKeyPort>(mm2px(Vec(23.6, 31.2)), module, BusDepot::FADE_CV_INPUT));
 
 		addOutput(createOutputCentered<gtgNutPort>(mm2px(Vec(23.1, 103.85)), module, BusDepot::LEFT_OUTPUT));
 		addOutput(createOutputCentered<gtgNutPort>(mm2px(Vec(23.1, 114.1)), module, BusDepot::RIGHT_OUTPUT));
