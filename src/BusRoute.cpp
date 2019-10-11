@@ -21,92 +21,47 @@ struct BusRoute : Module {
 		NUM_LIGHTS
 	};
 
-	float blue_buf[1000][2] = {};
-	float orange_buf[1000][2] = {};
-	float red_buf[1000][2] = {};
-	int blue_i = 0;
-	int orange_i = 0;
-	int red_i = 0;
-	int blue_delay = 0;
-	int orange_delay = 0;
-	int red_delay = 0;
+	float delay_buf[1000][6] = {};
+	int delay_i = 0;
+	int delay_knobs[3] = {0, 0, 0};
 
 	BusRoute() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-		configParam(DELAY_PARAMS + 0, 0, 999, 0, "Sample delay on blue bus return");
-		configParam(DELAY_PARAMS + 1, 0, 999, 0, "Sample delay on orange bus return");
-		configParam(DELAY_PARAMS + 2, 0, 999, 0, "Sample delay on red bus return");
+		configParam(DELAY_PARAMS + 0, 0, 999, 0, "Sample delay on blue bus send");
+		configParam(DELAY_PARAMS + 1, 0, 999, 0, "Sample delay on orange bus send");
+		configParam(DELAY_PARAMS + 2, 0, 999, 0, "Sample delay on red bus send");
 	}
 
 	void process(const ProcessArgs &args) override {
 
-		// sends
+		// record bus inputs into delay buffer
 		for (int c = 0; c < 6; c++) {
-			outputs[SEND_OUTPUTS + c].setVoltage(inputs[BUS_INPUT].getPolyVoltage(c));
+			delay_buf[delay_i][c] = inputs[BUS_INPUT].getPolyVoltage(c);
 		}
 
-		// blue bus returns
+		for (int sb = 0; sb < 3; sb++) {   // sb = stereo bus
 
-		// record inputs into buffer
-		blue_buf[blue_i][0] = inputs[RETURN_INPUTS + 0].getVoltage();
-		blue_buf[blue_i][1] = inputs[RETURN_INPUTS + 1].getVoltage();
+			// get knobs, used here and in display values
+			delay_knobs[sb] = params[DELAY_PARAMS + sb].getValue();
 
-		// get knob
-		blue_delay = params[DELAY_PARAMS + 0].getValue();
+			// set channel's delay
+			int delay = delay_i - delay_knobs[sb];
+			if (delay < 0) delay = 1000 + delay;   // adjust delay when buffer rolls
 
-		// get delay index
-		int delay_i = blue_i - blue_delay;
-		if (delay_i < 0) delay_i = 1000 + delay_i;   // adjust delay index when buffer rolls
+			// set send outputs from delay buffer
+			int chan = sb * 2;
+			outputs[SEND_OUTPUTS + chan].setVoltage(delay_buf[delay][chan]);   // left
+			outputs[SEND_OUTPUTS + chan + 1].setVoltage(delay_buf[delay][chan + 1]);   // right
+		}
 
-		// get outputs from buffer
-		outputs[BUS_OUTPUT].setVoltage(blue_buf[delay_i][0], 0);
-		outputs[BUS_OUTPUT].setVoltage(blue_buf[delay_i][1], 1);
+		// roll buffer index
+		delay_i++;
+		if (delay_i >= 1000) delay_i = 0;
 
-		// roll buffer
-		blue_i++;
-		if (blue_i >= 1000) blue_i = 0;
-
-		// orange bus returns
-
-		// record inputs into buffer
-		orange_buf[orange_i][0] = inputs[RETURN_INPUTS + 2].getVoltage();
-		orange_buf[orange_i][1] = inputs[RETURN_INPUTS + 3].getVoltage();
-
-		// get knob
-		orange_delay = params[DELAY_PARAMS + 1].getValue();
-
-		// get delay index
-		delay_i = orange_i - orange_delay;
-		if (delay_i < 0) delay_i = 1000 + delay_i;   // adjust delay index when buffer rolls
-
-		// get outputs from buffer
-		outputs[BUS_OUTPUT].setVoltage(orange_buf[delay_i][0], 2);
-		outputs[BUS_OUTPUT].setVoltage(orange_buf[delay_i][1], 3);
-
-		// roll buffer
-		orange_i++;
-		if (orange_i >= 1000) orange_i = 0;
-
-		// red bus returns
-
-		// record inputs into buffer
-		red_buf[red_i][0] = inputs[RETURN_INPUTS + 4].getVoltage();
-		red_buf[red_i][1] = inputs[RETURN_INPUTS + 5].getVoltage();
-
-		// get knob
-		red_delay = params[DELAY_PARAMS + 2].getValue();
-
-		// get delay index
-		delay_i = red_i - red_delay;
-		if (delay_i < 0) delay_i = 1000 + delay_i;   // adjust delay index when buffer rolls
-
-		// get outputs from buffer
-		outputs[BUS_OUTPUT].setVoltage(red_buf[delay_i][0], 4);
-		outputs[BUS_OUTPUT].setVoltage(red_buf[delay_i][1], 5);
-
-		// roll buffer
-		red_i++;
-		if (red_i >= 1000) red_i = 0;
+		// get returns
+		for (int c = 0; c < 6; c++) {
+			outputs[BUS_OUTPUT].setVoltage(inputs[RETURN_INPUTS + c].getVoltage(), c);
+		}
 
 		// set output to 3 stereo buses
 		outputs[BUS_OUTPUT].setChannels(6);
@@ -126,7 +81,7 @@ struct BlueDisplay : TransparentWidget {
 	}
 
 	void draw(const DrawArgs &args) override {
-		int value = module ? module->blue_delay : 0;
+		int value = module ? module->delay_knobs[0] : 0;
 		std::string text = string::f("%03d", value);
 
 		// background
@@ -159,7 +114,7 @@ struct OrangeDisplay : TransparentWidget {
 	}
 
 	void draw(const DrawArgs &args) override {
-		int value = module ? module->orange_delay : 0;
+		int value = module ? module->delay_knobs[1] : 0;
 		std::string text = string::f("%03d", value);
 
 		// background
@@ -192,7 +147,7 @@ struct RedDisplay : TransparentWidget {
 	}
 
 	void draw(const DrawArgs &args) override {
-		int value = module ? module->red_delay : 0;
+		int value = module ? module->delay_knobs[2] : 0;
 		std::string text = string::f("%03d", value);
 
 		// background
