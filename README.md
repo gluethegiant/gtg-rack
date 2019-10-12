@@ -5,13 +5,14 @@ You can use monolithic rack modules that mimic real-world mixing consoles, but t
 And other modular mixers tend to make it complicated to route multiple sounds to send effects.
 
 The modular bus mixers from Glue the Giant allow you to choose the right mixer strip, decide where to place each strip, and easily create mix groups.
-The modules also provide features like polyphonic stereo spread and latency compensation on send effects.
+The modules also provide features like auto fades, polyphonic stereo spread, and latency compensation on send effects.
+
+![alt text](https://github.com/gluethegiant/gtg-rack/blob/master/design/screenshot.png)
 
 To use these mixers, simply connect them together with the BUS IN and BUS OUT ports.
 The audio is routed along three stereo buses: red, orange, and blue.
 The bus design makes it easy to patch together modules while creating simple or complex effect sends and returns.
 
-![alt text](https://github.com/gluethegiant/gtg-rack/blob/master/design/screenshot.png)
 
 ## The Modular Bus Mixers
 
@@ -52,8 +53,8 @@ Note that panning rolls back seamlessly when the pan CV input, attenuator, and p
 
 ### 4. Metro City Bus Mixer
 
-This mixer can take a polyphonic input and spread the channels evenly across the stereo field.
-The pan knob controls the placement of the first channel from the polyphonic input (or the last channel if the REVERSE CHANNELS button is on).
+This mixer can take a polyphonic input and spread the channels across the stereo field.
+The pan knob controls the pan placement of the first channel from the polyphonic input (or the last channel if the REVERSE CHANNELS button is on).
 The spread knob spaces the other polyphonic channels to the left or to the right.
 The LED indicators give you a visual indication of the stereo spread.
 
@@ -67,7 +68,7 @@ Pan spread and pan follow are smoothed to allow for dynamic polyphonic channels.
 * Reverse channel order on polyphonic spread or pan follow
 * Three level controls, with CV inputs, to three stereo buses
 * Post fader option on two level controls (red becomes master bus)
-* 2x or 4x preamp-style gain on polyphonic input (selected from context menu)
+* 2x or 4x preamp-style gain on polyphonic input (selected the from context menu)
 * On button with CV input and pop filter
 
 ### 5. Bus Route
@@ -81,7 +82,7 @@ If you route to an effect on the orange bus, you could add a one sample delay to
 This latency compensation of one sample is hardly noticeable, but some effects, including external plugins, can require latency compensation to prevent unwanted phase or other issues.
 When latency is not documented by a plugin, a scope can be used to detect and correct for latency.
 
-The integrated sample delays can also be used to create phase effects, millisecond delays, or subtle time shifts on a bus or a mix group.
+The integrated sample delays can also be used to create effects based on millisecond delays, or subtle time shifts on a bus or a mix group.
 These delays are limited to 999 samples so they can be light on resources and set easily (use CTRL to improve the accuracy of a VCV Rack knob).
 
 * Three stereo sends for use with modular bus mixers
@@ -120,8 +121,8 @@ By changing the speed knob, the fader can go from providing a 20 millisecond pop
 * Aux level control
 * Left and right peak meters with a brief hold on peaks over 0dB
 * Each meter light represents -6dB
-* Output on/off button with a linear fader that can be a pop filter or a fade up to 17 seconds
-* Auto fader speed knob with CV
+* Output on/off button with a linear auto fader
+* Auto fader speed knob from 20 milliseconds to 17 seconds with CV
 
 ## More Information
 
