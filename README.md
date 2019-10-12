@@ -141,10 +141,11 @@ All the code is released to use under the GPL 3 license and above.
 
 Thanks to Andrew Belt for accepting a little fix I wrote for a library that VCV Rack uses.
 That encouraged me to start writing C++ as a hobby.
+
 Thanks to all the other Rack coders, especially those who share their code.
 You are too numerous to thank individually, but I tried to star all of your repos.
-Thanks for the early encouragement from users, like Aria_Salvatrice Woof and chaircrusher, who displayed the use of the modular bus mixers in published songs and videos.
-That early encouragement (you know who the rest of you are!) made me want to make the modules more feature complete with better code under the hood.
+Thanks for the early encouragement from users, like Aria_Salvatrice and chaircrusher, who displayed the use of the modular bus mixers in published songs and videos.
+That early encouragement (you know who the rest of you are) made me want to make the modules more feature complete with better code under the hood.
 Thanks to rsmus7 for beta testing.
 Thanks to Omri Cohen for the videos that inspired these modules.
 Finally, thanks always to Rebecca.
