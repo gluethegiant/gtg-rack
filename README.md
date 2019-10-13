@@ -2,16 +2,16 @@
 
 Mixing a VCV Rack patch to stereo output is a common task.
 You can use monolithic rack modules that mimic real-world mixing consoles, but they don't take advantage of the power or flexibility inherent in a modular environment.
-And other modular mixers tend to make it complicated to route multiple sounds to send effects.
+And other modular mixers tend to make it complicated to route multiple sounds to effect sends.
 
-The modular bus mixers from Glue the Giant allow you to choose the right mixer strip, decide where to place each strip, and easily create mix groups.
-The modules also provide features like auto fades, polyphonic stereo spread, and latency compensation on send effects.
+The modular bus mixers from Glue the Giant are designed for effect sends.
+They also provide features like auto fades, polyphonic stereo spread, and latency compensation.
 
 ![alt text](https://github.com/gluethegiant/gtg-rack/blob/master/design/screenshot.png)
 
 To use these mixers, simply connect them together with the BUS IN and BUS OUT ports.
 The audio is routed along three stereo buses: red, orange, and blue.
-The bus design makes it easy to patch together modules while creating simple or complex effect sends and returns.
+The bus design makes it easy to patch together modules while creating simple or complex routing.
 
 
 ## The Modular Bus Mixers
@@ -108,9 +108,7 @@ For advanced routing or a simple extension panel to expose the outputs of any mo
 
 This module is placed at the end of your bus mixer chains.
 The stereo outputs can then be connected to the left and right channels on your audio device.
-
-The provided aux inputs can be used to chain Bus Depot modules or to attached any other sound source.
-Mixer groups are created by using a different Bus Depot module after each group of mixers.
+The provided aux inputs can be used to chain Bus Depot modules or to attached any other sound source, including the outputs of a different mixer.
 
 Bus Depot has an on button that controls an auto fader on the output.
 By changing the speed knob, the fader can go from providing a 20 millisecond pop filter to a long fade of up to 17 seconds.
