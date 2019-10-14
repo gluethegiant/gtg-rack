@@ -22,6 +22,7 @@ struct BusDepot : Module {
 	enum OutputIds {
 		LEFT_OUTPUT,
 		RIGHT_OUTPUT,
+		BUS_OUTPUT,
 		NUM_OUTPUTS
 	};
 	enum LightIds {
@@ -55,7 +56,7 @@ struct BusDepot : Module {
 	}
 
 	void process(const ProcessArgs &args) override {
-		// on off button with fader onramp to filter pops
+		// on off button with fader that filters pops
 		if (on_trigger.process(params[ON_PARAM].getValue()) + on_cv_trigger.process(inputs[ON_CV_INPUT].getVoltage())) {
 			depot_fader.on = !depot_fader.on;
 		}
@@ -64,7 +65,7 @@ struct BusDepot : Module {
 
 		// process sound
 		float summed_out[2] = {0.f, 0.f};
-		if (depot_fader.getFade() > 0) {   // process only when sound is playing
+		if (depot_fader.getFade() > 0) {   // process sound only when not silent
 
 			float stereo_in[2] = {0.f, 0.f};
 
@@ -83,9 +84,25 @@ struct BusDepot : Module {
 				}
 			}
 
+			// get bus output
+			if (outputs[BUS_OUTPUT].isConnected()) {
+
+				// process blue and orange buses with levels
+				for (int c = 0; c < 4; c++) {
+					outputs[BUS_OUTPUT].setVoltage(inputs[BUS_INPUT].getPolyVoltage(c) * master_level * depot_fader.getFade(), c);
+				}
+
+				// add stereo aux input and levels to red bus
+				for (int c = 4; c < 6; c++) {
+					outputs[BUS_OUTPUT].setVoltage((stereo_in[c - 4] + inputs[BUS_INPUT].getPolyVoltage(c)) * master_level * depot_fader.getFade(), c);
+				}
+			}
+
 			// calculate stereo mix from three stereo buses on bus input
-			for (int c = 0; c < 2; c++) {
-				summed_out[c] = (stereo_in[c] + inputs[BUS_INPUT].getPolyVoltage(c) + inputs[BUS_INPUT].getPolyVoltage(c + 2) + inputs[BUS_INPUT].getPolyVoltage(c + 4)) * master_level * depot_fader.getFade();
+			if (outputs[LEFT_OUTPUT].isConnected() || outputs[RIGHT_OUTPUT].isConnected()) {
+				for (int c = 0; c < 2; c++) {
+					summed_out[c] = (stereo_in[c] + inputs[BUS_INPUT].getPolyVoltage(c) + inputs[BUS_INPUT].getPolyVoltage(c + 2) + inputs[BUS_INPUT].getPolyVoltage(c + 4)) * master_level * depot_fader.getFade();
+				}
 			}
 
 			outputs[LEFT_OUTPUT].setVoltage(summed_out[0]);
@@ -93,8 +110,8 @@ struct BusDepot : Module {
 		}
 
 		// hit peak lights accurately by polling every sample
-		if (summed_out[0] > 10.f) peak_left = 1;
-		if (summed_out[1] > 10.f) peak_right = 1;
+		if (summed_out[0] > 10.f) peak_left = 1.f;
+		if (summed_out[1] > 10.f) peak_right = 1.f;
 
 		// get levels for lights
 		if (vu_divider.process()) {   // check levels infrequently
@@ -122,8 +139,8 @@ struct BusDepot : Module {
 			}
 
 			// make peak lights stay on when hit
-			if (peak_left > 0) peak_left -= 15 / args.sampleRate; else peak_left = 0;
-			if (peak_right > 0) peak_right -= 15 / args.sampleRate; else peak_right = 0;
+			if (peak_left > 0) peak_left -= 15.f / args.sampleRate; else peak_left = 0.f;
+			if (peak_right > 0) peak_right -= 15.f / args.sampleRate; else peak_right = 0.f;
 			lights[LEFT_LIGHTS + 0].setBrightness(peak_left);
 			lights[RIGHT_LIGHTS + 0].setBrightness(peak_right);
 
@@ -149,6 +166,7 @@ struct BusDepot : Module {
 
 	void onSampleRateChange() override {
 		depot_fader.setSpeed(params[FADE_PARAM].getValue());
+		outputs[BUS_OUTPUT].setChannels(6);
 	}
 
 	void onReset() override {
@@ -170,12 +188,12 @@ struct BusDepotWidget : ModuleWidget {
 
 		addParam(createParamCentered<gtgBlackButton>(mm2px(Vec(15.24, 15.20)), module, BusDepot::ON_PARAM));
 		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(15.24, 15.20)), module, BusDepot::ON_LIGHT));
-		addParam(createParamCentered<gtgBlackTinyKnob>(mm2px(Vec(7.45, 103.85)), module, BusDepot::AUX_PARAM));
-		addParam(createParamCentered<gtgBlackKnob>(mm2px(Vec(15.24, 83.13)), module, BusDepot::LEVEL_PARAM));
+		addParam(createParamCentered<gtgBlackTinyKnob>(mm2px(Vec(15.24, 60.48)), module, BusDepot::AUX_PARAM));
+		addParam(createParamCentered<gtgBlackKnob>(mm2px(Vec(15.24, 83.88)), module, BusDepot::LEVEL_PARAM));
 		addParam(createParamCentered<gtgGrayTinySnapKnob>(mm2px(Vec(15.24, 42.54)), module, BusDepot::FADE_PARAM));
 
 		addInput(createInputCentered<gtgKeyPort>(mm2px(Vec(23.6, 21.1)), module, BusDepot::ON_CV_INPUT));
-		addInput(createInputCentered<gtgKeyPort>(mm2px(Vec(15.24, 71.15)), module, BusDepot::LEVEL_CV_INPUT));
+		addInput(createInputCentered<gtgKeyPort>(mm2px(Vec(15.24, 71.63)), module, BusDepot::LEVEL_CV_INPUT));
 		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(6.95, 21.1)), module, BusDepot::LMP_INPUT));
 		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(6.95, 31.2)), module, BusDepot::R_INPUT));
 		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(7.45, 114.1)), module, BusDepot::BUS_INPUT));
@@ -183,20 +201,22 @@ struct BusDepotWidget : ModuleWidget {
 
 		addOutput(createOutputCentered<gtgNutPort>(mm2px(Vec(23.1, 103.85)), module, BusDepot::LEFT_OUTPUT));
 		addOutput(createOutputCentered<gtgNutPort>(mm2px(Vec(23.1, 114.1)), module, BusDepot::RIGHT_OUTPUT));
+		addOutput(createOutputCentered<gtgNutPort>(mm2px(Vec(7.45, 103.85)), module, BusDepot::BUS_OUTPUT));
 
 		// create vu lights
 		for (int i = 0; i < 9; i++) {
-			float spacing = i * 5.0;
+			float spacing = i * 5.25;
+			float top = 50.0;
 			if (i < 1 ) {
-				addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(5.45, 52.22 + spacing)), module, BusDepot::LEFT_LIGHTS + i));
-				addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(25.1, 52.22 + spacing)), module, BusDepot::RIGHT_LIGHTS + i));
+				addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(5.45, top + spacing)), module, BusDepot::LEFT_LIGHTS + i));
+				addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(25.1, top + spacing)), module, BusDepot::RIGHT_LIGHTS + i));
 			} else {
 				if (i < 2) {
-					addChild(createLightCentered<MediumLight<YellowLight>>(mm2px(Vec(5.45, 52.22 + spacing)), module, BusDepot::LEFT_LIGHTS + i));
-					addChild(createLightCentered<MediumLight<YellowLight>>(mm2px(Vec(25.1, 52.22 + spacing)), module, BusDepot::RIGHT_LIGHTS + i));
+					addChild(createLightCentered<MediumLight<YellowLight>>(mm2px(Vec(5.45, top + spacing)), module, BusDepot::LEFT_LIGHTS + i));
+					addChild(createLightCentered<MediumLight<YellowLight>>(mm2px(Vec(25.1, top + spacing)), module, BusDepot::RIGHT_LIGHTS + i));
 				} else {
-					addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(5.45, 52.22 + spacing)), module, BusDepot::LEFT_LIGHTS + i));
-					addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(25.1, 52.22 + spacing)), module, BusDepot::RIGHT_LIGHTS + i));
+					addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(5.45, top + spacing)), module, BusDepot::LEFT_LIGHTS + i));
+					addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(25.1, top + spacing)), module, BusDepot::RIGHT_LIGHTS + i));
 				}
 			}
 			}
