@@ -65,7 +65,7 @@ struct BusDepot : Module {
 
 		// process sound
 		float summed_out[2] = {0.f, 0.f};
-		if (depot_fader.getFade() > 0) {   // process sound only when not silent
+		if (depot_fader.getFade() > 0) {   // don't need to process sound when silent
 
 			// get param levels
 			float aux_level = params[AUX_PARAM].getValue();
@@ -91,12 +91,12 @@ struct BusDepot : Module {
 				bus_in[c] = inputs[BUS_INPUT].getPolyVoltage(c) * master_level * depot_fader.getFade();
 			}
 
-			// get red levels with aux inputs
+			// get red levels and add aux inputs
 			for (int c = 4; c < 6; c++) {
 				bus_in[c] = (stereo_in[c - 4] + inputs[BUS_INPUT].getPolyVoltage(c)) * master_level * depot_fader.getFade();
 			}
 
-			// set bus output
+			// set bus outputs
 			for (int c = 0; c < 6; c++) {
 				outputs[BUS_OUTPUT].setVoltage(bus_in[c], c);
 			}
@@ -104,7 +104,7 @@ struct BusDepot : Module {
 			// set three stereo bus outputs on bus out
 			outputs[BUS_OUTPUT].setChannels(6);
 
-			// sum stereo mix outputs and light levels
+			// sum stereo mix for stereo outputs and light levels
 			for (int c = 0; c < 2; c++) {
 				summed_out[c] = bus_in[c] + bus_in[c + 2] + bus_in[c + 4];
 			}

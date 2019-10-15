@@ -116,7 +116,8 @@ struct MetroCityBus : Module {
 		// pans
 		if (pan_divider.process() && metro_fader.on) {   // calculate pan every few samples when input is on
 
-			if (inputs[PAN_CV_INPUT].isConnected()) {   // create follow pan when CV connected
+			// create follow pan when CV connected
+			if (inputs[PAN_CV_INPUT].isConnected()) {
 
 				// get pan knob with CV and attenuator
 				float pan_pos = params[PAN_PARAM].getValue() + (((inputs[PAN_CV_INPUT].getNormalVoltage(0) * 2) * params[PAN_ATT_PARAM].getValue()) * 0.1f);
