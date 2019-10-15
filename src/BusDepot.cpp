@@ -67,13 +67,12 @@ struct BusDepot : Module {
 		float summed_out[2] = {0.f, 0.f};
 		if (depot_fader.getFade() > 0) {   // process sound only when not silent
 
-			float stereo_in[2] = {0.f, 0.f};
-
 			// get param levels
 			float aux_level = params[AUX_PARAM].getValue();
 			float master_level = clamp(inputs[LEVEL_CV_INPUT].getNormalVoltage(10.0f) * 0.1f, 0.0f, 1.0f) * params[LEVEL_PARAM].getValue();
 
 			// get aux inputs
+			float stereo_in[2] = {0.f, 0.f};
 			if (inputs[R_INPUT].isConnected()) {   // get a channel from each cable
 				stereo_in[0] = inputs[LMP_INPUT].getVoltage() * aux_level;
 				stereo_in[1] = inputs[R_INPUT].getVoltage() * aux_level;
@@ -84,30 +83,33 @@ struct BusDepot : Module {
 				}
 			}
 
-			// get bus output
-			if (outputs[BUS_OUTPUT].isConnected()) {
+			// bus inputs with levels
+			float bus_in[6] = {};
 
-				// process blue and orange buses with levels
-				for (int c = 0; c < 4; c++) {
-					outputs[BUS_OUTPUT].setVoltage(inputs[BUS_INPUT].getPolyVoltage(c) * master_level * depot_fader.getFade(), c);
-				}
-
-				// add stereo aux input and levels to red bus
-				for (int c = 4; c < 6; c++) {
-					outputs[BUS_OUTPUT].setVoltage((stereo_in[c - 4] + inputs[BUS_INPUT].getPolyVoltage(c)) * master_level * depot_fader.getFade(), c);
-				}
-
-				// set three stereo bus outputs on bus out
-				outputs[BUS_OUTPUT].setChannels(6);
+			// get blue and orange buses with levels
+			for (int c = 0; c < 4; c++) {
+				bus_in[c] = inputs[BUS_INPUT].getPolyVoltage(c) * master_level * depot_fader.getFade();
 			}
 
-			// calculate stereo mix from three stereo buses on bus input
-			if (outputs[LEFT_OUTPUT].isConnected() || outputs[RIGHT_OUTPUT].isConnected()) {
-				for (int c = 0; c < 2; c++) {
-					summed_out[c] = (stereo_in[c] + inputs[BUS_INPUT].getPolyVoltage(c) + inputs[BUS_INPUT].getPolyVoltage(c + 2) + inputs[BUS_INPUT].getPolyVoltage(c + 4)) * master_level * depot_fader.getFade();
-				}
+			// get red levels with aux inputs
+			for (int c = 4; c < 6; c++) {
+				bus_in[c] = (stereo_in[c - 4] + inputs[BUS_INPUT].getPolyVoltage(c)) * master_level * depot_fader.getFade();
 			}
 
+			// set bus output
+			for (int c = 0; c < 6; c++) {
+				outputs[BUS_OUTPUT].setVoltage(bus_in[c], c);
+			}
+
+			// set three stereo bus outputs on bus out
+			outputs[BUS_OUTPUT].setChannels(6);
+
+			// sum stereo mix outputs and light levels
+			for (int c = 0; c < 2; c++) {
+				summed_out[c] = bus_in[c] + bus_in[c + 2] + bus_in[c + 4];
+			}
+
+			// set stereo mix out
 			outputs[LEFT_OUTPUT].setVoltage(summed_out[0]);
 			outputs[RIGHT_OUTPUT].setVoltage(summed_out[1]);
 		}
