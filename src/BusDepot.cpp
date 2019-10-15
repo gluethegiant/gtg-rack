@@ -96,6 +96,9 @@ struct BusDepot : Module {
 				for (int c = 4; c < 6; c++) {
 					outputs[BUS_OUTPUT].setVoltage((stereo_in[c - 4] + inputs[BUS_INPUT].getPolyVoltage(c)) * master_level * depot_fader.getFade(), c);
 				}
+
+				// set three stereo bus outputs on bus out
+				outputs[BUS_OUTPUT].setChannels(6);
 			}
 
 			// calculate stereo mix from three stereo buses on bus input
@@ -166,7 +169,6 @@ struct BusDepot : Module {
 
 	void onSampleRateChange() override {
 		depot_fader.setSpeed(params[FADE_PARAM].getValue());
-		outputs[BUS_OUTPUT].setChannels(6);
 	}
 
 	void onReset() override {
