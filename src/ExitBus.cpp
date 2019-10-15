@@ -44,15 +44,15 @@ struct ExitBusWidget : ModuleWidget {
 		addChild(createWidget<gtgScrewUp>(Vec(RACK_GRID_WIDTH, 0)));
 		addChild(createWidget<gtgScrewUp>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(7.62, 103.85)), module, ExitBus::BUS_INPUT));
+		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(7.62, 103.863)), module, ExitBus::BUS_INPUT));
 
-		addOutput(createOutputCentered<gtgNutPort>(mm2px(Vec(7.62, 21.05)), module, ExitBus::EXIT_OUTPUTS + 0));
-		addOutput(createOutputCentered<gtgNutPort>(mm2px(Vec(7.62, 31.2)), module, ExitBus::EXIT_OUTPUTS + 1));
-		addOutput(createOutputCentered<gtgNutPort>(mm2px(Vec(7.62, 46.85)), module, ExitBus::EXIT_OUTPUTS + 2));
-		addOutput(createOutputCentered<gtgNutPort>(mm2px(Vec(7.62, 57.0)), module, ExitBus::EXIT_OUTPUTS + 3));
-		addOutput(createOutputCentered<gtgNutPort>(mm2px(Vec(7.62, 72.85)), module, ExitBus::EXIT_OUTPUTS + 4));
-		addOutput(createOutputCentered<gtgNutPort>(mm2px(Vec(7.62, 83.1)), module, ExitBus::EXIT_OUTPUTS + 5));
-		addOutput(createOutputCentered<gtgNutPort>(mm2px(Vec(7.62, 114.1)), module, ExitBus::BUS_OUTPUT));
+		addOutput(createOutputCentered<gtgNutPort>(mm2px(Vec(7.62, 21.052)), module, ExitBus::EXIT_OUTPUTS + 0));
+		addOutput(createOutputCentered<gtgNutPort>(mm2px(Vec(7.62, 31.196)), module, ExitBus::EXIT_OUTPUTS + 1));
+		addOutput(createOutputCentered<gtgNutPort>(mm2px(Vec(7.62, 47.1)), module, ExitBus::EXIT_OUTPUTS + 2));
+		addOutput(createOutputCentered<gtgNutPort>(mm2px(Vec(7.62, 57.244)), module, ExitBus::EXIT_OUTPUTS + 3));
+		addOutput(createOutputCentered<gtgNutPort>(mm2px(Vec(7.62, 73.104)), module, ExitBus::EXIT_OUTPUTS + 4));
+		addOutput(createOutputCentered<gtgNutPort>(mm2px(Vec(7.62, 83.248)), module, ExitBus::EXIT_OUTPUTS + 5));
+		addOutput(createOutputCentered<gtgNutPort>(mm2px(Vec(7.62, 114.107)), module, ExitBus::BUS_OUTPUT));
 	}
 };
 
