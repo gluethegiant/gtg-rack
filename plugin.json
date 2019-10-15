@@ -60,9 +60,20 @@
       ]
     },
     {
+      "slug": "Road",
+      "name": "Road",
+      "description": "Sub mix buses to master buses",
+      "tags": [
+        "Mixer",
+        "Delay",
+        "Utility",
+        "Polyphonic"
+      ]
+    },
+    {
       "slug": "EnterBus",
       "name": "Enter Mixer Bus",
-      "description": "Three stereo inputs to bus",
+      "description": "Three stereo inputs to buses",
       "tags": [
         "Utility"
       ]
@@ -70,7 +81,7 @@
     {
       "slug": "ExitBus",
       "name": "Exit Mixer Bus",
-      "description": "Three stereo outputs from bus",
+      "description": "Three stereo outputs from buses",
       "tags": [
         "Utility"
       ]

@@ -14,6 +14,7 @@ void init(Plugin *p) {
 	p->addModel(modelSchoolBus);
 	p->addModel(modelMetroCityBus);
 	p->addModel(modelBusRoute);
+	p->addModel(modelRoad);
 	p->addModel(modelEnterBus);
 	p->addModel(modelExitBus);
 	p->addModel(modelBusDepot);
