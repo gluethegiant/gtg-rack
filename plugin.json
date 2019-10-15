@@ -78,10 +78,8 @@
     {
       "slug": "Road",
       "name": "Road",
-      "description": "Sub mix buses to master buses",
+      "description": "Merges buses from mix groups to a master bus",
       "tags": [
-        "Mixer",
-        "Delay",
         "Utility",
         "Polyphonic"
       ]
