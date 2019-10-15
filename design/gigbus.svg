@@ -2708,14 +2708,14 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="3.0034722"
-     inkscape:cx="-4.2880777"
-     inkscape:cy="195.17062"
+     inkscape:cx="47.794595"
+     inkscape:cy="260.01491"
      inkscape:document-units="mm"
-     inkscape:current-layer="layer3"
+     inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="956"
      inkscape:window-height="1050"
-     inkscape:window-x="1920"
+     inkscape:window-x="960"
      inkscape:window-y="0"
      inkscape:window-maximized="0"
      objecttolerance="1"
@@ -2761,12 +2761,12 @@
          style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';fill:#333333;stroke-width:0.26458332">L/M/P</tspan></text>
     <text
        id="text5585"
-       y="290.07782"
+       y="289.82782"
        x="5.5689578"
        style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;line-height:1.25;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';letter-spacing:0px;word-spacing:0px;fill:#333333;fill-opacity:1;stroke:none;stroke-width:0.26458332"
        xml:space="preserve"><tspan
          style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';fill:#333333;stroke-width:0.26458332"
-         y="290.07782"
+         y="289.82782"
          x="5.5689578"
          id="tspan5583"
          sodipodi:role="line">BUS OUT</tspan></text>
@@ -2876,12 +2876,12 @@
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;line-height:1.25;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';letter-spacing:0px;word-spacing:0px;display:inline;fill:#333333;fill-opacity:1;stroke:none;stroke-width:0.26458332"
        x="6.6929069"
-       y="266.31293"
+       y="266.56293"
        id="text1592"><tspan
          sodipodi:role="line"
          id="tspan1590"
          x="6.6929069"
-         y="266.31293"
+         y="266.56293"
          style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';fill:#333333;stroke-width:0.26458332">BUS IN</tspan></text>
     <text
        xml:space="preserve"
