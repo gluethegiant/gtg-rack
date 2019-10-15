@@ -78,7 +78,7 @@
     {
       "slug": "BusDepot",
       "name": "Bus Depot",
-      "description": "Sums three stereo buses",
+      "description": "Master fader, vu meters, and mix output for three stereo buses",
       "tags": [
         "Mixer",
         "Visual",
