@@ -13,7 +13,7 @@ extern Model *modelGigBus;
 extern Model *modelSchoolBus;
 extern Model *modelMetroCityBus;
 extern Model *modelBusRoute;
-extern Model *modelRoad;
 extern Model *modelEnterBus;
 extern Model *modelExitBus;
+extern Model *modelRoad;
 extern Model *modelBusDepot;

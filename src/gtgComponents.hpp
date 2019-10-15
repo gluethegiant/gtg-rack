@@ -1,3 +1,5 @@
+#pragma once
+
 struct gtgBlackButton : app::SvgSwitch {
 	gtgBlackButton() {
 		addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlackButton.svg")));

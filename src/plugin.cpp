@@ -14,9 +14,9 @@ void init(Plugin *p) {
 	p->addModel(modelSchoolBus);
 	p->addModel(modelMetroCityBus);
 	p->addModel(modelBusRoute);
-	p->addModel(modelRoad);
 	p->addModel(modelEnterBus);
 	p->addModel(modelExitBus);
+	p->addModel(modelRoad);
 	p->addModel(modelBusDepot);
 	// Any other plugin initialization may go here.
 	// As an alternative, consider lazy-loading assets and lookup tables when your module is created to reduce startup times of Rack.
