@@ -14,7 +14,7 @@ The audio is routed along three stereo buses: red, orange, and blue.
 The bus design makes it easy to patch together modules while creating simple or complex routing.
 
 This README will give you an overview and list of features for each module.
-Read the [Wiki](https://github.com/gluethegiant/gtg-rack/wiki) for examples on how the modules work together.
+Read the [Wiki](https://github.com/gluethegiant/gtg-rack/wiki) for examples on using the modules together in a patch.
 
 ## The Modular Bus Mixers
 
