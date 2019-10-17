@@ -39,7 +39,7 @@ To build these rack modules, see the official [VCV Rack documentation](https://v
 
 ## Release Notes
 
-v. 1.0.3 The Mix Group Release (October 18, 2019)
+v. 1.0.3 The Mix Group Release (October 19, 2019)
 
 - Mix groups can more easily use the faders and vu meters of Bus Depot modules while still routing buses to final send effects (e.g. when you have one reverb to rule them all)
 - Added bus output to Bus Depot to facilitate mix groups
