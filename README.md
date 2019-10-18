@@ -45,7 +45,7 @@ v. 1.0.3 The Mix Group Release (October 19, 2019)
 - Added bus output to Bus Depot to facilitate mix groups
 - Added the Road module to merge parallel mix groups 
 - Added three input level knobs to Enter Bus (allows, among other things, creative routing of a send effect return)
-- Began the User's Guide
+- Wrote an initial User's Guide, including a tutorial
 
 v. 1.0.2 The Tick Release (October 12, 2019)
 
