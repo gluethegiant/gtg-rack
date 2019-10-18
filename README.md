@@ -10,13 +10,13 @@ With features like auto faders, polyphonic stereo spread, mix groups, and integr
 
 ## User's Guide
 
-A [User's Guide](https://github.com/gluethegiant/gtg-rack/wiki) for these modules, including VCV Rack tutorials, is available in the [Wiki](https://github.com/gluethegiant/gtg-rack/wiki).
+A [User's Guide](https://github.com/gluethegiant/gtg-rack/wiki) for these modules, including a VCV Rack tutorial, is available in the [Wiki](https://github.com/gluethegiant/gtg-rack/wiki).
 
 ## Licenses, Copyrights, Etc.
 
 "Glue the Giant" is the name of a band and a software developer.
 Do your best to not steal it (we know it's cool).
-The designs help to give these modules a unique look and are automatically copyrighted (c) 2019 in some jurisdictions.
+The designs under the res/ and designs/ directories help to give these modules a unique look and are automatically copyrighted (c) 2019 in some jurisdictions.
 Try to not copy them too closely.
 All the code is released to use under the GPL 3 license and above.
 
