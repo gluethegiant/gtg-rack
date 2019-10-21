@@ -19,6 +19,18 @@
    width="30.48mm">
   <defs
      id="defs152">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient33573">
+      <stop
+         style="stop-color:#2c2b31;stop-opacity:1"
+         offset="0"
+         id="stop33569" />
+      <stop
+         style="stop-color:#403f45;stop-opacity:1"
+         offset="1"
+         id="stop33571" />
+    </linearGradient>
     <clipPath
        id="clip89">
       <rect
@@ -2699,6 +2711,15 @@
          d="M 0.855469,0.140625 H 17.914062 V 17.199219 H 0.855469 Z m 0,0"
          inkscape:connector-curvature="0" />
     </clipPath>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient33573"
+       id="linearGradient33575"
+       x1="15.328153"
+       y1="294.23856"
+       x2="15.328153"
+       y2="170.73288"
+       gradientUnits="userSpaceOnUse" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -2708,16 +2729,16 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.5017361"
-     inkscape:cx="49.368869"
-     inkscape:cy="231.32587"
+     inkscape:cx="60.607328"
+     inkscape:cy="279.20754"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1920"
-     inkscape:window-height="1052"
-     inkscape:window-x="1920"
+     inkscape:window-width="956"
+     inkscape:window-height="1050"
+     inkscape:window-x="2880"
      inkscape:window-y="0"
-     inkscape:window-maximized="1"
+     inkscape:window-maximized="0"
      objecttolerance="1"
      guidetolerance="1"
      gridtolerance="1"
@@ -2742,7 +2763,7 @@
      transform="translate(0,-168.5)"
      style="display:inline">
     <rect
-       style="fill:#424147;fill-opacity:1;stroke:#1f1c24;stroke-width:0.25;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:url(#linearGradient33575);fill-opacity:1;stroke:#1f1c24;stroke-width:0.25;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect255539"
        width="30.229879"
        height="128.24988"
