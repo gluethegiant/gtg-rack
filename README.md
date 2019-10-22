@@ -51,7 +51,7 @@ v. 1.0.2 The Tick Release (October 12, 2019)
 
 - Added 2x or 4x preamp-style gain on all four mixer strips (selected from the context menu)
 - New sample delay lines provide latency compensation on Bus Route
-- New auto fader with speed control on Bus Depot
+- New fade automation with speed control on Bus Depot
 - Improved performance on Metro City Bus Mixer's polyphonic pan follow
 - Initialization of all parameters that are not attached to a knob
 - Improved behavior when changing sample rates
