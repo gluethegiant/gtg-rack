@@ -10,7 +10,7 @@
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   sodipodi:docname="buslanes.svg"
+   sodipodi:docname="road.svg"
    inkscape:version="0.92.4 5da689c313, 2019-01-14"
    id="svg158"
    version="1.1"
@@ -2720,11 +2720,11 @@
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="956"
-     inkscape:window-height="1050"
-     inkscape:window-x="960"
+     inkscape:window-width="1920"
+     inkscape:window-height="1052"
+     inkscape:window-x="1920"
      inkscape:window-y="0"
-     inkscape:window-maximized="0"
+     inkscape:window-maximized="1"
      objecttolerance="10000"
      guidetolerance="10000"
      gridtolerance="10000"
@@ -2805,14 +2805,14 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;line-height:1.25;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';letter-spacing:0px;word-spacing:0px;display:inline;fill:#333333;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-       x="4.5063891"
+       x="3.1993506"
        y="261.06244"
        id="text1592"><tspan
          sodipodi:role="line"
          id="tspan1590"
-         x="4.5063891"
+         x="3.1993506"
          y="261.06244"
-         style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';fill:#333333;stroke-width:0.26458332">BUS 6</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';fill:#333333;stroke-width:0.26458332">BUS IN 6</tspan></text>
     <text
        id="text1598"
        y="289.8277"
@@ -2862,14 +2862,14 @@
     <text
        id="text12090"
        y="245.31244"
-       x="4.522264"
+       x="3.2152257"
        style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;line-height:1.25;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';letter-spacing:0px;word-spacing:0px;display:inline;fill:#333333;fill-opacity:1;stroke:none;stroke-width:0.26458332"
        xml:space="preserve"><tspan
          style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';fill:#333333;stroke-width:0.26458332"
          y="245.31244"
-         x="4.522264"
+         x="3.2152257"
          id="tspan12088"
-         sodipodi:role="line">BUS 5</tspan></text>
+         sodipodi:role="line">BUS IN 5</tspan></text>
     <g
        id="g12098"
        style="display:inline"
@@ -2898,14 +2898,14 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;line-height:1.25;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';letter-spacing:0px;word-spacing:0px;display:inline;fill:#333333;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-       x="4.4788723"
+       x="3.171834"
        y="229.56244"
        id="text12114"><tspan
          sodipodi:role="line"
          id="tspan12112"
-         x="4.4788723"
+         x="3.171834"
          y="229.56244"
-         style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';fill:#333333;stroke-width:0.26458332">BUS 4</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';fill:#333333;stroke-width:0.26458332">BUS IN 4</tspan></text>
     <g
        transform="translate(-1.1392914e-4,-36.999638)"
        style="display:inline"
@@ -2934,14 +2934,14 @@
     <text
        id="text12138"
        y="213.81244"
-       x="4.5148554"
+       x="3.2078173"
        style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;line-height:1.25;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';letter-spacing:0px;word-spacing:0px;display:inline;fill:#333333;fill-opacity:1;stroke:none;stroke-width:0.26458332"
        xml:space="preserve"><tspan
          style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';fill:#333333;stroke-width:0.26458332"
          y="213.81244"
-         x="4.5148554"
+         x="3.2078173"
          id="tspan12136"
-         sodipodi:role="line">BUS 3</tspan></text>
+         sodipodi:role="line">BUS IN 3</tspan></text>
     <g
        id="g12146"
        style="display:inline"
@@ -2970,14 +2970,14 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;line-height:1.25;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';letter-spacing:0px;word-spacing:0px;display:inline;fill:#333333;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-       x="4.5307307"
+       x="3.2236924"
        y="198.06244"
        id="text12162"><tspan
          sodipodi:role="line"
          id="tspan12160"
-         x="4.5307307"
+         x="3.2236924"
          y="198.06244"
-         style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';fill:#333333;stroke-width:0.26458332">BUS 2</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';fill:#333333;stroke-width:0.26458332">BUS IN 2</tspan></text>
     <g
        transform="translate(-1.1392914e-4,-68.499638)"
        style="display:inline"
@@ -3006,14 +3006,14 @@
     <text
        id="text12186"
        y="182.31244"
-       x="4.7201724"
+       x="3.4131339"
        style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;line-height:1.25;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';letter-spacing:0px;word-spacing:0px;display:inline;fill:#333333;fill-opacity:1;stroke:none;stroke-width:0.26458332"
        xml:space="preserve"><tspan
          style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';fill:#333333;stroke-width:0.26458332"
          y="182.31244"
-         x="4.7201724"
+         x="3.4131339"
          sodipodi:role="line"
-         id="tspan12208">BUS 1</tspan></text>
+         id="tspan12208">BUS IN 1</tspan></text>
     <g
        id="g12194"
        style="display:inline"

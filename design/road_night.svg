@@ -2745,11 +2745,11 @@
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="956"
-     inkscape:window-height="1050"
+     inkscape:window-width="1920"
+     inkscape:window-height="1052"
      inkscape:window-x="1920"
      inkscape:window-y="0"
-     inkscape:window-maximized="0"
+     inkscape:window-maximized="1"
      objecttolerance="10000"
      guidetolerance="10000"
      gridtolerance="10000"
@@ -3033,69 +3033,69 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;line-height:1.25;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';letter-spacing:0px;word-spacing:0px;display:inline;fill:#ececec;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-       x="4.5063891"
+       x="3.1993506"
        y="261.06244"
        id="text1592"><tspan
          sodipodi:role="line"
          id="tspan1590"
-         x="4.5063891"
+         x="3.1993506"
          y="261.06244"
-         style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';fill:#ececec;stroke-width:0.26458332">BUS 6</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';fill:#ececec;stroke-width:0.26458332">BUS IN 6</tspan></text>
     <text
        id="text2226"
        y="182.31244"
-       x="4.7201724"
+       x="3.4131339"
        style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;line-height:1.25;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';letter-spacing:0px;word-spacing:0px;display:inline;fill:#ececec;fill-opacity:1;stroke:none;stroke-width:0.26458332"
        xml:space="preserve"><tspan
          style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';fill:#ececec;stroke-width:0.26458332"
          y="182.31244"
-         x="4.7201724"
+         x="3.4131339"
          id="tspan2224"
-         sodipodi:role="line">BUS 1</tspan></text>
+         sodipodi:role="line">BUS IN 1</tspan></text>
     <text
        id="text2250"
        y="198.06244"
-       x="4.5307307"
+       x="3.2236924"
        style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;line-height:1.25;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';letter-spacing:0px;word-spacing:0px;display:inline;fill:#ececec;fill-opacity:1;stroke:none;stroke-width:0.26458332"
        xml:space="preserve"><tspan
          style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';fill:#ececec;stroke-width:0.26458332"
          y="198.06244"
-         x="4.5307307"
+         x="3.2236924"
          id="tspan2248"
-         sodipodi:role="line">BUS 2</tspan></text>
+         sodipodi:role="line">BUS IN 2</tspan></text>
     <text
        id="text2274"
        y="213.81244"
-       x="4.5148554"
+       x="3.2078173"
        style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;line-height:1.25;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';letter-spacing:0px;word-spacing:0px;display:inline;fill:#ececec;fill-opacity:1;stroke:none;stroke-width:0.26458332"
        xml:space="preserve"><tspan
          style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';fill:#ececec;stroke-width:0.26458332"
          y="213.81244"
-         x="4.5148554"
+         x="3.2078173"
          id="tspan2272"
-         sodipodi:role="line">BUS 3</tspan></text>
+         sodipodi:role="line">BUS IN 3</tspan></text>
     <text
        id="text2298"
        y="229.56244"
-       x="4.4788723"
+       x="3.171834"
        style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;line-height:1.25;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';letter-spacing:0px;word-spacing:0px;display:inline;fill:#ececec;fill-opacity:1;stroke:none;stroke-width:0.26458332"
        xml:space="preserve"><tspan
          style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';fill:#ececec;stroke-width:0.26458332"
          y="229.56244"
-         x="4.4788723"
+         x="3.171834"
          id="tspan2296"
-         sodipodi:role="line">BUS 4</tspan></text>
+         sodipodi:role="line">BUS IN 4</tspan></text>
     <text
        id="text2322"
        y="245.31244"
-       x="4.522264"
+       x="3.2152257"
        style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;line-height:1.25;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';letter-spacing:0px;word-spacing:0px;display:inline;fill:#ececec;fill-opacity:1;stroke:none;stroke-width:0.26458332"
        xml:space="preserve"><tspan
          style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';fill:#ececec;stroke-width:0.26458332"
          y="245.31244"
-         x="4.522264"
+         x="3.2152257"
          id="tspan2320"
-         sodipodi:role="line">BUS 5</tspan></text>
+         sodipodi:role="line">BUS IN 5</tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"
