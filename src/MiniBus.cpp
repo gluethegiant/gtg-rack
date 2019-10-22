@@ -29,6 +29,7 @@ struct MiniBus : Module {
 	AutoFader mini_fader;
 
 	const int fade_speed = 20;
+	int color_theme = 0;
 
 	MiniBus() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -66,20 +67,23 @@ struct MiniBus : Module {
 		outputs[BUS_OUTPUT].setChannels(6);
 	}
 
-	// save on button and gain states
+	// save on button, gain states, and color theme
 	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
 		json_object_set_new(rootJ, "input_on", json_integer(mini_fader.on));
 		json_object_set_new(rootJ, "gain", json_real(mini_fader.getGain()));
+		json_object_set_new(rootJ, "color_theme", json_integer(color_theme));
 		return rootJ;
 	}
 
-	// load on button and gain states
+	// load on button, gain states, and color theme
 	void dataFromJson(json_t *rootJ) override {
 		json_t *input_onJ = json_object_get(rootJ, "input_on");
 		if (input_onJ) mini_fader.on = json_integer_value(input_onJ);
 		json_t *gainJ = json_object_get(rootJ, "gain");
 		if (gainJ) mini_fader.setGain((float)json_real_value(gainJ));
+		json_t *color_themeJ = json_object_get(rootJ, "color_theme");
+		if (color_themeJ) color_theme = json_integer_value(color_themeJ);
 	}
 
 	// reset fader speed
@@ -96,9 +100,19 @@ struct MiniBus : Module {
 
 
 struct MiniBusWidget : ModuleWidget {
+	SvgPanel* nightPanel;
+
 	MiniBusWidget(MiniBus *module) {
 		setModule(module);
 		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/MiniBus.svg")));
+
+		// load night panel if not preview
+		if (module) {
+			nightPanel = new SvgPanel();
+			nightPanel->setBackground(APP->window->loadSvg(asset::plugin(pluginInstance, "res/MiniBus_Night.svg")));
+			nightPanel->visible = false;
+			addChild(nightPanel);
+		}
 
 		addChild(createWidget<gtgScrewUp>(Vec(RACK_GRID_WIDTH, 0)));
 		addChild(createWidget<gtgScrewUp>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
@@ -116,6 +130,15 @@ struct MiniBusWidget : ModuleWidget {
 		addOutput(createOutputCentered<gtgNutPort>(mm2px(Vec(7.62, 114.1)), module, MiniBus::BUS_OUTPUT));
 	}
 
+	// add theme items to context menu
+	struct ThemeItem : MenuItem {
+		MiniBus* module;
+		int theme;
+		void onAction(const event::Action& e) override {
+			module->color_theme = theme;
+		}
+	};
+
 	// add gain levels to context menu
 	struct GainItem : MenuItem {
 		MiniBus* module;
@@ -129,6 +152,18 @@ struct MiniBusWidget : ModuleWidget {
 		MiniBus* module = dynamic_cast<MiniBus*>(this->module);
 
 		menu->addChild(new MenuEntry);
+		menu->addChild(createMenuLabel("Color Theme"));
+
+		std::string themeTitles[2] = {"70's Cream", "Night Riding"};
+		for (int i = 0; i < 2; i++) {
+			ThemeItem* themeItem = createMenuItem<ThemeItem>(themeTitles[i]);
+			themeItem->rightText = CHECKMARK(module->color_theme == i);
+			themeItem->module = module;
+			themeItem->theme = i;
+			menu->addChild(themeItem);
+		}
+
+		menu->addChild(new MenuEntry);
 		menu->addChild(createMenuLabel("Preamp on M/P Input"));
 
 		std::string gainTitles[3] = {"No gain (default)", "2x gain", "4x gain"};
@@ -140,6 +175,14 @@ struct MiniBusWidget : ModuleWidget {
 			gainItem->gain = gainAmounts[i];
 			menu->addChild(gainItem);
 		}
+	}
+
+	void step() override {
+		if (module) {
+			panel->visible = ((((MiniBus*)module)->color_theme) == 0);
+			nightPanel->visible = ((((MiniBus*)module)->color_theme) == 1);
+		}
+		Widget::step();
 	}
 };
 
