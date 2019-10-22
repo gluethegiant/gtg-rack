@@ -28,6 +28,10 @@ struct AutoFader {
 		return fade;
 	}
 
+	float getExpFade(float power) {
+		return std::pow(fade, power);
+	}
+
 	void process() {   // increments or decreases fade value
 		if (on) {
 			if (fade < gain) {
