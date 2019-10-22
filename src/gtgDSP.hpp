@@ -28,7 +28,7 @@ struct AutoFader {
 		return fade;
 	}
 
-	float getExpFade(float power) {
+	float getExpFade(double power) {
 		return std::pow(fade, power);
 	}
 
