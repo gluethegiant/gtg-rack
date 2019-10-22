@@ -70,6 +70,7 @@ struct BusDepot : Module {
 			// get param levels
 			float aux_level = params[AUX_PARAM].getValue();
 			float master_level = clamp(inputs[LEVEL_CV_INPUT].getNormalVoltage(10.0f) * 0.1f, 0.0f, 1.0f) * params[LEVEL_PARAM].getValue();
+			float fade = std::pow(depot_fader.getFade(), 3);   // exponential fade on Bus Depot for auto fader
 
 			// get aux inputs
 			float stereo_in[2] = {0.f, 0.f};
@@ -88,12 +89,12 @@ struct BusDepot : Module {
 
 			// get blue and orange buses with levels
 			for (int c = 0; c < 4; c++) {
-				bus_in[c] = inputs[BUS_INPUT].getPolyVoltage(c) * master_level * depot_fader.getFade();
+				bus_in[c] = inputs[BUS_INPUT].getPolyVoltage(c) * master_level * fade;
 			}
 
 			// get red levels and add aux inputs
 			for (int c = 4; c < 6; c++) {
-				bus_in[c] = (stereo_in[c - 4] + inputs[BUS_INPUT].getPolyVoltage(c)) * master_level * depot_fader.getFade();
+				bus_in[c] = (stereo_in[c - 4] + inputs[BUS_INPUT].getPolyVoltage(c)) * master_level * fade;
 			}
 
 			// set bus outputs
