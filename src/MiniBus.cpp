@@ -154,7 +154,7 @@ struct MiniBusWidget : ModuleWidget {
 		menu->addChild(new MenuEntry);
 		menu->addChild(createMenuLabel("Color Theme"));
 
-		std::string themeTitles[2] = {"70's Cream", "Night Riding"};
+		std::string themeTitles[2] = {"70's Cream", "Night Ride"};
 		for (int i = 0; i < 2; i++) {
 			ThemeItem* themeItem = createMenuItem<ThemeItem>(themeTitles[i]);
 			themeItem->rightText = CHECKMARK(module->color_theme == i);

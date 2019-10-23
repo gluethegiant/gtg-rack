@@ -2,6 +2,7 @@
 
 To use these mixers, simply connect them together with the BUS IN and BUS OUT ports.
 The audio is routed along three stereo buses: red, orange, and blue.
+The Bus Depot module combines the buses to create a stereo mix out.
 
 The bus design makes it easy to patch together modules while creating simple or complex routing.
 With features like auto faders, polyphonic stereo spread, mix groups, and integrated latency compensation, they're also fun to use.
