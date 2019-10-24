@@ -2715,7 +2715,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.5017362"
-     inkscape:cx="34.744095"
+     inkscape:cx="-84.118326"
      inkscape:cy="263.26118"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
@@ -2752,12 +2752,12 @@
      transform="translate(0,-168.5)"
      style="display:inline">
     <rect
-       style="fill:#fafae9;fill-opacity:1;stroke:#d0cdb2;stroke-width:0.25;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#fafae9;fill-opacity:1;stroke:none;stroke-width:0.25232163;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect255539"
-       width="14.990005"
-       height="128.25"
-       x="0.12499762"
-       y="168.625" />
+       width="15.24"
+       height="128.5"
+       x="0"
+       y="168.5" />
     <g
        id="g5034">
       <path
