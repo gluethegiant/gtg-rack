@@ -2,10 +2,10 @@
 
 To use these mixers, simply connect them together with the BUS IN and BUS OUT ports.
 The audio is routed along three stereo buses: red, orange, and blue.
-The Bus Depot module combines the buses to create a stereo mix out.
+The Bus Depot module can create mix groups and provide a final stereo mix out.
 
 The bus design makes it easy to patch together modules while creating simple or complex routing.
-With features like auto faders, polyphonic stereo spread, mix groups, and integrated latency compensation, they're also fun to use.
+With features like polyphonic stereo spread, fade automation, mix groups, and integrated latency compensation, they're also fun to use.
 
 ![Modular bus mixers from Glue the Giant](https://github.com/gluethegiant/gtg-rack/blob/master/design/screenshot.png)
 
@@ -27,7 +27,7 @@ Thanks to Andrew Belt for accepting a tiny page of code for a library that VCV R
 That encouraged the coding of these modules.
 
 Thanks to all the other Rack coders, especially those who share their code.
-You are too numerous to thank individually, but I tried to star all of your repos.
+You are too numerous to thank individually, but I tried to star all of your repos and have started to include acknowledgments in the code.
 Thanks for the early encouragement from users, like Aria_Salvatrice, dag2099, and chaircrusher, who displayed the use of the modular bus mixers in published songs and videos.
 That early encouragement made me want to make the modules more feature complete with better code under the hood.
 Thanks to rsmus7 for beta testing.
