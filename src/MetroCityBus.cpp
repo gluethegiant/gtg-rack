@@ -63,6 +63,7 @@ struct MetroCityBus : Module {
 	float light_brights[9] = {};
 	long f_delay = 0;   // follow delay
 	float pan_rate = APP->engine->getSampleRate() / pan_division;   // to work with pan clock divider
+	int color_theme = 0;
 
 	MetroCityBus() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -80,6 +81,7 @@ struct MetroCityBus : Module {
 		light_divider.setDivision(64);
 		metro_fader.setSpeed(fade_speed);
 		initializePanObjects();
+		color_theme = loadDefaultTheme();
 	}
 
 	void process(const ProcessArgs &args) override {
@@ -320,39 +322,49 @@ struct MetroCityBus : Module {
 
 
 struct MetroCityBusWidget : ModuleWidget {
+	SvgPanel* night_panel;
+
 	MetroCityBusWidget(MetroCityBus *module) {
 		setModule(module);
 		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/MetroCityBus.svg")));
 
-		addChild(createWidget<gtgScrewUp>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<gtgScrewUp>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<gtgScrewUp>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<gtgScrewUp>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		// load night panel if not preview
+		if (module) {
+			night_panel = new SvgPanel();
+			night_panel->setBackground(APP->window->loadSvg(asset::plugin(pluginInstance, "res/MetroCityBus_Night.svg")));
+			night_panel->visible = false;
+			addChild(night_panel);
+		}
 
-		addParam(createParamCentered<gtgBlackButton>(mm2px(Vec(20.32, 15.20)), module, MetroCityBus::ON_PARAM));
+		addChild(createThemedWidget<gtgScrewUp>(Vec(RACK_GRID_WIDTH, 0), module ? &module->color_theme : NULL));
+		addChild(createThemedWidget<gtgScrewUp>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0), module ? &module->color_theme : NULL));
+		addChild(createThemedWidget<gtgScrewUp>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), module ? &module->color_theme : NULL));
+		addChild(createThemedWidget<gtgScrewUp>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), module ? &module->color_theme : NULL));
+
+		addParam(createThemedParamCentered<gtgBlackButton>(mm2px(Vec(20.32, 15.20)), module, MetroCityBus::ON_PARAM, module ? &module->color_theme : NULL));
 		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(20.32, 15.20)), module, MetroCityBus::ON_LIGHT));
-		addParam(createParamCentered<gtgGrayTinyKnob>(mm2px(Vec(11.379, 39.74)), module, MetroCityBus::SPREAD_PARAM));
-		addParam(createParamCentered<gtgGrayTinyKnob>(mm2px(Vec(29.06, 39.74)), module, MetroCityBus::PAN_ATT_PARAM));
-		addParam(createParamCentered<gtgBlackButton>(mm2px(Vec(6.95, 50.01)), module, MetroCityBus::REVERSE_PARAM));
+		addParam(createThemedParamCentered<gtgGrayTinyKnob>(mm2px(Vec(11.379, 39.74)), module, MetroCityBus::SPREAD_PARAM, module ? &module->color_theme : NULL));
+		addParam(createThemedParamCentered<gtgGrayTinyKnob>(mm2px(Vec(29.06, 39.74)), module, MetroCityBus::PAN_ATT_PARAM, module ? &module->color_theme : NULL));
+		addParam(createThemedParamCentered<gtgBlackButton>(mm2px(Vec(6.95, 50.01)), module, MetroCityBus::REVERSE_PARAM, module ? &module->color_theme : NULL));
 		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(6.95, 50.01)), module, MetroCityBus::REVERSE_LIGHT));
-		addParam(createParamCentered<gtgGrayKnob>(mm2px(Vec(20.32, 50.01)), module, MetroCityBus::PAN_PARAM));
-		addParam(createParamCentered<gtgBlackButton>(mm2px(Vec(6.95, 66.46)), module, MetroCityBus::BLUE_POST_PARAM));
+		addParam(createThemedParamCentered<gtgGrayKnob>(mm2px(Vec(20.32, 50.01)), module, MetroCityBus::PAN_PARAM, module ? &module->color_theme : NULL));
+		addParam(createThemedParamCentered<gtgBlackButton>(mm2px(Vec(6.95, 66.46)), module, MetroCityBus::BLUE_POST_PARAM, module ? &module->color_theme : NULL));
 		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(6.95, 66.46)), module, MetroCityBus::BLUE_POST_LIGHT));
-		addParam(createParamCentered<gtgBlueKnob>(mm2px(Vec(20.32, 66.46)), module, MetroCityBus::LEVEL_PARAMS + 0));
-		addParam(createParamCentered<gtgBlackButton>(mm2px(Vec(6.95, 82.87)), module, MetroCityBus::ORANGE_POST_PARAM));
+		addParam(createThemedParamCentered<gtgBlueKnob>(mm2px(Vec(20.32, 66.46)), module, MetroCityBus::LEVEL_PARAMS + 0, module ? &module->color_theme : NULL));
+		addParam(createThemedParamCentered<gtgBlackButton>(mm2px(Vec(6.95, 82.87)), module, MetroCityBus::ORANGE_POST_PARAM, module ? &module->color_theme : NULL));
 		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(6.95, 82.87)), module, MetroCityBus::ORANGE_POST_LIGHT));
-		addParam(createParamCentered<gtgOrangeKnob>(mm2px(Vec(20.32, 82.87)), module, MetroCityBus::LEVEL_PARAMS + 1));
-		addParam(createParamCentered<gtgRedKnob>(mm2px(Vec(20.32, 99.32)), module, MetroCityBus::LEVEL_PARAMS + 2));
+		addParam(createThemedParamCentered<gtgOrangeKnob>(mm2px(Vec(20.32, 82.87)), module, MetroCityBus::LEVEL_PARAMS + 1, module ? &module->color_theme : NULL));
+		addParam(createThemedParamCentered<gtgRedKnob>(mm2px(Vec(20.32, 99.32)), module, MetroCityBus::LEVEL_PARAMS + 2, module ? &module->color_theme : NULL));
 
-		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(7.44, 21.083)), module, MetroCityBus::POLY_INPUT));
-		addInput(createInputCentered<gtgKeyPort>(mm2px(Vec(33.231, 21.083)), module, MetroCityBus::ON_CV_INPUT));
-		addInput(createInputCentered<gtgKeyPort>(mm2px(Vec(33.73, 50.01)), module, MetroCityBus::PAN_CV_INPUT));
-		addInput(createInputCentered<gtgKeyPort>(mm2px(Vec(33.73, 66.46)), module, MetroCityBus::LEVEL_CV_INPUTS + 0));
-		addInput(createInputCentered<gtgKeyPort>(mm2px(Vec(33.73, 82.87)), module, MetroCityBus::LEVEL_CV_INPUTS + 1));
-		addInput(createInputCentered<gtgKeyPort>(mm2px(Vec(33.73, 99.32)), module, MetroCityBus::LEVEL_CV_INPUTS + 2));
-		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(7.44, 114.107)), module, MetroCityBus::BUS_INPUT));
+		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(7.44, 21.083)), true, module, MetroCityBus::POLY_INPUT, module ? &module->color_theme : NULL));
+		addInput(createThemedPortCentered<gtgKeyPort>(mm2px(Vec(33.231, 21.083)), true, module, MetroCityBus::ON_CV_INPUT, module ? &module->color_theme : NULL));
+		addInput(createThemedPortCentered<gtgKeyPort>(mm2px(Vec(33.73, 50.01)), true, module, MetroCityBus::PAN_CV_INPUT, module ? &module->color_theme : NULL));
+		addInput(createThemedPortCentered<gtgKeyPort>(mm2px(Vec(33.73, 66.46)), true, module, MetroCityBus::LEVEL_CV_INPUTS + 0, module ? &module->color_theme : NULL));
+		addInput(createThemedPortCentered<gtgKeyPort>(mm2px(Vec(33.73, 82.87)), true, module, MetroCityBus::LEVEL_CV_INPUTS + 1, module ? &module->color_theme : NULL));
+		addInput(createThemedPortCentered<gtgKeyPort>(mm2px(Vec(33.73, 99.32)), true, module, MetroCityBus::LEVEL_CV_INPUTS + 2, module ? &module->color_theme : NULL));
+		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(7.44, 114.107)), true, module, MetroCityBus::BUS_INPUT, module ? &module->color_theme : NULL));
 
-		addOutput(createOutputCentered<gtgNutPort>(mm2px(Vec(33.231, 114.107)), module, MetroCityBus::BUS_OUTPUT));
+		addOutput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(33.231, 114.107)), false, module, MetroCityBus::BUS_OUTPUT, module ? &module->color_theme : NULL));
 
 		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(4.423, 33.341)), module, MetroCityBus::PAN_LIGHTS + 0));
 		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(8.401, 31.86)), module, MetroCityBus::PAN_LIGHTS + 1));
@@ -365,6 +377,15 @@ struct MetroCityBusWidget : ModuleWidget {
 		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(36.248, 33.341)), module, MetroCityBus::PAN_LIGHTS + 8));
 	}
 
+	// add theme items to context menu
+	struct ThemeItem : MenuItem {
+		MetroCityBus* module;
+		int theme;
+		void onAction(const event::Action& e) override {
+			module->color_theme = theme;
+		}
+	};
+
 	// add gain options to context menu
 	struct GainItem : MenuItem {
 		MetroCityBus* module;
@@ -374,8 +395,29 @@ struct MetroCityBusWidget : ModuleWidget {
 		}
 	};
 
+	// load default theme
+	struct DefaultThemeItem : MenuItem {
+		MetroCityBus* module;
+		void onAction(const event::Action &e) override {
+			saveDefaultTheme(rightText.empty());
+		}
+	};
+
+	// create menu
 	void appendContextMenu(Menu* menu) override {
 		MetroCityBus* module = dynamic_cast<MetroCityBus*>(this->module);
+
+		menu->addChild(new MenuEntry);
+		menu->addChild(createMenuLabel("Color Theme"));
+
+		std::string themeTitles[2] = {"70's Cream", "Night Ride"};
+		for (int i = 0; i < 2; i++) {
+			ThemeItem* themeItem = createMenuItem<ThemeItem>(themeTitles[i]);
+			themeItem->rightText = CHECKMARK(module->color_theme == i);
+			themeItem->module = module;
+			themeItem->theme = i;
+			menu->addChild(themeItem);
+		}
 
 		menu->addChild(new MenuEntry);
 		menu->addChild(createMenuLabel("Preamp on Polyphonic Input"));
@@ -389,6 +431,20 @@ struct MetroCityBusWidget : ModuleWidget {
 			gainItem->gain = gainAmounts[i];
 			menu->addChild(gainItem);
 		}
+	
+		menu->addChild(new MenuEntry);
+		menu->addChild(createMenuLabel("Modular Bus Mixer Defaults"));
+
+		menu->addChild(createMenuItem<DefaultThemeItem>("Night Ride theme", CHECKMARK(loadDefaultTheme())));
+}
+
+	// display panel based on theme
+	void step() override {
+		if (module) {
+			panel->visible = ((((MetroCityBus*)module)->color_theme) == 0);
+			night_panel->visible = ((((MetroCityBus*)module)->color_theme) == 1);
+		}
+		Widget::step();
 	}
 };
 

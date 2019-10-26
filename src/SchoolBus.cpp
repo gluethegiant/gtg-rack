@@ -234,6 +234,7 @@ struct SchoolBusWidget : ModuleWidget {
 		}
 	};
 
+	// create menu
 	void appendContextMenu(Menu* menu) override {
 		SchoolBus* module = dynamic_cast<SchoolBus*>(this->module);
 
@@ -264,6 +265,7 @@ struct SchoolBusWidget : ModuleWidget {
 
 		menu->addChild(new MenuEntry);
 		menu->addChild(createMenuLabel("Modular Bus Mixer Defaults"));
+
 		menu->addChild(createMenuItem<DefaultThemeItem>("Night Ride theme", CHECKMARK(loadDefaultTheme())));
 	}
 
