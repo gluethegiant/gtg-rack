@@ -1,3 +1,10 @@
+// ***
+//
+// Thanks to Marc Boulé (Geodesics code) for figuring out theme switching and keeping it open source.
+// Components based on component library and Andrew Belt's VCV Rack work
+//
+// ***
+
 #pragma once
 
 #include <rack.hpp>
