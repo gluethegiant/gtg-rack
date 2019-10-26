@@ -2769,16 +2769,16 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.4142136"
-     inkscape:cx="44.437719"
+     inkscape:cx="3.0719734"
      inkscape:cy="254.30002"
      inkscape:document-units="mm"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="layer3"
      showgrid="false"
-     inkscape:window-width="1920"
-     inkscape:window-height="1052"
-     inkscape:window-x="1920"
+     inkscape:window-width="939"
+     inkscape:window-height="1050"
+     inkscape:window-x="33"
      inkscape:window-y="0"
-     inkscape:window-maximized="1"
+     inkscape:window-maximized="0"
      objecttolerance="1"
      guidetolerance="1"
      gridtolerance="1"
@@ -4065,7 +4065,7 @@
          sodipodi:nodetypes="ccccc" />
     </g>
     <rect
-       style="display:inline;opacity:1;fill:#4d4d4d;fill-opacity:1;stroke:none;stroke-width:0.14634223;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;enable-background:new"
+       style="display:inline;opacity:1;fill:#333333;fill-opacity:1;stroke:none;stroke-width:0.14634223;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;enable-background:new"
        id="rect8116"
        width="6.5192161"
        height="3.9080014"
@@ -4075,7 +4075,7 @@
        rx="0.51027209" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222223px;line-height:1.25;font-family:monospace;-inkscape-font-specification:monospace;letter-spacing:0px;word-spacing:0px;display:inline;opacity:1;fill:#fafae9;fill-opacity:1;stroke:none;stroke-width:0.26458332;enable-background:new"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222223px;line-height:1.25;font-family:monospace;-inkscape-font-specification:monospace;letter-spacing:0px;word-spacing:0px;display:inline;opacity:1;fill:#8dd35f;fill-opacity:1;stroke:none;stroke-width:0.26458332;enable-background:new;"
        x="12.613459"
        y="13.087328"
        id="text8128"><tspan
@@ -4083,7 +4083,7 @@
          id="tspan8126"
          x="12.613459"
          y="13.087328"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222223px;font-family:monospace;-inkscape-font-specification:monospace;fill:#fafae9;fill-opacity:1;stroke-width:0.26458332">100</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222223px;font-family:monospace;-inkscape-font-specification:monospace;fill:#8dd35f;fill-opacity:1;stroke-width:0.26458332;">100</tspan></text>
     <rect
        rx="0.51027209"
        ry="0.47720057"
@@ -4092,10 +4092,10 @@
        height="3.9080014"
        width="6.5192161"
        id="rect1692"
-       style="display:inline;opacity:1;fill:#4d4d4d;fill-opacity:1;stroke:none;stroke-width:0.14634223;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;enable-background:new" />
+       style="display:inline;opacity:1;fill:#333333;fill-opacity:1;stroke:none;stroke-width:0.14634223;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;enable-background:new" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222223px;line-height:1.25;font-family:monospace;-inkscape-font-specification:monospace;letter-spacing:0px;word-spacing:0px;display:inline;opacity:1;fill:#fafae9;fill-opacity:1;stroke:none;stroke-width:0.26458332;enable-background:new"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222223px;line-height:1.25;font-family:monospace;-inkscape-font-specification:monospace;letter-spacing:0px;word-spacing:0px;display:inline;opacity:1;fill:#8dd35f;fill-opacity:1;stroke:none;stroke-width:0.26458332;enable-background:new;"
        x="12.613459"
        y="44.335781"
        id="text8128-9"><tspan
@@ -4103,9 +4103,9 @@
          id="tspan8126-2"
          x="12.613459"
          y="44.335781"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222223px;font-family:monospace;-inkscape-font-specification:monospace;fill:#fafae9;fill-opacity:1;stroke-width:0.26458332">100</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222223px;font-family:monospace;-inkscape-font-specification:monospace;fill:#8dd35f;fill-opacity:1;stroke-width:0.26458332;">100</tspan></text>
     <rect
-       style="display:inline;opacity:1;fill:#4d4d4d;fill-opacity:1;stroke:none;stroke-width:0.14634223;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;enable-background:new"
+       style="display:inline;opacity:1;fill:#333333;fill-opacity:1;stroke:none;stroke-width:0.14634223;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;enable-background:new"
        id="rect1694"
        width="6.5192161"
        height="3.9080014"
@@ -4115,7 +4115,7 @@
        rx="0.51027209" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222223px;line-height:1.25;font-family:monospace;-inkscape-font-specification:monospace;letter-spacing:0px;word-spacing:0px;display:inline;opacity:1;fill:#fafae9;fill-opacity:1;stroke:none;stroke-width:0.26458332;enable-background:new"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222223px;line-height:1.25;font-family:monospace;-inkscape-font-specification:monospace;letter-spacing:0px;word-spacing:0px;display:inline;opacity:1;fill:#8dd35f;fill-opacity:1;stroke:none;stroke-width:0.26458332;enable-background:new;"
        x="12.613459"
        y="75.375328"
        id="text8128-2"><tspan
@@ -4123,7 +4123,7 @@
          id="tspan8126-4"
          x="12.613459"
          y="75.375328"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222223px;font-family:monospace;-inkscape-font-specification:monospace;fill:#fafae9;fill-opacity:1;stroke-width:0.26458332">100</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222223px;font-family:monospace;-inkscape-font-specification:monospace;fill:#8dd35f;fill-opacity:1;stroke-width:0.26458332;">100</tspan></text>
     <circle
        style="fill:#333333;fill-opacity:1;stroke:none;stroke-width:0.22246392;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.56593407"
        id="circle8096"
