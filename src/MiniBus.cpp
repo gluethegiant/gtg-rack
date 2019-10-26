@@ -38,6 +38,7 @@ struct MiniBus : Module {
 		configParam(LEVEL_PARAMS + 1, 0.f, 1.f, 0.f, "Level to orange bus");
 		configParam(LEVEL_PARAMS + 2, 0.f, 1.f, 1.f, "Level to red bus");
 		mini_fader.setSpeed(fade_speed);
+		color_theme = loadDefaultTheme();
 	}
 
 	void process(const ProcessArgs &args) override {
@@ -100,7 +101,7 @@ struct MiniBus : Module {
 
 
 struct MiniBusWidget : ModuleWidget {
-	SvgPanel* nightPanel;
+	SvgPanel* night_panel;
 
 	MiniBusWidget(MiniBus *module) {
 		setModule(module);
@@ -108,26 +109,26 @@ struct MiniBusWidget : ModuleWidget {
 
 		// load night panel if not preview
 		if (module) {
-			nightPanel = new SvgPanel();
-			nightPanel->setBackground(APP->window->loadSvg(asset::plugin(pluginInstance, "res/MiniBus_Night.svg")));
-			nightPanel->visible = false;
-			addChild(nightPanel);
+			night_panel = new SvgPanel();
+			night_panel->setBackground(APP->window->loadSvg(asset::plugin(pluginInstance, "res/MiniBus_Night.svg")));
+			night_panel->visible = false;
+			addChild(night_panel);
 		}
 
-		addChild(createWidget<gtgScrewUp>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<gtgScrewUp>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createThemedWidget<gtgScrewUp>(Vec(RACK_GRID_WIDTH, 0), module ? &module->color_theme : NULL));
+		addChild(createThemedWidget<gtgScrewUp>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), module ? &module->color_theme : NULL));
 
-		addParam(createParamCentered<gtgBlackButton>(mm2px(Vec(7.62, 15.20)), module, MiniBus::ON_PARAM));
+		addParam(createThemedParamCentered<gtgBlackButton>(mm2px(Vec(7.62, 15.20)), module, MiniBus::ON_PARAM, module ? &module->color_theme : NULL));
 		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(7.62, 15.20)), module, MiniBus::ON_LIGHT));
-		addParam(createParamCentered<gtgBlueKnob>(mm2px(Vec(7.62, 51.0)), module, MiniBus::LEVEL_PARAMS + 0));
-		addParam(createParamCentered<gtgOrangeKnob>(mm2px(Vec(7.62, 67.75)), module, MiniBus::LEVEL_PARAMS + 1));
-		addParam(createParamCentered<gtgRedKnob>(mm2px(Vec(7.62, 84.5)), module, MiniBus::LEVEL_PARAMS + 2));
+		addParam(createThemedParamCentered<gtgBlueKnob>(mm2px(Vec(7.62, 51.0)), module, MiniBus::LEVEL_PARAMS + 0, module ? &module->color_theme : NULL));
+		addParam(createThemedParamCentered<gtgOrangeKnob>(mm2px(Vec(7.62, 67.75)), module, MiniBus::LEVEL_PARAMS + 1, module ? &module->color_theme : NULL));
+		addParam(createThemedParamCentered<gtgRedKnob>(mm2px(Vec(7.62, 84.5)), module, MiniBus::LEVEL_PARAMS + 2, module ? &module->color_theme : NULL));
 
-		addInput(createInputCentered<gtgKeyPort>(mm2px(Vec(7.62, 23.20)), module, MiniBus::ON_CV_INPUT));
-		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(7.62, 35.4)), module, MiniBus::MP_INPUT));
-		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(7.62, 103.85)), module, MiniBus::BUS_INPUT));
+		addInput(createThemedPortCentered<gtgKeyPort>(mm2px(Vec(7.62, 23.20)), true, module, MiniBus::ON_CV_INPUT, module ? &module->color_theme : NULL));
+		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(7.62, 35.4)), true, module, MiniBus::MP_INPUT, module ? &module->color_theme : NULL));
+		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(7.62, 103.85)), true, module, MiniBus::BUS_INPUT, module ? &module->color_theme : NULL));
 
-		addOutput(createOutputCentered<gtgNutPort>(mm2px(Vec(7.62, 114.1)), module, MiniBus::BUS_OUTPUT));
+		addOutput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(7.62, 114.1)), false, module, MiniBus::BUS_OUTPUT, module ? &module->color_theme : NULL));
 	}
 
 	// add theme items to context menu
@@ -148,6 +149,15 @@ struct MiniBusWidget : ModuleWidget {
 		}
 	};
 
+	// load default theme
+	struct DefaultThemeItem : MenuItem {
+		MiniBus* module;
+		void onAction(const event::Action &e) override {
+			saveDefaultTheme(rightText.empty());
+		}
+	};
+
+	// build the menu
 	void appendContextMenu(Menu* menu) override {
 		MiniBus* module = dynamic_cast<MiniBus*>(this->module);
 
@@ -175,12 +185,17 @@ struct MiniBusWidget : ModuleWidget {
 			gainItem->gain = gainAmounts[i];
 			menu->addChild(gainItem);
 		}
+
+		menu->addChild(new MenuEntry);
+		menu->addChild(createMenuLabel("Modular Bus Mixer Defaults"));
+		menu->addChild(createMenuItem<DefaultThemeItem>("Night Ride theme", CHECKMARK(loadDefaultTheme())));
 	}
 
+	// display panel based on theme
 	void step() override {
 		if (module) {
 			panel->visible = ((((MiniBus*)module)->color_theme) == 0);
-			nightPanel->visible = ((((MiniBus*)module)->color_theme) == 1);
+			night_panel->visible = ((((MiniBus*)module)->color_theme) == 1);
 		}
 		Widget::step();
 	}
