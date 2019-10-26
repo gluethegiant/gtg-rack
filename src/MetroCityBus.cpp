@@ -272,6 +272,7 @@ struct MetroCityBus : Module {
 		json_object_set_new(rootJ, "blue_post_fade", json_integer(post_fades[0]));
 		json_object_set_new(rootJ, "orange_post_fade", json_integer(post_fades[1]));
 		json_object_set_new(rootJ, "gain", json_real(metro_fader.getGain()));
+		json_object_set_new(rootJ, "color_theme", json_integer(color_theme));
 		return rootJ;
 	}
 
@@ -287,6 +288,8 @@ struct MetroCityBus : Module {
 		if (orange_post_fadeJ) post_fades[1] = json_integer_value(orange_post_fadeJ);
 		json_t *gainJ = json_object_get(rootJ, "gain");
 		if (gainJ) metro_fader.setGain((float)json_real_value(gainJ));
+		json_t *color_themeJ = json_object_get(rootJ, "color_theme");
+		if (color_themeJ) color_theme = json_integer_value(color_themeJ);
 	}
 
 	// recalculate fader, pan smoothing, and pan_rate (used by pan follow)
