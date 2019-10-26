@@ -46,6 +46,28 @@ void ThemedSvgKnob::step() {
 	SvgKnob::step();
 }
 
+// themed snap knob
+void ThemedRoundBlackSnapKnob::addFrameAll(std::shared_ptr<Svg> svg) {
+    framesAll.push_back(svg);
+	if (framesAll.size() == 1) {
+		setSvg(svg);
+	}
+}
+
+void ThemedRoundBlackSnapKnob::step() {
+    if(theme != NULL && *theme != old_theme) {
+        if ((*theme) == 0) {
+			setSvg(framesAll[0]);
+		}
+		else {
+			setSvg(framesAll[1]);
+		}
+        old_theme = *theme;
+		fb->dirty = true;
+    }
+	SvgKnob::step();
+}
+
 // themed port
 void ThemedSvgPort::addFrame(std::shared_ptr<Svg> svg) {
 	frames.push_back(svg);

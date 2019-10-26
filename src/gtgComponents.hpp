@@ -34,6 +34,16 @@ struct ThemedSvgKnob : SvgKnob {
     void step() override;
 };
 
+struct ThemedRoundBlackSnapKnob : SvgKnob {
+    int* theme = NULL;
+    int old_theme = -1;
+	std::vector<std::shared_ptr<Svg>> framesAll;
+
+	void setOrientation(float angle);
+	void addFrameAll(std::shared_ptr<Svg> svg);
+    void step() override;
+};
+
 // themed port widgets
 template <class TThemedPort>
 TThemedPort* createThemedPortCentered(Vec pos, bool isInput, Module *module, int portId, int* theme) {
@@ -121,17 +131,19 @@ struct gtgGrayKnob : ThemedSvgKnob {
 	}
 };
 
-struct gtgBlackKnob : app::SvgKnob {
+struct gtgBlackKnob : ThemedSvgKnob {
 	gtgBlackKnob() {
-		setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlackKnob.svg")));
+		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlackKnob.svg")));
+		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlackKnob_Night.svg")));
 		minAngle = -0.83 * M_PI;
 		maxAngle = 0.83 * M_PI;
 	}
 };
 
-struct gtgBlackTinyKnob : app::SvgKnob {
+struct gtgBlackTinyKnob : ThemedSvgKnob {
 	gtgBlackTinyKnob() {
-		setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlackTinyKnob.svg")));
+		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlackTinyKnob.svg")));
+		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlackTinyKnob_Night.svg")));
 		minAngle = -0.83 * M_PI;
 		maxAngle = 0.83 * M_PI;
 	}
@@ -164,41 +176,46 @@ struct gtgOrangeTinyKnob : ThemedSvgKnob {
 	}
 };
 
-struct gtgRedTinyKnob : app::SvgKnob {
+struct gtgRedTinyKnob : ThemedSvgKnob {
 	gtgRedTinyKnob() {
-		setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/RedTinyKnob.svg")));
+		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/RedTinyKnob.svg")));
+		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/RedTinyKnob_Night.svg")));
 		minAngle = -0.83 * M_PI;
 		maxAngle = 0.83 * M_PI;
 	}
 };
 
-struct gtgBlueTinySnapKnob : RoundBlackSnapKnob {
+struct gtgBlueTinySnapKnob : ThemedRoundBlackSnapKnob {
 	gtgBlueTinySnapKnob() {
-		setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlueTinyKnob.svg")));
+		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlueTinyKnob.svg")));
+		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlueTinyKnob_Night.svg")));
 		minAngle = -0.83 * M_PI;
 		maxAngle = 0.83 * M_PI;
 	}
 };
 
-struct gtgOrangeTinySnapKnob : RoundBlackSnapKnob {
+struct gtgOrangeTinySnapKnob : ThemedRoundBlackSnapKnob {
 	gtgOrangeTinySnapKnob() {
-		setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/OrangeTinyKnob.svg")));
+		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/OrangeTinyKnob.svg")));
+		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/OrangeTinyKnob_Night.svg")));
 		minAngle = -0.83 * M_PI;
 		maxAngle = 0.83 * M_PI;
 	}
 };
 
-struct gtgRedTinySnapKnob : RoundBlackSnapKnob {
+struct gtgRedTinySnapKnob : ThemedRoundBlackSnapKnob {
 	gtgRedTinySnapKnob() {
-		setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/RedTinyKnob.svg")));
+		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/RedTinyKnob.svg")));
+		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/RedTinyKnob_Night.svg")));
 		minAngle = -0.83 * M_PI;
 		maxAngle = 0.83 * M_PI;
 	}
 };
 
-struct gtgGrayTinySnapKnob : RoundBlackSnapKnob {
+struct gtgGrayTinySnapKnob : ThemedRoundBlackSnapKnob {
 	gtgGrayTinySnapKnob() {
-		setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlackTinyKnob.svg")));
+		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/GrayTinyKnob.svg")));
+		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/GrayTinyKnob_Night.svg")));
 		minAngle = -0.83 * M_PI;
 		maxAngle = 0.83 * M_PI;
 	}
