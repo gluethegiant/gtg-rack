@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="7mm"
+   height="7mm"
+   viewBox="0 0 7 7"
+   version="1.1"
+   id="svg2921"
+   inkscape:version="0.92.4 5da689c313, 2019-01-14"
+   sodipodi:docname="BlackTinyKnob_Night.svg">
+  <defs
+     id="defs2915" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="11.2"
+     inkscape:cx="-4.284078"
+     inkscape:cy="9.0562028"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="956"
+     inkscape:window-height="1050"
+     inkscape:window-x="960"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0" />
+  <metadata
+     id="metadata2918">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-290)">
+    <g
+       transform="translate(-20.069901,262.77308)"
+       style="display:inline"
+       id="g6131">
+      <circle
+         r="3.4222002"
+         cy="30.726915"
+         cx="23.569901"
+         id="circle13557-6"
+         style="fill:#b3b3b3;fill-opacity:1;stroke:none;stroke-width:0.22326328;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.56593407" />
+      <circle
+         style="fill:#333333;fill-opacity:1;stroke:none;stroke-width:0.20146504;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.56593407"
+         id="circle5952-1"
+         cx="23.569901"
+         cy="30.726915"
+         r="3.0880747" />
+      <circle
+         style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.20604372;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         id="circle829-0"
+         cx="23.569901"
+         cy="30.726915"
+         r="2.5741992" />
+      <path
+         sodipodi:nodetypes="cccscc"
+         inkscape:connector-curvature="0"
+         id="path13559-6"
+         d="m 22.392648,29.99856 h 2.354504 l -0.67819,-2.347497 c -0.198351,-0.0563 -0.334126,-0.07633 -0.479082,-0.07275 -0.163772,0.0045 -0.300351,0.02216 -0.519042,0.06637 z"
+         style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.22186913;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.56593407" />
+      <circle
+         style="opacity:1;fill:#1a1a1a;fill-opacity:1;stroke:none;stroke-width:0.47269568;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         id="circle827-3"
+         cx="23.569901"
+         cy="30.726915"
+         r="1.8786088" />
+    </g>
+  </g>
+</svg>

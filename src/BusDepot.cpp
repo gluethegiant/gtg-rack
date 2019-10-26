@@ -32,6 +32,8 @@ struct BusDepot : Module {
 		NUM_LIGHTS
 	};
 
+	int color_theme = 0;
+
 	dsp::VuMeter2 vu_meters[2];
 	dsp::ClockDivider vu_divider;
 	dsp::ClockDivider light_divider;
@@ -53,6 +55,7 @@ struct BusDepot : Module {
 		vu_divider.setDivision(512);
 		light_divider.setDivision(64);
 		depot_fader.setSpeed(20);
+		color_theme = loadDefaultTheme();
 	}
 
 	void process(const ProcessArgs &args) override {
@@ -162,13 +165,16 @@ struct BusDepot : Module {
 	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
 		json_object_set_new(rootJ, "input_on", json_integer(depot_fader.on));
+		json_object_set_new(rootJ, "color_theme", json_integer(color_theme));
 		return rootJ;
 	}
 
 	void dataFromJson(json_t *rootJ) override {
 		json_t *input_onJ = json_object_get(rootJ, "input_on");
 		if (input_onJ) depot_fader.on = json_integer_value(input_onJ);
-	}
+		json_t *color_themeJ = json_object_get(rootJ, "color_theme");
+		if (color_themeJ) color_theme = json_integer_value(color_themeJ);
+}
 
 	void onSampleRateChange() override {
 		depot_fader.setSpeed(params[FADE_PARAM].getValue());
@@ -182,31 +188,41 @@ struct BusDepot : Module {
 
 
 struct BusDepotWidget : ModuleWidget {
+	SvgPanel* night_panel;
+
 	BusDepotWidget(BusDepot *module) {
 		setModule(module);
 		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/BusDepot.svg")));
 
-		addChild(createWidget<gtgScrewUp>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<gtgScrewUp>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<gtgScrewUp>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<gtgScrewUp>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		// load night panel if not preview
+		if (module) {
+			night_panel = new SvgPanel();
+			night_panel->setBackground(APP->window->loadSvg(asset::plugin(pluginInstance, "res/BusDepot_Night.svg")));
+			night_panel->visible = false;
+			addChild(night_panel);
+		}
 
-		addParam(createParamCentered<gtgBlackButton>(mm2px(Vec(15.24, 15.20)), module, BusDepot::ON_PARAM));
+		addChild(createThemedWidget<gtgScrewUp>(Vec(RACK_GRID_WIDTH, 0), module ? &module->color_theme : NULL));
+		addChild(createThemedWidget<gtgScrewUp>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0), module ? &module->color_theme : NULL));
+		addChild(createThemedWidget<gtgScrewUp>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), module ? &module->color_theme : NULL));
+		addChild(createThemedWidget<gtgScrewUp>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), module ? &module->color_theme : NULL));
+
+		addParam(createThemedParamCentered<gtgBlackButton>(mm2px(Vec(15.24, 15.20)), module, BusDepot::ON_PARAM, module ? &module->color_theme : NULL));
 		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(15.24, 15.20)), module, BusDepot::ON_LIGHT));
-		addParam(createParamCentered<gtgBlackTinyKnob>(mm2px(Vec(15.24, 60.48)), module, BusDepot::AUX_PARAM));
-		addParam(createParamCentered<gtgBlackKnob>(mm2px(Vec(15.24, 83.88)), module, BusDepot::LEVEL_PARAM));
-		addParam(createParamCentered<gtgGrayTinySnapKnob>(mm2px(Vec(15.24, 42.54)), module, BusDepot::FADE_PARAM));
+		addParam(createThemedParamCentered<gtgBlackTinyKnob>(mm2px(Vec(15.24, 60.48)), module, BusDepot::AUX_PARAM, module ? &module->color_theme : NULL));
+		addParam(createThemedParamCentered<gtgBlackKnob>(mm2px(Vec(15.24, 83.88)), module, BusDepot::LEVEL_PARAM, module ? &module->color_theme : NULL));
+		addParam(createThemedParamCentered<gtgGrayTinySnapKnob>(mm2px(Vec(15.24, 42.54)), module, BusDepot::FADE_PARAM, module ? &module->color_theme : NULL));
 
-		addInput(createInputCentered<gtgKeyPort>(mm2px(Vec(23.6, 21.1)), module, BusDepot::ON_CV_INPUT));
-		addInput(createInputCentered<gtgKeyPort>(mm2px(Vec(15.24, 71.63)), module, BusDepot::LEVEL_CV_INPUT));
-		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(6.95, 21.1)), module, BusDepot::LMP_INPUT));
-		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(6.95, 31.2)), module, BusDepot::R_INPUT));
-		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(7.45, 114.1)), module, BusDepot::BUS_INPUT));
-		addInput(createInputCentered<gtgKeyPort>(mm2px(Vec(23.6, 31.2)), module, BusDepot::FADE_CV_INPUT));
+		addInput(createThemedPortCentered<gtgKeyPort>(mm2px(Vec(23.6, 21.1)), true, module, BusDepot::ON_CV_INPUT, module ? &module->color_theme : NULL));
+		addInput(createThemedPortCentered<gtgKeyPort>(mm2px(Vec(15.24, 71.63)), true, module, BusDepot::LEVEL_CV_INPUT, module ? &module->color_theme : NULL));
+		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(6.95, 21.1)), true, module, BusDepot::LMP_INPUT, module ? &module->color_theme : NULL));
+		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(6.95, 31.2)), true, module, BusDepot::R_INPUT, module ? &module->color_theme : NULL));
+		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(7.45, 114.1)), true, module, BusDepot::BUS_INPUT, module ? &module->color_theme : NULL));
+		addInput(createThemedPortCentered<gtgKeyPort>(mm2px(Vec(23.6, 31.2)), true, module, BusDepot::FADE_CV_INPUT, module ? &module->color_theme : NULL));
 
-		addOutput(createOutputCentered<gtgNutPort>(mm2px(Vec(23.1, 103.85)), module, BusDepot::LEFT_OUTPUT));
-		addOutput(createOutputCentered<gtgNutPort>(mm2px(Vec(23.1, 114.1)), module, BusDepot::RIGHT_OUTPUT));
-		addOutput(createOutputCentered<gtgNutPort>(mm2px(Vec(7.45, 103.85)), module, BusDepot::BUS_OUTPUT));
+		addOutput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(23.1, 103.85)), false, module, BusDepot::LEFT_OUTPUT, module ? &module->color_theme : NULL));
+		addOutput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(23.1, 114.1)), false, module, BusDepot::RIGHT_OUTPUT, module ? &module->color_theme : NULL));
+		addOutput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(7.45, 103.85)), false, module, BusDepot::BUS_OUTPUT, module ? &module->color_theme : NULL));
 
 		// create vu lights
 		for (int i = 0; i < 9; i++) {
@@ -225,6 +241,53 @@ struct BusDepotWidget : ModuleWidget {
 				}
 			}
 			}
+	}
+
+	// add theme items to context menu
+	struct ThemeItem : MenuItem {
+		BusDepot* module;
+		int theme;
+		void onAction(const event::Action& e) override {
+			module->color_theme = theme;
+		}
+	};
+
+	// load default theme
+	struct DefaultThemeItem : MenuItem {
+		BusDepot* module;
+		void onAction(const event::Action &e) override {
+			saveDefaultTheme(rightText.empty());
+		}
+	};
+
+	// build the menu
+	void appendContextMenu(Menu* menu) override {
+		BusDepot* module = dynamic_cast<BusDepot*>(this->module);
+
+		menu->addChild(new MenuEntry);
+		menu->addChild(createMenuLabel("Color Theme"));
+
+		std::string themeTitles[2] = {"70's Cream", "Night Ride"};
+		for (int i = 0; i < 2; i++) {
+			ThemeItem* themeItem = createMenuItem<ThemeItem>(themeTitles[i]);
+			themeItem->rightText = CHECKMARK(module->color_theme == i);
+			themeItem->module = module;
+			themeItem->theme = i;
+			menu->addChild(themeItem);
+		}
+
+		menu->addChild(new MenuEntry);
+		menu->addChild(createMenuLabel("Modular Bus Mixer Defaults"));
+		menu->addChild(createMenuItem<DefaultThemeItem>("Night Ride theme", CHECKMARK(loadDefaultTheme())));
+	}
+
+	// display the panel based on the theme
+	void step() override {
+		if (module) {
+			panel->visible = ((((BusDepot*)module)->color_theme) == 0);
+			night_panel->visible = ((((BusDepot*)module)->color_theme) == 1);
+		}
+		Widget::step();
 	}
 };
 
