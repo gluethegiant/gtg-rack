@@ -73,7 +73,7 @@ struct BusDepot : Module {
 			// get param levels
 			float aux_level = params[AUX_PARAM].getValue();
 			float master_level = clamp(inputs[LEVEL_CV_INPUT].getNormalVoltage(10.0f) * 0.1f, 0.0f, 1.0f) * params[LEVEL_PARAM].getValue();
-			float fade = depot_fader.getExpFade(3);   // exponential fade for fade automation
+			float fade = depot_fader.getExpFade(2.5);   // exponential fade for fade automation
 
 			// get aux inputs
 			float stereo_in[2] = {0.f, 0.f};
