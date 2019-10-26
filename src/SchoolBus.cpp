@@ -43,6 +43,7 @@ struct SchoolBus : Module {
 
 	const int fade_speed = 20;
 	bool post_fades[2] = {false, false};
+	int color_theme = 0;
 
 	SchoolBus() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -56,6 +57,7 @@ struct SchoolBus : Module {
 		configParam(ORANGE_POST_PARAM, 0.f, 1.f, 0.f, "Post red fader send");
 		pan_divider.setDivision(3);
 		school_fader.setSpeed(fade_speed);
+		color_theme = loadDefaultTheme();
 	}
 
 	void process(const ProcessArgs &args) override {
@@ -129,6 +131,7 @@ struct SchoolBus : Module {
 		json_object_set_new(rootJ, "blue_post_fade", json_integer(post_fades[0]));
 		json_object_set_new(rootJ, "orange_post_fade", json_integer(post_fades[1]));
 		json_object_set_new(rootJ, "gain", json_real(school_fader.getGain()));
+		json_object_set_new(rootJ, "color_theme", json_integer(color_theme));
 		return rootJ;
 	}
 
@@ -142,6 +145,8 @@ struct SchoolBus : Module {
 		if (orange_post_fadeJ) post_fades[1] = json_integer_value(orange_post_fadeJ);
 		json_t *gainJ = json_object_get(rootJ, "gain");
 		if (gainJ) school_fader.setGain((float)json_real_value(gainJ));
+		json_t *color_themeJ = json_object_get(rootJ, "color_theme");
+		if (color_themeJ) color_theme = json_integer_value(color_themeJ);
 	}
 
 	// reset fader speed on sample rate change
@@ -160,38 +165,57 @@ struct SchoolBus : Module {
 
 
 struct SchoolBusWidget : ModuleWidget {
+	SvgPanel* night_panel;
+
 	SchoolBusWidget(SchoolBus *module) {
 		setModule(module);
 		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/SchoolBus.svg")));
 
-		addChild(createWidget<gtgScrewUp>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<gtgScrewUp>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<gtgScrewUp>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<gtgScrewUp>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		// load night panel if not preview
+		if (module) {
+			night_panel = new SvgPanel();
+			night_panel->setBackground(APP->window->loadSvg(asset::plugin(pluginInstance, "res/SchoolBus_Night.svg")));
+			night_panel->visible = false;
+			addChild(night_panel);
+		}
 
-		addParam(createParamCentered<gtgBlackButton>(mm2px(Vec(15.24, 15.20)), module, SchoolBus::ON_PARAM));
+		addChild(createThemedWidget<gtgScrewUp>(Vec(RACK_GRID_WIDTH, 0), module ? &module->color_theme : NULL));
+		addChild(createThemedWidget<gtgScrewUp>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0), module ? &module->color_theme : NULL));
+		addChild(createThemedWidget<gtgScrewUp>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), module ? &module->color_theme : NULL));
+		addChild(createThemedWidget<gtgScrewUp>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), module ? &module->color_theme : NULL));
+
+		addParam(createThemedParamCentered<gtgBlackButton>(mm2px(Vec(15.24, 15.20)), module, SchoolBus::ON_PARAM, module ? &module->color_theme : NULL));
 		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(15.24, 15.20)), module, SchoolBus::ON_LIGHT));
-		addParam(createParamCentered<gtgGrayTinyKnob>(mm2px(Vec(15.24, 25.9)), module, SchoolBus::PAN_ATT_PARAM));
-		addParam(createParamCentered<gtgGrayKnob>(mm2px(Vec(15.24, 43.0)), module, SchoolBus::PAN_PARAM));
-		addParam(createParamCentered<gtgBlueKnob>(mm2px(Vec(15.24, 61.0)), module, SchoolBus::LEVEL_PARAMS + 0));
-		addParam(createParamCentered<gtgOrangeKnob>(mm2px(Vec(15.24, 79.13)), module, SchoolBus::LEVEL_PARAMS + 1));
-		addParam(createParamCentered<gtgRedKnob>(mm2px(Vec(15.24, 97.29)), module, SchoolBus::LEVEL_PARAMS + 2));
-		addParam(createParamCentered<gtgBlackButton>(mm2px(Vec(4.58, 61.0)), module, SchoolBus::BLUE_POST_PARAM));
+		addParam(createThemedParamCentered<gtgGrayTinyKnob>(mm2px(Vec(15.24, 25.9)), module, SchoolBus::PAN_ATT_PARAM, module ? &module->color_theme : NULL));
+		addParam(createThemedParamCentered<gtgGrayKnob>(mm2px(Vec(15.24, 43.0)), module, SchoolBus::PAN_PARAM, module ? &module->color_theme : NULL));
+		addParam(createThemedParamCentered<gtgBlueKnob>(mm2px(Vec(15.24, 61.0)), module, SchoolBus::LEVEL_PARAMS + 0, module ? &module->color_theme : NULL));
+		addParam(createThemedParamCentered<gtgOrangeKnob>(mm2px(Vec(15.24, 79.13)), module, SchoolBus::LEVEL_PARAMS + 1, module ? &module->color_theme : NULL));
+		addParam(createThemedParamCentered<gtgRedKnob>(mm2px(Vec(15.24, 97.29)), module, SchoolBus::LEVEL_PARAMS + 2, module ? &module->color_theme : NULL));
+		addParam(createThemedParamCentered<gtgBlackButton>(mm2px(Vec(4.58, 61.0)), module, SchoolBus::BLUE_POST_PARAM, module ? &module->color_theme : NULL));
 		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(4.58, 61.0)), module, SchoolBus::BLUE_POST_LIGHT));
-		addParam(createParamCentered<gtgBlackButton>(mm2px(Vec(4.58, 79.13)), module, SchoolBus::ORANGE_POST_PARAM));
+		addParam(createThemedParamCentered<gtgBlackButton>(mm2px(Vec(4.58, 79.13)), module, SchoolBus::ORANGE_POST_PARAM, module ? &module->color_theme : NULL));
 		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(4.58, 79.13)), module, SchoolBus::ORANGE_POST_LIGHT));
 
-		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(6.95, 21.1)), module, SchoolBus::LMP_INPUT));
-		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(6.95, 31.23)), module, SchoolBus::R_INPUT));
-		addInput(createInputCentered<gtgKeyPort>(mm2px(Vec(23.6, 21.1)), module, SchoolBus::ON_CV_INPUT));
-		addInput(createInputCentered<gtgKeyPort>(mm2px(Vec(23.6, 31.23)), module, SchoolBus::PAN_CV_INPUT));
-		addInput(createInputCentered<gtgKeyPort>(mm2px(Vec(25.07, 52.63)), module, SchoolBus::LEVEL_CV_INPUTS + 0));
-		addInput(createInputCentered<gtgKeyPort>(mm2px(Vec(25.07, 70.79)), module, SchoolBus::LEVEL_CV_INPUTS + 1));
-		addInput(createInputCentered<gtgKeyPort>(mm2px(Vec(25.07, 89.0)), module, SchoolBus::LEVEL_CV_INPUTS + 2));
-		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(7.45, 114.1)), module, SchoolBus::BUS_INPUT));
+		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(6.95, 21.1)), true, module, SchoolBus::LMP_INPUT, module ? &module->color_theme : NULL));
+		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(6.95, 31.23)), true, module, SchoolBus::R_INPUT, module ? &module->color_theme : NULL));
+		addInput(createThemedPortCentered<gtgKeyPort>(mm2px(Vec(23.6, 21.1)), true, module, SchoolBus::ON_CV_INPUT, module ? &module->color_theme : NULL));
+		addInput(createThemedPortCentered<gtgKeyPort>(mm2px(Vec(23.6, 31.23)), true, module, SchoolBus::PAN_CV_INPUT, module ? &module->color_theme : NULL));
+		addInput(createThemedPortCentered<gtgKeyPort>(mm2px(Vec(25.07, 52.63)), true, module, SchoolBus::LEVEL_CV_INPUTS + 0, module ? &module->color_theme : NULL));
+		addInput(createThemedPortCentered<gtgKeyPort>(mm2px(Vec(25.07, 70.79)), true, module, SchoolBus::LEVEL_CV_INPUTS + 1, module ? &module->color_theme : NULL));
+		addInput(createThemedPortCentered<gtgKeyPort>(mm2px(Vec(25.07, 89.0)), true, module, SchoolBus::LEVEL_CV_INPUTS + 2, module ? &module->color_theme : NULL));
+		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(7.45, 114.1)), true, module, SchoolBus::BUS_INPUT, module ? &module->color_theme : NULL));
 
-		addOutput(createOutputCentered<gtgNutPort>(mm2px(Vec(23.1, 114.1)), module, SchoolBus::BUS_OUTPUT));
+		addOutput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(23.1, 114.1)), false, module, SchoolBus::BUS_OUTPUT, module ? &module->color_theme : NULL));
 	}
+
+	// add theme items to context menu
+	struct ThemeItem : MenuItem {
+		SchoolBus* module;
+		int theme;
+		void onAction(const event::Action& e) override {
+			module->color_theme = theme;
+		}
+	};
 
 	// add gain levels to context menu
 	struct GainItem : MenuItem {
@@ -202,8 +226,28 @@ struct SchoolBusWidget : ModuleWidget {
 		}
 	};
 
+	// load default theme
+	struct DefaultThemeItem : MenuItem {
+		SchoolBus* module;
+		void onAction(const event::Action &e) override {
+			saveDefaultTheme(rightText.empty());
+		}
+	};
+
 	void appendContextMenu(Menu* menu) override {
 		SchoolBus* module = dynamic_cast<SchoolBus*>(this->module);
+
+		menu->addChild(new MenuEntry);
+		menu->addChild(createMenuLabel("Color Theme"));
+
+		std::string themeTitles[2] = {"70's Cream", "Night Ride"};
+		for (int i = 0; i < 2; i++) {
+			ThemeItem* themeItem = createMenuItem<ThemeItem>(themeTitles[i]);
+			themeItem->rightText = CHECKMARK(module->color_theme == i);
+			themeItem->module = module;
+			themeItem->theme = i;
+			menu->addChild(themeItem);
+		}
 
 		menu->addChild(new MenuEntry);
 		menu->addChild(createMenuLabel("Preamp on L/M/P/R Inputs"));
@@ -217,6 +261,19 @@ struct SchoolBusWidget : ModuleWidget {
 			gainItem->gain = gainAmounts[i];
 			menu->addChild(gainItem);
 		}
+
+		menu->addChild(new MenuEntry);
+		menu->addChild(createMenuLabel("Modular Bus Mixer Defaults"));
+		menu->addChild(createMenuItem<DefaultThemeItem>("Night Ride theme", CHECKMARK(loadDefaultTheme())));
+	}
+
+	// display panel based on theme
+	void step() override {
+		if (module) {
+			panel->visible = ((((SchoolBus*)module)->color_theme) == 0);
+			night_panel->visible = ((((SchoolBus*)module)->color_theme) == 1);
+		}
+		Widget::step();
 	}
 };
 
