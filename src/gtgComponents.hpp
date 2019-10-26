@@ -1,39 +1,121 @@
 #pragma once
 
-struct gtgBlackButton : app::SvgSwitch {
+#include <rack.hpp>
+
+using namespace rack;
+
+extern Plugin *pluginInstance;
+
+
+// themed button and knob params
+template <class TThemedParam>
+TThemedParam* createThemedParamCentered(Vec pos, Module *module, int paramId, int* theme) {
+	TThemedParam *o = createParamCentered<TThemedParam>(pos, module, paramId);
+	o->theme = theme;
+	return o;
+}
+
+struct ThemedSvgSwitch : SvgSwitch {
+    int* theme = NULL;
+    int old_theme = -1;
+	std::vector<std::shared_ptr<Svg>> framesAll;
+
+	void addFrameAll(std::shared_ptr<Svg> svg);
+    void step() override;
+};
+
+struct ThemedSvgKnob : SvgKnob {
+    int* theme = NULL;
+    int old_theme = -1;
+	std::vector<std::shared_ptr<Svg>> framesAll;
+
+	void setOrientation(float angle);
+	void addFrameAll(std::shared_ptr<Svg> svg);
+    void step() override;
+};
+
+// themed port widgets
+template <class TThemedPort>
+TThemedPort* createThemedPortCentered(Vec pos, bool isInput, Module *module, int portId, int* theme) {
+	TThemedPort *o = isInput ?
+		createInputCentered<TThemedPort>(pos, module, portId) :
+		createOutputCentered<TThemedPort>(pos, module, portId);
+	o->theme = theme;
+	return o;
+}
+
+struct ThemedSvgPort : SvgPort {
+	int* theme = NULL;
+	int old_theme = -1;
+	std::vector<std::shared_ptr<Svg>> frames;
+
+	void addFrame(std::shared_ptr<Svg> svg);
+	void step() override;
+};
+
+// themed widgets for screws
+template <class TWidget>
+TWidget *createThemedWidget(Vec pos, int* theme) {
+	TWidget *o = createWidget<TWidget>(pos);
+	o->theme = theme;
+	return o;
+}
+
+struct ThemedSvgScrew : SvgScrew {
+	int* theme = NULL;
+	int old_theme = -1;
+	std::vector<std::shared_ptr<Svg>> frames;
+
+	void addFrame(std::shared_ptr<Svg> svg);
+	void step() override;
+};
+
+// saving and loading default theme
+
+void saveDefaultTheme(int default_theme);
+
+int loadDefaultTheme();
+
+// custom components
+struct gtgBlackButton : ThemedSvgSwitch {
 	gtgBlackButton() {
-		addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlackButton.svg")));
+		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlackButton.svg")));
+		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlackButton_Night.svg")));
 		momentary = true;
 	}
 };
 
-struct gtgRedKnob : app::SvgKnob {
+struct gtgRedKnob : ThemedSvgKnob {
 	gtgRedKnob() {
-		setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/RedKnob.svg")));
+		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/RedKnob.svg")));
+		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/RedKnob_Night.svg")));
 		minAngle = -0.83 * M_PI;
 		maxAngle = 0.83 * M_PI;
 	}
 };
 
-struct gtgOrangeKnob : app::SvgKnob {
+struct gtgOrangeKnob : ThemedSvgKnob {
 	gtgOrangeKnob() {
-		setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/OrangeKnob.svg")));
+		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/OrangeKnob.svg")));
+		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/OrangeKnob_Night.svg")));
 		minAngle = -0.83 * M_PI;
 		maxAngle = 0.83 * M_PI;
 	}
 };
 
-struct gtgBlueKnob : app::SvgKnob {
+struct gtgBlueKnob : ThemedSvgKnob {
 	gtgBlueKnob() {
-		setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlueKnob.svg")));
+		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlueKnob.svg")));
+		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlueKnob_Night.svg")));
 		minAngle = -0.83 * M_PI;
 		maxAngle = 0.83 * M_PI;
 	}
 };
 
-struct gtgGrayKnob : app::SvgKnob {
+struct gtgGrayKnob : ThemedSvgKnob {
 	gtgGrayKnob() {
-		setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/GrayKnob.svg")));
+		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/GrayKnob.svg")));
+		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/GrayKnob_Night.svg")));
 		minAngle = -0.83 * M_PI;
 		maxAngle = 0.83 * M_PI;
 	}
@@ -55,25 +137,28 @@ struct gtgBlackTinyKnob : app::SvgKnob {
 	}
 };
 
-struct gtgGrayTinyKnob : app::SvgKnob {
+struct gtgGrayTinyKnob : ThemedSvgKnob {
 	gtgGrayTinyKnob() {
-		setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/GrayTinyKnob.svg")));
+		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/GrayTinyKnob.svg")));
+		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/GrayTinyKnob_Night.svg")));
 		minAngle = -0.83 * M_PI;
 		maxAngle = 0.83 * M_PI;
 	}
 };
 
-struct gtgBlueTinyKnob : app::SvgKnob {
+struct gtgBlueTinyKnob : ThemedSvgKnob {
 	gtgBlueTinyKnob() {
-		setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlueTinyKnob.svg")));
+		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlueTinyKnob.svg")));
+		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlueTinyKnob_Night.svg")));
 		minAngle = -0.83 * M_PI;
 		maxAngle = 0.83 * M_PI;
 	}
 };
 
-struct gtgOrangeTinyKnob : app::SvgKnob {
+struct gtgOrangeTinyKnob : ThemedSvgKnob {
 	gtgOrangeTinyKnob() {
-		setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/OrangeTinyKnob.svg")));
+		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/OrangeTinyKnob.svg")));
+		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/OrangeTinyKnob_Night.svg")));
 		minAngle = -0.83 * M_PI;
 		maxAngle = 0.83 * M_PI;
 	}
@@ -119,23 +204,25 @@ struct gtgGrayTinySnapKnob : RoundBlackSnapKnob {
 	}
 };
 
-struct gtgNutPort : app::SvgPort {
+struct gtgNutPort : ThemedSvgPort {
 	gtgNutPort() {
-		setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/NutPort.svg")));
+		addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/NutPort.svg")));
+		addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/NutPort_Night.svg")));
 		shadow->box.size = shadow->box.size.div(1.07);   // slight improvement on huge round shadow
 		shadow->box.pos = Vec(box.size.x * 0.028, box.size.y * 0.094);
 	}
 };
 
-struct gtgKeyPort : app::SvgPort {
+struct gtgKeyPort : ThemedSvgPort {
 	gtgKeyPort() {
-		setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/KeyPort.svg")));
+		addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/KeyPort.svg")));
+		addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/KeyPort_Night.svg")));
 	}
 };
 
-struct gtgScrewUp : app::SvgScrew {
-	gtgScrewUp()
-		{
-			setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/ScrewUp.svg")));
-		}
+struct gtgScrewUp : ThemedSvgScrew {
+	gtgScrewUp() {
+		addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/ScrewUp.svg")));
+		addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/ScrewUp_Night.svg")));
+	}
 };
