@@ -20,11 +20,14 @@ struct EnterBus : Module {
 		NUM_LIGHTS
 	};
 
+	int color_theme = 0;
+
 	EnterBus() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		configParam(LEVEL_PARAMS + 0, 0.f, 1.f, 1.f, "Blue stereo input level");
 		configParam(LEVEL_PARAMS + 1, 0.f, 1.f, 1.f, "Orange stereo input level");
 		configParam(LEVEL_PARAMS + 2, 0.f, 1.f, 1.f, "Red stereo input level");
+		color_theme = loadDefaultTheme();
 	}
 
 	void process(const ProcessArgs &args) override {
@@ -40,29 +43,99 @@ struct EnterBus : Module {
 		// set output to 3 stereo buses
 		outputs[BUS_OUTPUT].setChannels(6);
 	}
+
+	// save color theme
+	json_t *dataToJson() override {
+		json_t *rootJ = json_object();
+		json_object_set_new(rootJ, "color_theme", json_integer(color_theme));
+		return rootJ;
+	}
+
+	// load color theme
+	void dataFromJson(json_t *rootJ) override {
+		json_t *color_themeJ = json_object_get(rootJ, "color_theme");
+		if (color_themeJ) color_theme = json_integer_value(color_themeJ);
+	}
 };
 
 struct EnterBusWidget : ModuleWidget {
+	SvgPanel* night_panel;
+
 	EnterBusWidget(EnterBus *module) {
 		setModule(module);
 		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/EnterBus.svg")));
 
-		addChild(createWidget<gtgScrewUp>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<gtgScrewUp>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		// load night panel if not preview
+		if (module) {
+			night_panel = new SvgPanel();
+			night_panel->setBackground(APP->window->loadSvg(asset::plugin(pluginInstance, "res/EnterBus_Night.svg")));
+			night_panel->visible = false;
+			addChild(night_panel);
+		}
 
-		addParam(createParamCentered<gtgBlueTinyKnob>(mm2px(Vec(10.37, 34.419)), module, EnterBus::LEVEL_PARAMS + 0));
-		addParam(createParamCentered<gtgOrangeTinyKnob>(mm2px(Vec(10.37, 62.909)), module, EnterBus::LEVEL_PARAMS + 1));
-		addParam(createParamCentered<gtgRedTinyKnob>(mm2px(Vec(10.37, 91.384)), module, EnterBus::LEVEL_PARAMS + 2));
+		addChild(createThemedWidget<gtgScrewUp>(Vec(RACK_GRID_WIDTH, 0), module ? &module->color_theme : NULL));
+		addChild(createThemedWidget<gtgScrewUp>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), module ? &module->color_theme : NULL));
 
-		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(6.87, 15.302)), module, EnterBus::ENTER_INPUTS + 0));
-		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(6.87, 25.446)), module, EnterBus::ENTER_INPUTS + 1));
-		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(6.87, 43.85)), module, EnterBus::ENTER_INPUTS + 2));
-		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(6.87, 53.994)), module, EnterBus::ENTER_INPUTS + 3));
-		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(6.87, 72.354)), module, EnterBus::ENTER_INPUTS + 4));
-		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(6.87, 82.498)), module, EnterBus::ENTER_INPUTS + 5));
-		addInput(createInputCentered<gtgNutPort>(mm2px(Vec(7.62, 103.863)), module, EnterBus::BUS_INPUT));
+		addParam(createThemedParamCentered<gtgBlueTinyKnob>(mm2px(Vec(10.37, 34.419)), module, EnterBus::LEVEL_PARAMS + 0, module ? &module->color_theme : NULL));
+		addParam(createThemedParamCentered<gtgOrangeTinyKnob>(mm2px(Vec(10.37, 62.909)), module, EnterBus::LEVEL_PARAMS + 1, module ? &module->color_theme : NULL));
+		addParam(createThemedParamCentered<gtgRedTinyKnob>(mm2px(Vec(10.37, 91.384)), module, EnterBus::LEVEL_PARAMS + 2, module ? &module->color_theme : NULL));
 
-		addOutput(createOutputCentered<gtgNutPort>(mm2px(Vec(7.62, 114.107)), module, EnterBus::BUS_OUTPUT));
+		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(6.87, 15.302)), true, module, EnterBus::ENTER_INPUTS + 0, module ? &module->color_theme : NULL));
+		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(6.87, 25.446)), true, module, EnterBus::ENTER_INPUTS + 1, module ? &module->color_theme : NULL));
+		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(6.87, 43.85)), true, module, EnterBus::ENTER_INPUTS + 2, module ? &module->color_theme : NULL));
+		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(6.87, 53.994)), true, module, EnterBus::ENTER_INPUTS + 3, module ? &module->color_theme : NULL));
+		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(6.87, 72.354)), true, module, EnterBus::ENTER_INPUTS + 4, module ? &module->color_theme : NULL));
+		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(6.87, 82.498)), true, module, EnterBus::ENTER_INPUTS + 5, module ? &module->color_theme : NULL));
+		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(7.62, 103.863)), true, module, EnterBus::BUS_INPUT, module ? &module->color_theme : NULL));
+
+		addOutput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(7.62, 114.107)), false, module, EnterBus::BUS_OUTPUT, module ? &module->color_theme : NULL));
+	}
+
+	// add theme items to context menu
+	struct ThemeItem : MenuItem {
+		EnterBus* module;
+		int theme;
+		void onAction(const event::Action& e) override {
+			module->color_theme = theme;
+		}
+	};
+
+	// load default theme
+	struct DefaultThemeItem : MenuItem {
+		EnterBus* module;
+		void onAction(const event::Action &e) override {
+			saveDefaultTheme(rightText.empty());
+		}
+	};
+
+	// build the menu
+	void appendContextMenu(Menu* menu) override {
+		EnterBus* module = dynamic_cast<EnterBus*>(this->module);
+
+		menu->addChild(new MenuEntry);
+		menu->addChild(createMenuLabel("Color Theme"));
+
+		std::string themeTitles[2] = {"70's Cream", "Night Ride"};
+		for (int i = 0; i < 2; i++) {
+			ThemeItem* themeItem = createMenuItem<ThemeItem>(themeTitles[i]);
+			themeItem->rightText = CHECKMARK(module->color_theme == i);
+			themeItem->module = module;
+			themeItem->theme = i;
+			menu->addChild(themeItem);
+		}
+
+		menu->addChild(new MenuEntry);
+		menu->addChild(createMenuLabel("Modular Bus Mixer Defaults"));
+		menu->addChild(createMenuItem<DefaultThemeItem>("Night Ride theme", CHECKMARK(loadDefaultTheme())));
+	}
+
+	// display the panel based on the theme
+	void step() override {
+		if (module) {
+			panel->visible = ((((EnterBus*)module)->color_theme) == 0);
+			night_panel->visible = ((((EnterBus*)module)->color_theme) == 1);
+		}
+		Widget::step();
 	}
 };
 
