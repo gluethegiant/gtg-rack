@@ -29,7 +29,7 @@ That encouraged the coding of these modules.
 Thanks to all the other Rack coders, especially those who share their code.
 You are too numerous to thank individually, but I tried to star all of your repos and have started to include acknowledgments in the code.
 Thanks for the early encouragement from users, like Aria_Salvatrice, dag2099, and chaircrusher, who displayed the use of the modular bus mixers in published songs and videos.
-That early encouragement made me want to make the modules more feature complete with better code under the hood.
+While these modules are still a work in progress, that early encouragement made me want to make them more feature complete with better code under the hood.
 Thanks to rsmus7 for beta testing.
 Thanks to Omri Cohen for the videos that helped inspire these modules.
 Finally, thanks always to Rebecca.
