@@ -43,6 +43,7 @@ struct BusDepot : Module {
 
 	float peak_left = 0;
 	float peak_right = 0;
+	bool level_cv_filter = true;
 
 	BusDepot() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -165,6 +166,7 @@ struct BusDepot : Module {
 	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
 		json_object_set_new(rootJ, "input_on", json_integer(depot_fader.on));
+		json_object_set_new(rootJ, "level_cv_filter", json_integer(level_cv_filter));
 		json_object_set_new(rootJ, "color_theme", json_integer(color_theme));
 		return rootJ;
 	}
@@ -172,6 +174,8 @@ struct BusDepot : Module {
 	void dataFromJson(json_t *rootJ) override {
 		json_t *input_onJ = json_object_get(rootJ, "input_on");
 		if (input_onJ) depot_fader.on = json_integer_value(input_onJ);
+		json_t *level_cv_filterJ = json_object_get(rootJ, "level_cv_filter");
+		if (level_cv_filterJ) level_cv_filter = json_integer_value(level_cv_filterJ);
 		json_t *color_themeJ = json_object_get(rootJ, "color_theme");
 		if (color_themeJ) color_theme = json_integer_value(color_themeJ);
 }
@@ -183,6 +187,7 @@ struct BusDepot : Module {
 	void onReset() override {
 		depot_fader.on = true;
 		depot_fader.setGain(1.f);
+		level_cv_filter = true;
 	}
 };
 
@@ -243,26 +248,32 @@ struct BusDepotWidget : ModuleWidget {
 			}
 	}
 
-	// add theme items to context menu
-	struct ThemeItem : MenuItem {
-		BusDepot* module;
-		int theme;
-		void onAction(const event::Action& e) override {
-			module->color_theme = theme;
-		}
-	};
-
-	// load default theme
-	struct DefaultThemeItem : MenuItem {
-		BusDepot* module;
-		void onAction(const event::Action &e) override {
-			saveDefaultTheme(rightText.empty());
-		}
-	};
-
 	// build the menu
 	void appendContextMenu(Menu* menu) override {
 		BusDepot* module = dynamic_cast<BusDepot*>(this->module);
+
+		struct ThemeItem : MenuItem {
+			BusDepot* module;
+			int theme;
+			void onAction(const event::Action& e) override {
+				module->color_theme = theme;
+			}
+		};
+
+		struct LevelCVFilterItem : MenuItem {
+			BusDepot* module;
+			bool filter_on;
+			void onAction(const event::Action& e) override {
+				module->level_cv_filter = !filter_on;
+			}
+		};
+
+		struct DefaultThemeItem : MenuItem {
+			BusDepot* module;
+			void onAction(const event::Action &e) override {
+				saveDefaultTheme(rightText.empty());
+			}
+		};
 
 		menu->addChild(new MenuEntry);
 		menu->addChild(createMenuLabel("Color Theme"));
@@ -276,9 +287,23 @@ struct BusDepotWidget : ModuleWidget {
 			menu->addChild(themeItem);
 		}
 
+		// CV filters
+		menu->addChild(new MenuEntry);
+		menu->addChild(createMenuLabel("CV Filters"));
+
+		LevelCVFilterItem* levelCVFilterItem = createMenuItem<LevelCVFilterItem>("Smoothing on master level CV");
+		levelCVFilterItem->rightText = CHECKMARK(module->level_cv_filter);
+		levelCVFilterItem->module = module;
+		levelCVFilterItem->filter_on = module->level_cv_filter;
+		menu->addChild(levelCVFilterItem);
+
 		menu->addChild(new MenuEntry);
 		menu->addChild(createMenuLabel("Modular Bus Mixer Defaults"));
-		menu->addChild(createMenuItem<DefaultThemeItem>("Night Ride theme", CHECKMARK(loadDefaultTheme())));
+
+		DefaultThemeItem* defaultThemeItem = createMenuItem<DefaultThemeItem>("Night Ride theme");
+		defaultThemeItem->rightText = CHECKMARK(loadDefaultTheme());
+		defaultThemeItem->module = module;
+		menu->addChild(defaultThemeItem);
 	}
 
 	// display the panel based on the theme

@@ -43,6 +43,8 @@ struct SchoolBus : Module {
 
 	const int fade_speed = 20;
 	bool post_fades[2] = {false, false};
+	bool pan_cv_filter = true;
+	bool level_cv_filter = true;
 	int color_theme = 0;
 
 	SchoolBus() {
@@ -131,6 +133,8 @@ struct SchoolBus : Module {
 		json_object_set_new(rootJ, "blue_post_fade", json_integer(post_fades[0]));
 		json_object_set_new(rootJ, "orange_post_fade", json_integer(post_fades[1]));
 		json_object_set_new(rootJ, "gain", json_real(school_fader.getGain()));
+		json_object_set_new(rootJ, "pan_cv_filter", json_integer(pan_cv_filter));
+		json_object_set_new(rootJ, "level_cv_filter", json_integer(level_cv_filter));
 		json_object_set_new(rootJ, "color_theme", json_integer(color_theme));
 		return rootJ;
 	}
@@ -145,6 +149,10 @@ struct SchoolBus : Module {
 		if (orange_post_fadeJ) post_fades[1] = json_integer_value(orange_post_fadeJ);
 		json_t *gainJ = json_object_get(rootJ, "gain");
 		if (gainJ) school_fader.setGain((float)json_real_value(gainJ));
+		json_t *pan_cv_filterJ = json_object_get(rootJ, "pan_cv_filter");
+		if (pan_cv_filterJ) pan_cv_filter = json_integer_value(pan_cv_filterJ);
+		json_t *level_cv_filterJ = json_object_get(rootJ, "level_cv_filter");
+		if (level_cv_filterJ) level_cv_filter = json_integer_value(level_cv_filterJ);
 		json_t *color_themeJ = json_object_get(rootJ, "color_theme");
 		if (color_themeJ) color_theme = json_integer_value(color_themeJ);
 	}
@@ -160,6 +168,8 @@ struct SchoolBus : Module {
 		school_fader.setGain(1.f);
 		post_fades[0] = false;
 		post_fades[1] = false;
+		pan_cv_filter = true;
+		level_cv_filter = true;
 	}
 };
 
@@ -208,36 +218,50 @@ struct SchoolBusWidget : ModuleWidget {
 		addOutput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(23.1, 114.1)), false, module, SchoolBus::BUS_OUTPUT, module ? &module->color_theme : NULL));
 	}
 
-	// add theme items to context menu
-	struct ThemeItem : MenuItem {
-		SchoolBus* module;
-		int theme;
-		void onAction(const event::Action& e) override {
-			module->color_theme = theme;
-		}
-	};
-
-	// add gain levels to context menu
-	struct GainItem : MenuItem {
-		SchoolBus* module;
-		float gain;
-		void onAction(const event::Action& e) override {
-			module->school_fader.setGain(gain);
-		}
-	};
-
-	// load default theme
-	struct DefaultThemeItem : MenuItem {
-		SchoolBus* module;
-		void onAction(const event::Action &e) override {
-			saveDefaultTheme(rightText.empty());
-		}
-	};
-
 	// create menu
 	void appendContextMenu(Menu* menu) override {
 		SchoolBus* module = dynamic_cast<SchoolBus*>(this->module);
 
+		struct ThemeItem : MenuItem {
+			SchoolBus* module;
+			int theme;
+			void onAction(const event::Action& e) override {
+				module->color_theme = theme;
+			}
+		};
+
+		struct GainItem : MenuItem {
+			SchoolBus* module;
+			float gain;
+			void onAction(const event::Action& e) override {
+				module->school_fader.setGain(gain);
+			}
+		};
+
+		struct PanCVFilterItem : MenuItem {
+			SchoolBus* module;
+			bool filter_on;
+			void onAction(const event::Action& e) override {
+				module->pan_cv_filter = !filter_on;
+			}
+		};
+
+		struct LevelCVFilterItem : MenuItem {
+			SchoolBus* module;
+			bool filter_on;
+			void onAction(const event::Action& e) override {
+				module->level_cv_filter = !filter_on;
+			}
+		};
+
+		struct DefaultThemeItem : MenuItem {
+			SchoolBus* module;
+			void onAction(const event::Action &e) override {
+				saveDefaultTheme(rightText.empty());
+			}
+		};
+
+		// color themes
 		menu->addChild(new MenuEntry);
 		menu->addChild(createMenuLabel("Color Theme"));
 
@@ -250,6 +274,7 @@ struct SchoolBusWidget : ModuleWidget {
 			menu->addChild(themeItem);
 		}
 
+		// pre amps
 		menu->addChild(new MenuEntry);
 		menu->addChild(createMenuLabel("Preamp on L/M/P/R Inputs"));
 
@@ -263,10 +288,30 @@ struct SchoolBusWidget : ModuleWidget {
 			menu->addChild(gainItem);
 		}
 
+		// CV filters
+		menu->addChild(new MenuEntry);
+		menu->addChild(createMenuLabel("CV Filters"));
+
+		PanCVFilterItem* panCVFilterItem = createMenuItem<PanCVFilterItem>("Smoothing on pan CV");
+		panCVFilterItem->rightText = CHECKMARK(module->pan_cv_filter);
+		panCVFilterItem->module = module;
+		panCVFilterItem->filter_on = module->pan_cv_filter;
+		menu->addChild(panCVFilterItem);
+
+		LevelCVFilterItem* levelCVFilterItem = createMenuItem<LevelCVFilterItem>("Smoothing on level CVs");
+		levelCVFilterItem->rightText = CHECKMARK(module->level_cv_filter);
+		levelCVFilterItem->module = module;
+		levelCVFilterItem->filter_on = module->level_cv_filter;
+		menu->addChild(levelCVFilterItem);
+
+		// plugin defaults
 		menu->addChild(new MenuEntry);
 		menu->addChild(createMenuLabel("Modular Bus Mixer Defaults"));
 
-		menu->addChild(createMenuItem<DefaultThemeItem>("Night Ride theme", CHECKMARK(loadDefaultTheme())));
+		DefaultThemeItem* defaultThemeItem = createMenuItem<DefaultThemeItem>("Night Ride theme");
+		defaultThemeItem->rightText = CHECKMARK(loadDefaultTheme());
+		defaultThemeItem->module = module;
+		menu->addChild(defaultThemeItem);
 	}
 
 	// display panel based on theme

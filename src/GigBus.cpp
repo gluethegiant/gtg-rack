@@ -159,36 +159,34 @@ struct GigBusWidget : ModuleWidget {
 		addOutput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(10.13, 114.108)), false, module, GigBus::BUS_OUTPUT, module ? &module->color_theme : NULL));
 	}
 
-	// add theme items to context menu
-	struct ThemeItem : MenuItem {
-		GigBus* module;
-		int theme;
-		void onAction(const event::Action& e) override {
-			module->color_theme = theme;
-		}
-	};
-
-	// add gain levels to context menu
-	struct GainItem : MenuItem {
-		GigBus* module;
-		float gain;
-		void onAction(const event::Action& e) override {
-			module->gig_fader.setGain(gain);
-		}
-	};
-
-	// load default theme
-	struct DefaultThemeItem : MenuItem {
-		GigBus* module;
-		void onAction(const event::Action &e) override {
-			saveDefaultTheme(rightText.empty());
-		}
-	};
-
 	// build the context menu
 	void appendContextMenu(Menu* menu) override {
 		GigBus* module = dynamic_cast<GigBus*>(this->module);
 
+		struct ThemeItem : MenuItem {
+			GigBus* module;
+			int theme;
+			void onAction(const event::Action& e) override {
+				module->color_theme = theme;
+			}
+		};
+
+		struct GainItem : MenuItem {
+			GigBus* module;
+			float gain;
+			void onAction(const event::Action& e) override {
+				module->gig_fader.setGain(gain);
+			}
+		};
+
+		struct DefaultThemeItem : MenuItem {
+			GigBus* module;
+			void onAction(const event::Action &e) override {
+				saveDefaultTheme(rightText.empty());
+			}
+		};
+
+		// color theme
 		menu->addChild(new MenuEntry);
 		menu->addChild(createMenuLabel("Color Theme"));
 
@@ -216,7 +214,11 @@ struct GigBusWidget : ModuleWidget {
 
 		menu->addChild(new MenuEntry);
 		menu->addChild(createMenuLabel("Modular Bus Mixer Defaults"));
-		menu->addChild(createMenuItem<DefaultThemeItem>("Night Ride theme", CHECKMARK(loadDefaultTheme())));
+
+		DefaultThemeItem* defaultThemeItem = createMenuItem<DefaultThemeItem>("Night Ride theme");
+		defaultThemeItem->rightText = CHECKMARK(loadDefaultTheme());
+		defaultThemeItem->module = module;
+		menu->addChild(defaultThemeItem);
 	}
 
 	// display panel based on theme
