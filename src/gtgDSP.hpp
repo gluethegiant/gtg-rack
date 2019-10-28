@@ -12,7 +12,7 @@ struct AutoFader {
 	void setSpeed(int speed) {   // uses sampleRate and gain to keep time consistent
 		last_speed = speed;
 		float sampleRate = APP->engine->getSampleRate();
-		delta = gain/(sampleRate * 0.001f * speed);   // milliseconds from 0 to full gain
+		delta = gain/(sampleRate * 0.001f * (float)speed);   // milliseconds from 0 to full gain
 	}
 
 	void setGain(float amount) {
@@ -72,7 +72,7 @@ struct ConstantPan {
 
 	void setSmoothSpeed(int speed) {   // uses sampleRate to keep smoothing speed consistent
 		float sampleRate = APP->engine->getSampleRate();
-		delta = 2.0f/(sampleRate * 0.001f * speed);   // milliseconds from pan left to pan right
+		delta = 2.0f/(sampleRate * 0.001f * (float)speed);   // milliseconds from pan left to pan right
 	}
 
 	void setSmoothPan(float new_position) {
@@ -100,4 +100,32 @@ private:
 		levels[0] = sin((1.f - pan_angle) * M_PI_2) * M_SQRT2;   // left level
 		levels[1] = sin(pan_angle * M_PI_2) * M_SQRT2;   // right level
 	}
+};
+
+
+// a simple slew limiter that uses milliseconds
+
+struct SimpleSlewer {
+
+	float value = 0.f;
+
+	float slew(float new_value) {
+		if (new_value != value) {
+			if (new_value > value) {
+				value = std::fmin(value + delta, new_value);
+			} else {
+				value = std::fmax(value - delta, new_value);
+			}
+		}
+		return value;
+	}
+
+	void setSlewSpeed(int speed) {
+		float sampleRate = APP->engine->getSampleRate();
+		delta = 1.f/(sampleRate * 0.001f * (float)speed);   // milliseconds from 0 to 1
+	}
+
+private:
+
+	float delta = 0.0005f;
 };
