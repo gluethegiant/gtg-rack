@@ -50,7 +50,7 @@ struct MetroCityBus : Module {
 	ConstantPan metro_pan[16];
 
 	const int fade_speed = 20;   // milliseconds from 0 to gain
-	const int smooth_speed = 100;   // milliseconds from full left to full right
+	const int smooth_speed = 80;   // milliseconds from full left to full right
 	float pan_history[HISTORY_CAP] = {};
 	long hist_i = 0;
 	long hist_size = 0;
@@ -63,7 +63,6 @@ struct MetroCityBus : Module {
 	float light_brights[9] = {};
 	long f_delay = 0;   // follow delay
 	float pan_rate = APP->engine->getSampleRate() / pan_division;   // to work with pan clock divider
-	bool pan_cv_filter = true;
 	bool level_cv_filter = true;
 	int color_theme = 0;
 
@@ -125,7 +124,7 @@ struct MetroCityBus : Module {
 
 				// get pan knob with CV and attenuator
 				float pan_pos = params[PAN_PARAM].getValue() + (((inputs[PAN_CV_INPUT].getNormalVoltage(0) * 2) * params[PAN_ATT_PARAM].getValue()) * 0.1f);
-				metro_pan[0].setPan(pan_pos);   // no smoothing on first channel's pan
+				metro_pan[0].setSmoothPan(pan_pos);
 				light_pan[0] = metro_pan[0].position;   // pan position for lights
 
 				// spread is only 0 to 1 for pan follow
@@ -274,7 +273,6 @@ struct MetroCityBus : Module {
 		json_object_set_new(rootJ, "blue_post_fade", json_integer(post_fades[0]));
 		json_object_set_new(rootJ, "orange_post_fade", json_integer(post_fades[1]));
 		json_object_set_new(rootJ, "gain", json_real(metro_fader.getGain()));
-		json_object_set_new(rootJ, "pan_cv_filter", json_integer(pan_cv_filter));
 		json_object_set_new(rootJ, "level_cv_filter", json_integer(level_cv_filter));
 		json_object_set_new(rootJ, "color_theme", json_integer(color_theme));
 		return rootJ;
@@ -292,8 +290,6 @@ struct MetroCityBus : Module {
 		if (orange_post_fadeJ) post_fades[1] = json_integer_value(orange_post_fadeJ);
 		json_t *gainJ = json_object_get(rootJ, "gain");
 		if (gainJ) metro_fader.setGain((float)json_real_value(gainJ));
-		json_t *pan_cv_filterJ = json_object_get(rootJ, "pan_cv_filter");
-		if (pan_cv_filterJ) pan_cv_filter = json_integer_value(pan_cv_filterJ);
 		json_t *level_cv_filterJ = json_object_get(rootJ, "level_cv_filter");
 		if (level_cv_filterJ) level_cv_filter = json_integer_value(level_cv_filterJ);
 		json_t *color_themeJ = json_object_get(rootJ, "color_theme");
@@ -317,7 +313,6 @@ struct MetroCityBus : Module {
 		post_fades[0] = false;
 		post_fades[1] = false;
 		initializePanObjects();
-		pan_cv_filter = true;
 		level_cv_filter = true;
 	}
 
@@ -410,14 +405,6 @@ struct MetroCityBusWidget : ModuleWidget {
 			}
 		};
 
-		struct PanCVFilterItem : MenuItem {
-			MetroCityBus* module;
-			bool filter_on;
-			void onAction(const event::Action& e) override {
-				module->pan_cv_filter = !filter_on;
-			}
-		};
-
 		struct LevelCVFilterItem : MenuItem {
 			MetroCityBus* module;
 			bool filter_on;
@@ -461,12 +448,6 @@ struct MetroCityBusWidget : ModuleWidget {
 		// CV filters
 		menu->addChild(new MenuEntry);
 		menu->addChild(createMenuLabel("CV Filters"));
-
-		PanCVFilterItem* panCVFilterItem = createMenuItem<PanCVFilterItem>("Smoothing on pan CV");
-		panCVFilterItem->rightText = CHECKMARK(module->pan_cv_filter);
-		panCVFilterItem->module = module;
-		panCVFilterItem->filter_on = module->pan_cv_filter;
-		menu->addChild(panCVFilterItem);
 
 		LevelCVFilterItem* levelCVFilterItem = createMenuItem<LevelCVFilterItem>("Smoothing on level CVs");
 		levelCVFilterItem->rightText = CHECKMARK(module->level_cv_filter);

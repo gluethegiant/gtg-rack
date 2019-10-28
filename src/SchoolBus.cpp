@@ -42,6 +42,7 @@ struct SchoolBus : Module {
 	ConstantPan school_pan;
 
 	const int fade_speed = 20;
+	const int pan_speed = 40;   // milliseconds from left to right
 	bool post_fades[2] = {false, false};
 	bool pan_cv_filter = true;
 	bool level_cv_filter = true;
@@ -59,6 +60,7 @@ struct SchoolBus : Module {
 		configParam(ORANGE_POST_PARAM, 0.f, 1.f, 0.f, "Post red fader send");
 		pan_divider.setDivision(3);
 		school_fader.setSpeed(fade_speed);
+		school_pan.setSmoothSpeed(pan_speed);
 		color_theme = loadDefaultTheme();
 	}
 
@@ -92,7 +94,11 @@ struct SchoolBus : Module {
 		if (pan_divider.process()) {   // calculate pan infrequently, useful for auto panning
 			if (inputs[PAN_CV_INPUT].isConnected()) {
 				float pan_pos = params[PAN_PARAM].getValue() + (((inputs[PAN_CV_INPUT].getNormalVoltage(0) * 2) * params[PAN_ATT_PARAM].getValue()) * 0.1);
-				school_pan.setPan(pan_pos);
+				if (pan_cv_filter) {
+					school_pan.setSmoothPan(pan_pos);
+				} else {
+					school_pan.setPan(pan_pos);
+				}
 			} else {
 				school_pan.setPan(params[PAN_PARAM].getValue());
 			}
@@ -160,6 +166,7 @@ struct SchoolBus : Module {
 	// reset fader speed on sample rate change
 	void onSampleRateChange() override {
 		school_fader.setSpeed(fade_speed);
+		school_pan.setSmoothSpeed(pan_speed);
 	}
 
 	// Initialize on state and post fades
