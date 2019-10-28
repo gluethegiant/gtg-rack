@@ -28,7 +28,7 @@ struct MiniBus : Module {
 	dsp::SchmittTrigger on_cv_trigger;
 	AutoFader mini_fader;
 
-	const int fade_speed = 20;
+	const int fade_speed = 26;
 	int color_theme = 0;
 
 	MiniBus() {

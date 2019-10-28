@@ -32,7 +32,7 @@ struct GigBus : Module {
 	AutoFader gig_fader;
 	ConstantPan gig_pan;
 
-	const int fade_speed = 20;
+	const int fade_speed = 26;
 	int color_theme = 0;
 
 	GigBus() {
