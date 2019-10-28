@@ -40,22 +40,25 @@ struct BusDepot : Module {
 	dsp::SchmittTrigger on_trigger;
 	dsp::SchmittTrigger on_cv_trigger;
 	AutoFader depot_fader;
+	SimpleSlewer level_smoother;
 
+	const int level_speed = 26;   // for level cv filter
 	float peak_left = 0;
 	float peak_right = 0;
-	bool level_cv_filter = false;
+	bool level_cv_filter = true;
 
 	BusDepot() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		configParam(ON_PARAM, 0.f, 1.f, 0.f, "Output on");   // depot_fader defaults to on and creates a quick fade up
 		configParam(AUX_PARAM, 0.f, 1.f, 1.f, "Aux level in");
 		configParam(LEVEL_PARAM, 0.f, 1.f, 1.f, "Master level");
-		configParam(FADE_PARAM, 20, 17000, 20, "Auto fader milliseconds");
+		configParam(FADE_PARAM, 20, 17000, 26, "Auto fader milliseconds");
 		vu_meters[0].lambda = 25.f;
 		vu_meters[1].lambda = 25.f;
 		vu_divider.setDivision(512);
 		light_divider.setDivision(64);
-		depot_fader.setSpeed(20);
+		depot_fader.setSpeed(26);
+		level_smoother.setSlewSpeed(level_speed);   // for level cv filter
 		color_theme = loadDefaultTheme();
 	}
 
@@ -74,6 +77,7 @@ struct BusDepot : Module {
 			// get param levels
 			float aux_level = params[AUX_PARAM].getValue();
 			float master_level = clamp(inputs[LEVEL_CV_INPUT].getNormalVoltage(10.0f) * 0.1f, 0.0f, 1.0f) * params[LEVEL_PARAM].getValue();
+			if (level_cv_filter) master_level = level_smoother.slew(master_level);
 			float fade = depot_fader.getExpFade(2.5);   // exponential fade for fade automation
 
 			// get aux inputs
@@ -175,13 +179,18 @@ struct BusDepot : Module {
 		json_t *input_onJ = json_object_get(rootJ, "input_on");
 		if (input_onJ) depot_fader.on = json_integer_value(input_onJ);
 		json_t *level_cv_filterJ = json_object_get(rootJ, "level_cv_filter");
-		if (level_cv_filterJ) level_cv_filter = json_integer_value(level_cv_filterJ);
+		if (level_cv_filterJ) {
+			level_cv_filter = json_integer_value(level_cv_filterJ);
+		} else {
+			if (input_onJ) level_cv_filter = false;   // do not change existing patches
+		}
 		json_t *color_themeJ = json_object_get(rootJ, "color_theme");
 		if (color_themeJ) color_theme = json_integer_value(color_themeJ);
 }
 
 	void onSampleRateChange() override {
 		depot_fader.setSpeed(params[FADE_PARAM].getValue());
+		level_smoother.setSlewSpeed(level_speed);
 	}
 
 	void onReset() override {
@@ -289,7 +298,7 @@ struct BusDepotWidget : ModuleWidget {
 
 		// CV filters
 		menu->addChild(new MenuEntry);
-		menu->addChild(createMenuLabel("CV Filters"));
+		menu->addChild(createMenuLabel("CV Input Filters"));
 
 		LevelCVFilterItem* levelCVFilterItem = createMenuItem<LevelCVFilterItem>("Smoothing on level CV");
 		levelCVFilterItem->rightText = CHECKMARK(module->level_cv_filter);
