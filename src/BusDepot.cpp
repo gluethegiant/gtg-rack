@@ -43,7 +43,7 @@ struct BusDepot : Module {
 
 	float peak_left = 0;
 	float peak_right = 0;
-	bool level_cv_filter = true;
+	bool level_cv_filter = false;
 
 	BusDepot() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -291,7 +291,7 @@ struct BusDepotWidget : ModuleWidget {
 		menu->addChild(new MenuEntry);
 		menu->addChild(createMenuLabel("CV Filters"));
 
-		LevelCVFilterItem* levelCVFilterItem = createMenuItem<LevelCVFilterItem>("Smoothing on master level CV");
+		LevelCVFilterItem* levelCVFilterItem = createMenuItem<LevelCVFilterItem>("Smoothing on level CV");
 		levelCVFilterItem->rightText = CHECKMARK(module->level_cv_filter);
 		levelCVFilterItem->module = module;
 		levelCVFilterItem->filter_on = module->level_cv_filter;

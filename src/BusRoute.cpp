@@ -258,7 +258,7 @@ struct BusRouteWidget : ModuleWidget {
 		};
 
 		menu->addChild(new MenuEntry);
-		menu->addChild(createMenuLabel("Color Theme"));
+		menu->addChild(createMenuLabel("Color Themes"));
 
 		std::string themeTitles[2] = {"70's Cream", "Night Ride"};
 		for (int i = 0; i < 2; i++) {
@@ -270,9 +270,9 @@ struct BusRouteWidget : ModuleWidget {
 		}
 
 		menu->addChild(new MenuEntry);
-		menu->addChild(createMenuLabel("Modular Bus Mixer Defaults"));
+		menu->addChild(createMenuLabel("All Modular Bus Mixers"));
 
-		DefaultThemeItem* defaultThemeItem = createMenuItem<DefaultThemeItem>("Night Ride theme");
+		DefaultThemeItem* defaultThemeItem = createMenuItem<DefaultThemeItem>("Default to Night Ride theme");
 		defaultThemeItem->rightText = CHECKMARK(loadDefaultTheme());
 		defaultThemeItem->module = module;
 		menu->addChild(defaultThemeItem);

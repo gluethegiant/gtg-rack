@@ -63,7 +63,7 @@ struct MetroCityBus : Module {
 	float light_brights[9] = {};
 	long f_delay = 0;   // follow delay
 	float pan_rate = APP->engine->getSampleRate() / pan_division;   // to work with pan clock divider
-	bool level_cv_filter = true;
+	bool level_cv_filter = false;
 	int color_theme = 0;
 
 	MetroCityBus() {

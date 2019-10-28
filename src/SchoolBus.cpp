@@ -45,7 +45,7 @@ struct SchoolBus : Module {
 	const int pan_speed = 40;   // milliseconds from left to right
 	bool post_fades[2] = {false, false};
 	bool pan_cv_filter = true;
-	bool level_cv_filter = true;
+	bool level_cv_filter = false;
 	int color_theme = 0;
 
 	SchoolBus() {
