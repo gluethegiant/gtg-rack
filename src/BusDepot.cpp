@@ -51,8 +51,8 @@ struct BusDepot : Module {
 		configParam(AUX_PARAM, 0.f, 1.f, 1.f, "Aux level in");
 		configParam(LEVEL_PARAM, 0.f, 1.f, 1.f, "Master level");
 		configParam(FADE_PARAM, 20, 17000, 20, "Auto fader milliseconds");
-		vu_meters[0].lambda = 15.f;
-		vu_meters[1].lambda = 15.f;
+		vu_meters[0].lambda = 25.f;
+		vu_meters[1].lambda = 25.f;
 		vu_divider.setDivision(512);
 		light_divider.setDivision(64);
 		depot_fader.setSpeed(20);
