@@ -40,12 +40,14 @@ struct SchoolBus : Module {
 	dsp::ClockDivider pan_divider;
 	AutoFader school_fader;
 	ConstantPan school_pan;
+	SimpleSlewer level_smoother[3];
 
-	const int fade_speed = 20;
-	const int pan_speed = 40;   // milliseconds from left to right
+	const int fade_speed = 26;
+	const int pan_speed = 52;   // milliseconds from left to right
+	const int level_speed = 26;   // for level cv filter
 	bool post_fades[2] = {false, false};
 	bool pan_cv_filter = true;
-	bool level_cv_filter = false;
+	bool level_cv_filter = true;
 	int color_theme = 0;
 
 	SchoolBus() {
@@ -61,6 +63,9 @@ struct SchoolBus : Module {
 		pan_divider.setDivision(3);
 		school_fader.setSpeed(fade_speed);
 		school_pan.setSmoothSpeed(pan_speed);
+		for (int i = 0; i < 3; i++) {
+			level_smoother[i].setSlewSpeed(level_speed);
+		}
 		color_theme = loadDefaultTheme();
 	}
 
@@ -81,6 +86,13 @@ struct SchoolBus : Module {
 		float in_levels[3] = {0.f, 0.f, 0.f};
 		for (int sb = 0; sb < 3; sb++) {   // sb = stereo bus
 			in_levels[sb] = clamp(inputs[LEVEL_CV_INPUTS + sb].getNormalVoltage(10) * 0.1f, 0.f, 1.f) * params[LEVEL_PARAMS + sb].getValue();
+		}
+
+		// smooth input levels
+		if (level_cv_filter) {
+			for (int sb = 0; sb < 3; sb++) {
+				in_levels[sb] = level_smoother[sb].slew(in_levels[sb]);
+			}
 		}
 
 		// set post fades on levels
@@ -156,9 +168,17 @@ struct SchoolBus : Module {
 		json_t *gainJ = json_object_get(rootJ, "gain");
 		if (gainJ) school_fader.setGain((float)json_real_value(gainJ));
 		json_t *pan_cv_filterJ = json_object_get(rootJ, "pan_cv_filter");
-		if (pan_cv_filterJ) pan_cv_filter = json_integer_value(pan_cv_filterJ);
+		if (pan_cv_filterJ) {
+			pan_cv_filter = json_integer_value(pan_cv_filterJ);
+		} else {
+			if (input_onJ) pan_cv_filter = false;   // do not change existing patches
+		}
 		json_t *level_cv_filterJ = json_object_get(rootJ, "level_cv_filter");
-		if (level_cv_filterJ) level_cv_filter = json_integer_value(level_cv_filterJ);
+		if (level_cv_filterJ) {
+			level_cv_filter = json_integer_value(level_cv_filterJ);
+		} else {
+			if (input_onJ) level_cv_filter = false;   // do not change existing patches
+		}
 		json_t *color_themeJ = json_object_get(rootJ, "color_theme");
 		if (color_themeJ) color_theme = json_integer_value(color_themeJ);
 	}
@@ -167,6 +187,9 @@ struct SchoolBus : Module {
 	void onSampleRateChange() override {
 		school_fader.setSpeed(fade_speed);
 		school_pan.setSmoothSpeed(pan_speed);
+		for (int i = 0; i < 3; i++) {
+			level_smoother[i].setSlewSpeed(level_speed);
+		}
 	}
 
 	// Initialize on state and post fades
@@ -297,7 +320,7 @@ struct SchoolBusWidget : ModuleWidget {
 
 		// CV filters
 		menu->addChild(new MenuEntry);
-		menu->addChild(createMenuLabel("CV Filters"));
+		menu->addChild(createMenuLabel("CV Input Filters"));
 
 		PanCVFilterItem* panCVFilterItem = createMenuItem<PanCVFilterItem>("Smoothing on pan CV");
 		panCVFilterItem->rightText = CHECKMARK(module->pan_cv_filter);
