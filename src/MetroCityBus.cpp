@@ -48,9 +48,11 @@ struct MetroCityBus : Module {
 	dsp::ClockDivider light_divider;
 	AutoFader metro_fader;
 	ConstantPan metro_pan[16];
+	SimpleSlewer level_smoother[3];
 
-	const int fade_speed = 20;   // milliseconds from 0 to gain
-	const int smooth_speed = 80;   // milliseconds from full left to full right
+	const int fade_speed = 26;   // milliseconds from 0 to gain
+	const int smooth_speed = 86;   // milliseconds from full left to full right
+	const int level_speed = 26;
 	float pan_history[HISTORY_CAP] = {};
 	long hist_i = 0;
 	long hist_size = 0;
@@ -63,7 +65,7 @@ struct MetroCityBus : Module {
 	float light_brights[9] = {};
 	long f_delay = 0;   // follow delay
 	float pan_rate = APP->engine->getSampleRate() / pan_division;   // to work with pan clock divider
-	bool level_cv_filter = false;
+	bool level_cv_filter = true;
 	int color_theme = 0;
 
 	MetroCityBus() {
@@ -82,6 +84,9 @@ struct MetroCityBus : Module {
 		light_divider.setDivision(64);
 		metro_fader.setSpeed(fade_speed);
 		initializePanObjects();
+		for (int i = 0; i < 3; i++) {
+			level_smoother[i].setSlewSpeed(level_speed);
+		}
 		color_theme = loadDefaultTheme();
 	}
 
@@ -104,6 +109,13 @@ struct MetroCityBus : Module {
 		float in_levels[3] = {0.f, 0.f, 0.f};
 		for (int sb = 0; sb < 3; sb++) {   // sb = stereo bus
 			in_levels[sb] = clamp(inputs[LEVEL_CV_INPUTS + sb].getNormalVoltage(10) * 0.1f, 0.f, 1.f) * params[LEVEL_PARAMS + sb].getValue();
+		}
+
+		// smooth input levels
+		if (level_cv_filter) {
+			for (int sb = 0; sb < 3; sb++) {
+				in_levels[sb] = level_smoother[sb].slew(in_levels[sb]);
+			}
 		}
 
 		// set post fades on levels
@@ -291,7 +303,11 @@ struct MetroCityBus : Module {
 		json_t *gainJ = json_object_get(rootJ, "gain");
 		if (gainJ) metro_fader.setGain((float)json_real_value(gainJ));
 		json_t *level_cv_filterJ = json_object_get(rootJ, "level_cv_filter");
-		if (level_cv_filterJ) level_cv_filter = json_integer_value(level_cv_filterJ);
+		if (level_cv_filterJ) {
+			level_cv_filter = json_integer_value(level_cv_filterJ);
+		} else {
+			if (input_onJ) level_cv_filter = false;   // do not change existing patches
+		}
 		json_t *color_themeJ = json_object_get(rootJ, "color_theme");
 		if (color_themeJ) color_theme = json_integer_value(color_themeJ);
 	}
@@ -303,6 +319,9 @@ struct MetroCityBus : Module {
 			metro_pan[i].setSmoothSpeed(smooth_speed);
 		}
 		pan_rate = (APP->engine->getSampleRate() / pan_division);   // used by pan follow, accounts for pan clock divider
+		for (int i = 0; i < 3; i++) {
+			level_smoother[i].setSlewSpeed(level_speed);
+		}
 	}
 
 	// Initialize on state and buttons
@@ -447,7 +466,7 @@ struct MetroCityBusWidget : ModuleWidget {
 
 		// CV filters
 		menu->addChild(new MenuEntry);
-		menu->addChild(createMenuLabel("CV Filters"));
+		menu->addChild(createMenuLabel("CV Input Filters"));
 
 		LevelCVFilterItem* levelCVFilterItem = createMenuItem<LevelCVFilterItem>("Smoothing on level CVs");
 		levelCVFilterItem->rightText = CHECKMARK(module->level_cv_filter);
