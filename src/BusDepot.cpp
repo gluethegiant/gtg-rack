@@ -307,9 +307,9 @@ struct BusDepotWidget : ModuleWidget {
 		menu->addChild(levelCVFilterItem);
 
 		menu->addChild(new MenuEntry);
-		menu->addChild(createMenuLabel("Modular Bus Mixer Defaults"));
+		menu->addChild(createMenuLabel("All Modular Bus Mixers"));
 
-		DefaultThemeItem* defaultThemeItem = createMenuItem<DefaultThemeItem>("Night Ride theme");
+		DefaultThemeItem* defaultThemeItem = createMenuItem<DefaultThemeItem>("Default Night Ride theme");
 		defaultThemeItem->rightText = CHECKMARK(loadDefaultTheme());
 		defaultThemeItem->module = module;
 		menu->addChild(defaultThemeItem);
