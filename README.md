@@ -5,7 +5,7 @@ The audio is routed along three stereo buses: red, orange, and blue.
 The Bus Depot module can create mix groups and provide a final stereo mix out.
 
 The bus design makes it easy to patch together modules while creating simple or complex routing.
-With features like polyphonic stereo spread, fade automation, mix groups, and integrated latency compensation, they're also fun to use.
+With features like pop filters, polyphonic stereo spread, fade automation, mix groups, and integrated latency compensation, they're also fun to use.
 
 ![Modular bus mixers from Glue the Giant](https://github.com/gluethegiant/gtg-rack/blob/master/design/screenshot.png)
 
@@ -39,6 +39,14 @@ Finally, thanks always to Rebecca.
 To build these rack modules, see the official [VCV Rack documentation](https://vcvrack.com/manual/Building.html).
 
 ## Release Notes
+
+v. 1.0.4 The Halloween Release (October 31, 2019)
+
+- Night Ride theme released on Halloween day (available in the context menu)
+- Optionally default to the Night Ride theme
+- CV input filters added where applicable per suggestion by Omri Cohen (toggle on or off in the context menu)
+- Improved fade automation on Bus Depot (exponential)
+- Improved responsiveness on Bus Depot vu meters
 
 v. 1.0.3 The Mix Group Release (October 18, 2019)
 
