@@ -2707,11 +2707,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.5017363"
-     inkscape:cx="-135.88762"
-     inkscape:cy="212.44778"
+     inkscape:zoom="2.1237758"
+     inkscape:cx="-28.019359"
+     inkscape:cy="307.28103"
      inkscape:document-units="mm"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="layer3"
      showgrid="false"
      inkscape:window-width="1887"
      inkscape:window-height="1052"
@@ -3612,6 +3612,13 @@
          d="m 5.8648951,287.92716 0.5,2.70155 -0.8646997,0.75 -0.8646997,-0.75 0.5,-2.69827 c -1.8313898,0.18676 -3.2249953,1.72809 -3.2269244,3.56898 -4.24e-5,1.98347 1.6078853,3.59139 3.5913512,3.59135 1.983466,4e-5 3.5913938,-1.60788 3.5913514,-3.59135 -2.192e-4,-1.84195 -1.3939573,-3.38511 -3.2263788,-3.57226 z"
          style="fill:#333333;fill-opacity:1;stroke:none;stroke-width:0.22488335;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     </g>
+    <circle
+       transform="translate(0,-168.5)"
+       r="3.3506446"
+       cy="229.7802"
+       cx="15.240018"
+       id="circle19858"
+       style="display:inline;fill:#000000;fill-opacity:0.09890113;stroke:none;stroke-width:0.62353331;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.56593407" />
     <g
        style="display:inline"
        id="g888"
@@ -3838,12 +3845,5 @@
          inkscape:connector-curvature="0"
          sodipodi:nodetypes="ccccc" />
     </g>
-    <circle
-       transform="translate(0,-168.5)"
-       r="3.3506446"
-       cy="229.7802"
-       cx="15.240018"
-       id="circle19858"
-       style="display:inline;fill:#000000;fill-opacity:0.09890113;stroke:none;stroke-width:0.62353331;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.56593407" />
   </g>
 </svg>
