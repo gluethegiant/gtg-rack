@@ -8,6 +8,7 @@ struct BusDepot : Module {
 		AUX_PARAM,
 		LEVEL_PARAM,
 		FADE_PARAM,
+		FADE_IN_PARAM,
 		NUM_PARAMS
 	};
 	enum InputIds {
@@ -46,13 +47,15 @@ struct BusDepot : Module {
 	float peak_left = 0;
 	float peak_right = 0;
 	bool level_cv_filter = true;
+	int fade_cv_mode = 0;
 
 	BusDepot() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		configParam(ON_PARAM, 0.f, 1.f, 0.f, "Output on");   // depot_fader defaults to on and creates a quick fade up
 		configParam(AUX_PARAM, 0.f, 1.f, 1.f, "Aux level in");
 		configParam(LEVEL_PARAM, 0.f, 1.f, 1.f, "Master level");
-		configParam(FADE_PARAM, 20, 17000, 26, "Auto fader milliseconds");
+		configParam(FADE_PARAM, 20, 17000, 26, "Fade out automation in milliseconds");
+		configParam(FADE_IN_PARAM, 20, 17000, 26, "Fade in automation in milliseconds");
 		vu_meters[0].lambda = 25.f;
 		vu_meters[1].lambda = 25.f;
 		vu_divider.setDivision(512);
@@ -138,10 +141,30 @@ struct BusDepot : Module {
 
 			// set fade speed infrequently
 			if (inputs[FADE_CV_INPUT].isConnected()) {
-				depot_fader.setSpeed(std::round((clamp(inputs[FADE_CV_INPUT].getNormalVoltage(0.0f) * .1f, 0.0f, 1.0f) * 16980.f) + 20.f));   // 20 to 17000 milliseconds
-			} else {
-				if (params[FADE_PARAM].getValue() != depot_fader.last_speed) {
-					depot_fader.setSpeed(params[FADE_PARAM].getValue());
+				if (depot_fader.on) {   // fade in with CV
+					if (fade_cv_mode == 0 || fade_cv_mode == 1) {
+						depot_fader.setSpeed(std::round((clamp(inputs[FADE_CV_INPUT].getNormalVoltage(0.0f) * 0.1f, 0.0f, 1.0f) * 16974.f) + 26.f));   // 26 to 17000 milliseconds
+					} else {
+						if (params[FADE_IN_PARAM].getValue() != depot_fader.last_speed) {
+							depot_fader.setSpeed(params[FADE_IN_PARAM].getValue());
+						}
+					}
+				} else {   // fade out with CV
+					if (fade_cv_mode == 0 || fade_cv_mode == 2) {
+						depot_fader.setSpeed(std::round((clamp(inputs[FADE_CV_INPUT].getNormalVoltage(0.0f) * 0.1f, 0.0f, 1.0f) * 16974.f) + 26.f));   // 26 to 17000 milliseconds
+					} else {
+						if (params[FADE_PARAM].getValue() != depot_fader.last_speed) {
+							depot_fader.setSpeed(params[FADE_PARAM].getValue());
+						}
+					}
+				}
+			} else {   // fade without CV
+				if (params[FADE_IN_PARAM].getValue() != depot_fader.last_speed) {
+					if (depot_fader.on) {   // calculate fade in speed
+						depot_fader.setSpeed(params[FADE_IN_PARAM].getValue());
+					} else {   // calculate fade out speed
+						depot_fader.setSpeed(params[FADE_PARAM].getValue());
+					}
 				}
 			}
 
@@ -172,6 +195,7 @@ struct BusDepot : Module {
 		json_object_set_new(rootJ, "input_on", json_integer(depot_fader.on));
 		json_object_set_new(rootJ, "level_cv_filter", json_integer(level_cv_filter));
 		json_object_set_new(rootJ, "color_theme", json_integer(color_theme));
+		json_object_set_new(rootJ, "fade_cv_mode", json_integer(fade_cv_mode));
 		return rootJ;
 	}
 
@@ -186,7 +210,15 @@ struct BusDepot : Module {
 		}
 		json_t *color_themeJ = json_object_get(rootJ, "color_theme");
 		if (color_themeJ) color_theme = json_integer_value(color_themeJ);
-}
+		json_t *fade_cv_modeJ = json_object_get(rootJ, "fade_cv_mode");
+		if (fade_cv_modeJ) {
+			fade_cv_mode = json_integer_value(fade_cv_modeJ);
+		} else {
+			if (input_onJ) {
+				params[FADE_IN_PARAM].setValue(params[FADE_PARAM].getValue());   // same behavior on patches saved before fade in knob existed
+			}
+		}
+	}
 
 	void onSampleRateChange() override {
 		depot_fader.setSpeed(params[FADE_PARAM].getValue());
@@ -197,6 +229,7 @@ struct BusDepot : Module {
 		depot_fader.on = true;
 		depot_fader.setGain(1.f);
 		level_cv_filter = true;
+		fade_cv_mode = 0;
 	}
 };
 
@@ -226,6 +259,7 @@ struct BusDepotWidget : ModuleWidget {
 		addParam(createThemedParamCentered<gtgBlackTinyKnob>(mm2px(Vec(15.24, 60.48)), module, BusDepot::AUX_PARAM, module ? &module->color_theme : NULL));
 		addParam(createThemedParamCentered<gtgBlackKnob>(mm2px(Vec(15.24, 83.88)), module, BusDepot::LEVEL_PARAM, module ? &module->color_theme : NULL));
 		addParam(createThemedParamCentered<gtgGrayTinySnapKnob>(mm2px(Vec(15.24, 42.54)), module, BusDepot::FADE_PARAM, module ? &module->color_theme : NULL));
+		addParam(createThemedParamCentered<gtgGrayTinySnapKnob>(mm2px(Vec(15.24, 26.15)), module, BusDepot::FADE_IN_PARAM, module ? &module->color_theme : NULL));
 
 		addInput(createThemedPortCentered<gtgKeyPort>(mm2px(Vec(23.6, 21.1)), true, module, BusDepot::ON_CV_INPUT, module ? &module->color_theme : NULL));
 		addInput(createThemedPortCentered<gtgKeyPort>(mm2px(Vec(15.24, 71.63)), true, module, BusDepot::LEVEL_CV_INPUT, module ? &module->color_theme : NULL));
@@ -269,11 +303,18 @@ struct BusDepotWidget : ModuleWidget {
 			}
 		};
 
-		struct LevelCVFilterItem : MenuItem {
+		struct LevelCvFilterItem : MenuItem {
 			BusDepot* module;
-			bool filter_on;
 			void onAction(const event::Action& e) override {
-				module->level_cv_filter = !filter_on;
+				module->level_cv_filter = !module->level_cv_filter;
+			}
+		};
+
+		struct FadeCvModeItem : MenuItem {
+			BusDepot* module;
+			int cv_mode;
+			void onAction(const event::Action& e) override {
+				module->fade_cv_mode = cv_mode;
 			}
 		};
 
@@ -300,11 +341,23 @@ struct BusDepotWidget : ModuleWidget {
 		menu->addChild(new MenuEntry);
 		menu->addChild(createMenuLabel("CV Input Filters"));
 
-		LevelCVFilterItem* levelCVFilterItem = createMenuItem<LevelCVFilterItem>("Smoothing on level CV");
-		levelCVFilterItem->rightText = CHECKMARK(module->level_cv_filter);
-		levelCVFilterItem->module = module;
-		levelCVFilterItem->filter_on = module->level_cv_filter;
-		menu->addChild(levelCVFilterItem);
+		LevelCvFilterItem* levelCvFilterItem = createMenuItem<LevelCvFilterItem>("Smoothing on level CV");
+		levelCvFilterItem->rightText = CHECKMARK(module->level_cv_filter);
+		levelCvFilterItem->module = module;
+		menu->addChild(levelCvFilterItem);
+
+		// Fade CV filters
+		menu->addChild(new MenuEntry);
+		menu->addChild(createMenuLabel("Fade CV Mode"));
+
+		std::string fadeCvModeTitles[3] = {"Both fade in and fade out speeds", "Fade in speed only", "Fade out speed only"};
+		for (int i = 0; i < 3; i++) {
+			FadeCvModeItem* fadeCvModeItem = createMenuItem<FadeCvModeItem>(fadeCvModeTitles[i]);
+			fadeCvModeItem->rightText = CHECKMARK(module->fade_cv_mode == i);
+			fadeCvModeItem->module = module;
+			fadeCvModeItem->cv_mode = i;
+			menu->addChild(fadeCvModeItem);
+		}
 
 		menu->addChild(new MenuEntry);
 		menu->addChild(createMenuLabel("All Modular Bus Mixers"));
