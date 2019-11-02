@@ -54,8 +54,8 @@ struct BusDepot : Module {
 		configParam(ON_PARAM, 0.f, 1.f, 0.f, "Output on");   // depot_fader defaults to on and creates a quick fade up
 		configParam(AUX_PARAM, 0.f, 1.f, 1.f, "Aux level in");
 		configParam(LEVEL_PARAM, 0.f, 1.f, 1.f, "Master level");
-		configParam(FADE_PARAM, 20, 17000, 26, "Fade out automation in milliseconds");
-		configParam(FADE_IN_PARAM, 20, 17000, 26, "Fade in automation in milliseconds");
+		configParam(FADE_PARAM, 26, 17000, 26, "Fade out automation in milliseconds");
+		configParam(FADE_IN_PARAM, 26, 17000, 26, "Fade in automation in milliseconds");
 		vu_meters[0].lambda = 25.f;
 		vu_meters[1].lambda = 25.f;
 		vu_divider.setDivision(512);
