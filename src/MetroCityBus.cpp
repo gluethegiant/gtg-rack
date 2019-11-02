@@ -424,11 +424,10 @@ struct MetroCityBusWidget : ModuleWidget {
 			}
 		};
 
-		struct LevelCVFilterItem : MenuItem {
+		struct LevelCvFilterItem : MenuItem {
 			MetroCityBus* module;
-			bool filter_on;
 			void onAction(const event::Action& e) override {
-				module->level_cv_filter = !filter_on;
+				module->level_cv_filter = !module->level_cv_filter;
 			}
 		};
 
@@ -468,11 +467,10 @@ struct MetroCityBusWidget : ModuleWidget {
 		menu->addChild(new MenuEntry);
 		menu->addChild(createMenuLabel("CV Input Filters"));
 
-		LevelCVFilterItem* levelCVFilterItem = createMenuItem<LevelCVFilterItem>("Smoothing on level CVs");
-		levelCVFilterItem->rightText = CHECKMARK(module->level_cv_filter);
-		levelCVFilterItem->module = module;
-		levelCVFilterItem->filter_on = module->level_cv_filter;
-		menu->addChild(levelCVFilterItem);
+		LevelCvFilterItem* levelCvFilterItem = createMenuItem<LevelCvFilterItem>("Smoothing on level CVs");
+		levelCvFilterItem->rightText = CHECKMARK(module->level_cv_filter);
+		levelCvFilterItem->module = module;
+		menu->addChild(levelCvFilterItem);
 
 		menu->addChild(new MenuEntry);
 		menu->addChild(createMenuLabel("All Modular Bus Mixers"));

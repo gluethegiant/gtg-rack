@@ -268,19 +268,17 @@ struct SchoolBusWidget : ModuleWidget {
 			}
 		};
 
-		struct PanCVFilterItem : MenuItem {
+		struct PanCvFilterItem : MenuItem {
 			SchoolBus* module;
-			bool filter_on;
 			void onAction(const event::Action& e) override {
-				module->pan_cv_filter = !filter_on;
+				module->pan_cv_filter = !module->pan_cv_filter;
 			}
 		};
 
-		struct LevelCVFilterItem : MenuItem {
+		struct LevelCvFilterItem : MenuItem {
 			SchoolBus* module;
-			bool filter_on;
 			void onAction(const event::Action& e) override {
-				module->level_cv_filter = !filter_on;
+				module->level_cv_filter = !module->level_cv_filter;
 			}
 		};
 
@@ -322,17 +320,15 @@ struct SchoolBusWidget : ModuleWidget {
 		menu->addChild(new MenuEntry);
 		menu->addChild(createMenuLabel("CV Input Filters"));
 
-		PanCVFilterItem* panCVFilterItem = createMenuItem<PanCVFilterItem>("Smoothing on pan CV");
-		panCVFilterItem->rightText = CHECKMARK(module->pan_cv_filter);
-		panCVFilterItem->module = module;
-		panCVFilterItem->filter_on = module->pan_cv_filter;
-		menu->addChild(panCVFilterItem);
+		PanCvFilterItem* panCvFilterItem = createMenuItem<PanCvFilterItem>("Smoothing on pan CV");
+		panCvFilterItem->rightText = CHECKMARK(module->pan_cv_filter);
+		panCvFilterItem->module = module;
+		menu->addChild(panCvFilterItem);
 
-		LevelCVFilterItem* levelCVFilterItem = createMenuItem<LevelCVFilterItem>("Smoothing on level CVs");
-		levelCVFilterItem->rightText = CHECKMARK(module->level_cv_filter);
-		levelCVFilterItem->module = module;
-		levelCVFilterItem->filter_on = module->level_cv_filter;
-		menu->addChild(levelCVFilterItem);
+		LevelCvFilterItem* levelCvFilterItem = createMenuItem<LevelCvFilterItem>("Smoothing on level CVs");
+		levelCvFilterItem->rightText = CHECKMARK(module->level_cv_filter);
+		levelCvFilterItem->module = module;
+		menu->addChild(levelCvFilterItem);
 
 		// plugin defaults
 		menu->addChild(new MenuEntry);
