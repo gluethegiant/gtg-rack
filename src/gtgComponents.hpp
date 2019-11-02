@@ -131,8 +131,8 @@ int loadDefaultTheme();
 // custom components
 struct gtgBlackButton : ThemedSvgSwitch {
 	gtgBlackButton() {
-		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlackButton.svg")));
-		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlackButton_Night.svg")));
+		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlackButton_0.svg")));
+		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlackButton_Night_0.svg")));
 		momentary = true;
 	}
 };
