@@ -5,6 +5,7 @@
 struct BusRoute : Module {
 	enum ParamIds {
 		ENUMS(DELAY_PARAMS, 3),
+		ENUMS(PASS_PARAMS, 3),
 		NUM_PARAMS
 	};
 	enum InputIds {
@@ -15,9 +16,12 @@ struct BusRoute : Module {
 	enum OutputIds {
 		ENUMS(SEND_OUTPUTS, 6),
 		BUS_OUTPUT,
+		MIX_L_OUTPUT,
+		MIX_R_OUTPUT,
 		NUM_OUTPUTS
 	};
 	enum LightIds {
+		ENUMS(PASS_LIGHTS, 3),
 		NUM_LIGHTS
 	};
 
@@ -200,15 +204,15 @@ struct BusRouteWidget : ModuleWidget {
 			addChild(night_panel);
 		}
 
-		BlueDisplay *blueDisplay = createWidgetCentered<BlueDisplay>(mm2px(Vec(15.25, 12.12)));
+		BlueDisplay *blueDisplay = createWidgetCentered<BlueDisplay>(mm2px(Vec(15.25, 23.64)));
 		blueDisplay->module = module;
 		addChild(blueDisplay);
 
-		OrangeDisplay *orangeDisplay = createWidgetCentered<OrangeDisplay>(mm2px(Vec(15.25, 43.18)));
+		OrangeDisplay *orangeDisplay = createWidgetCentered<OrangeDisplay>(mm2px(Vec(15.25, 52.68)));
 		orangeDisplay->module = module;
 		addChild(orangeDisplay);
 
-		RedDisplay *redDisplay = createWidgetCentered<RedDisplay>(mm2px(Vec(15.25, 74.33)));
+		RedDisplay *redDisplay = createWidgetCentered<RedDisplay>(mm2px(Vec(15.25, 81.68)));
 		redDisplay->module = module;
 		addChild(redDisplay);
 
@@ -217,25 +221,33 @@ struct BusRouteWidget : ModuleWidget {
 		addChild(createThemedWidget<gtgScrewUp>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), module ? &module->color_theme : NULL));
 		addChild(createThemedWidget<gtgScrewUp>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), module ? &module->color_theme : NULL));
 
-		addParam(createThemedParamCentered<gtgBlueTinySnapKnob>(mm2px(Vec(15.25, 26.12)), module, BusRoute::DELAY_PARAMS + 0, module ? &module->color_theme : NULL));
-		addParam(createThemedParamCentered<gtgOrangeTinySnapKnob>(mm2px(Vec(15.25, 57.18)), module, BusRoute::DELAY_PARAMS + 1, module ? &module->color_theme : NULL));
-		addParam(createThemedParamCentered<gtgRedTinySnapKnob>(mm2px(Vec(15.25, 88.03)), module, BusRoute::DELAY_PARAMS + 2, module ? &module->color_theme : NULL));
+		addParam(createThemedParamCentered<gtgBlueTinySnapKnob>(mm2px(Vec(15.24, 33.624)), module, BusRoute::DELAY_PARAMS + 0, module ? &module->color_theme : NULL));
+		addParam(createThemedParamCentered<gtgOrangeTinySnapKnob>(mm2px(Vec(15.24, 62.672)), module, BusRoute::DELAY_PARAMS + 1, module ? &module->color_theme : NULL));
+		addParam(createThemedParamCentered<gtgRedTinySnapKnob>(mm2px(Vec(15.24, 91.676)), module, BusRoute::DELAY_PARAMS + 2, module ? &module->color_theme : NULL));
+		addParam(createThemedParamCentered<gtgBlackButton>(mm2px(Vec(15.24, 15.25)), module, BusRoute::PASS_PARAMS + 0, module ? &module->color_theme : NULL));
+		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(15.24, 15.25)), module, BusRoute::PASS_LIGHTS + 0));
+		addParam(createThemedParamCentered<gtgBlackButton>(mm2px(Vec(15.24, 44.25)), module, BusRoute::PASS_PARAMS + 1, module ? &module->color_theme : NULL));
+		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(15.24, 44.25)), module, BusRoute::PASS_LIGHTS + 1));
+		addParam(createThemedParamCentered<gtgBlackButton>(mm2px(Vec(15.24, 73.25)), module, BusRoute::PASS_PARAMS + 2, module ? &module->color_theme : NULL));
+		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(15.24, 73.25)), module, BusRoute::PASS_LIGHTS + 2));
 
-		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(23.32, 21.05)), true, module, BusRoute::RETURN_INPUTS + 0, module ? &module->color_theme : NULL));
-		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(23.32, 31.2)), true, module, BusRoute::RETURN_INPUTS + 1, module ? &module->color_theme : NULL));
-		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(23.32, 52.11)), true, module, BusRoute::RETURN_INPUTS + 2, module ? &module->color_theme : NULL));
-		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(23.32, 62.23)), true, module, BusRoute::RETURN_INPUTS + 3, module ? &module->color_theme : NULL));
-		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(23.32, 83.35)), true, module, BusRoute::RETURN_INPUTS + 4, module ? &module->color_theme : NULL));
-		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(23.32, 93.5)), true, module, BusRoute::RETURN_INPUTS + 5, module ? &module->color_theme : NULL));
-		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(7.28, 114.1)), true, module, BusRoute::BUS_INPUT, module ? &module->color_theme : NULL));
+		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(23.49, 19.052)), true, module, BusRoute::RETURN_INPUTS + 0, module ? &module->color_theme : NULL));
+		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(23.49, 29.196)), true, module, BusRoute::RETURN_INPUTS + 1, module ? &module->color_theme : NULL));
+		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(23.49, 48.1)), true, module, BusRoute::RETURN_INPUTS + 2, module ? &module->color_theme : NULL));
+		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(23.49, 58.244)), true, module, BusRoute::RETURN_INPUTS + 3, module ? &module->color_theme : NULL));
+		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(23.49, 77.104)), true, module, BusRoute::RETURN_INPUTS + 4, module ? &module->color_theme : NULL));
+		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(23.49, 87.248)), true, module, BusRoute::RETURN_INPUTS + 5, module ? &module->color_theme : NULL));
+		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(6.99, 114.118)), true, module, BusRoute::BUS_INPUT, module ? &module->color_theme : NULL));
 
-		addOutput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(7.28, 21.05)), false, module, BusRoute::SEND_OUTPUTS + 0, module ? &module->color_theme : NULL));
-		addOutput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(7.28, 31.2)), false, module, BusRoute::SEND_OUTPUTS + 1, module ? &module->color_theme : NULL));
-		addOutput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(7.28, 52.11)), false, module, BusRoute::SEND_OUTPUTS + 2, module ? &module->color_theme : NULL));
-		addOutput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(7.28, 62.23)), false, module, BusRoute::SEND_OUTPUTS + 3, module ? &module->color_theme : NULL));
-		addOutput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(7.28, 83.35)), false, module, BusRoute::SEND_OUTPUTS + 4, module ? &module->color_theme : NULL));
-		addOutput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(7.28, 93.5)), false, module, BusRoute::SEND_OUTPUTS + 5, module ? &module->color_theme : NULL));
-		addOutput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(23.32, 114.1)), false, module, BusRoute::BUS_OUTPUT, module ? &module->color_theme : NULL));
+		addOutput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(6.99, 19.052)), false, module, BusRoute::SEND_OUTPUTS + 0, module ? &module->color_theme : NULL));
+		addOutput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(6.99, 29.196)), false, module, BusRoute::SEND_OUTPUTS + 1, module ? &module->color_theme : NULL));
+		addOutput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(6.99, 48.1)), false, module, BusRoute::SEND_OUTPUTS + 2, module ? &module->color_theme : NULL));
+		addOutput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(6.99, 58.244)), false, module, BusRoute::SEND_OUTPUTS + 3, module ? &module->color_theme : NULL));
+		addOutput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(6.99, 77.104)), false, module, BusRoute::SEND_OUTPUTS + 4, module ? &module->color_theme : NULL));
+		addOutput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(6.99, 87.248)), false, module, BusRoute::SEND_OUTPUTS + 5, module ? &module->color_theme : NULL));
+		addOutput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(6.99, 103.916)), false, module, BusRoute::BUS_OUTPUT, module ? &module->color_theme : NULL));
+		addOutput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(23.49, 103.916)), false, module, BusRoute::MIX_L_OUTPUT, module ? &module->color_theme : NULL));
+		addOutput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(23.49, 114.107)), false, module, BusRoute::MIX_R_OUTPUT, module ? &module->color_theme : NULL));
 	}
 
 	// build the menu
