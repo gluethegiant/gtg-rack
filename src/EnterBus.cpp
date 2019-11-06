@@ -76,16 +76,16 @@ struct EnterBusWidget : ModuleWidget {
 		addChild(createThemedWidget<gtgScrewUp>(Vec(RACK_GRID_WIDTH, 0), module ? &module->color_theme : NULL));
 		addChild(createThemedWidget<gtgScrewUp>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), module ? &module->color_theme : NULL));
 
-		addParam(createThemedParamCentered<gtgBlueTinyKnob>(mm2px(Vec(10.37, 34.419)), module, EnterBus::LEVEL_PARAMS + 0, module ? &module->color_theme : NULL));
-		addParam(createThemedParamCentered<gtgOrangeTinyKnob>(mm2px(Vec(10.37, 62.909)), module, EnterBus::LEVEL_PARAMS + 1, module ? &module->color_theme : NULL));
-		addParam(createThemedParamCentered<gtgRedTinyKnob>(mm2px(Vec(10.37, 91.384)), module, EnterBus::LEVEL_PARAMS + 2, module ? &module->color_theme : NULL));
+		addParam(createThemedParamCentered<gtgBlueTinyKnob>(mm2px(Vec(10.87, 34.419)), module, EnterBus::LEVEL_PARAMS + 0, module ? &module->color_theme : NULL));
+		addParam(createThemedParamCentered<gtgOrangeTinyKnob>(mm2px(Vec(10.87, 62.909)), module, EnterBus::LEVEL_PARAMS + 1, module ? &module->color_theme : NULL));
+		addParam(createThemedParamCentered<gtgRedTinyKnob>(mm2px(Vec(10.87, 91.384)), module, EnterBus::LEVEL_PARAMS + 2, module ? &module->color_theme : NULL));
 
-		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(6.87, 15.302)), true, module, EnterBus::ENTER_INPUTS + 0, module ? &module->color_theme : NULL));
-		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(6.87, 25.446)), true, module, EnterBus::ENTER_INPUTS + 1, module ? &module->color_theme : NULL));
-		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(6.87, 43.85)), true, module, EnterBus::ENTER_INPUTS + 2, module ? &module->color_theme : NULL));
-		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(6.87, 53.994)), true, module, EnterBus::ENTER_INPUTS + 3, module ? &module->color_theme : NULL));
-		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(6.87, 72.354)), true, module, EnterBus::ENTER_INPUTS + 4, module ? &module->color_theme : NULL));
-		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(6.87, 82.498)), true, module, EnterBus::ENTER_INPUTS + 5, module ? &module->color_theme : NULL));
+		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(6.62, 15.302)), true, module, EnterBus::ENTER_INPUTS + 0, module ? &module->color_theme : NULL));
+		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(6.62, 25.446)), true, module, EnterBus::ENTER_INPUTS + 1, module ? &module->color_theme : NULL));
+		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(6.62, 43.85)), true, module, EnterBus::ENTER_INPUTS + 2, module ? &module->color_theme : NULL));
+		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(6.62, 53.994)), true, module, EnterBus::ENTER_INPUTS + 3, module ? &module->color_theme : NULL));
+		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(6.62, 72.354)), true, module, EnterBus::ENTER_INPUTS + 4, module ? &module->color_theme : NULL));
+		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(6.62, 82.498)), true, module, EnterBus::ENTER_INPUTS + 5, module ? &module->color_theme : NULL));
 		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(7.62, 103.863)), true, module, EnterBus::BUS_INPUT, module ? &module->color_theme : NULL));
 
 		addOutput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(7.62, 114.107)), false, module, EnterBus::BUS_OUTPUT, module ? &module->color_theme : NULL));
