@@ -4,18 +4,21 @@
 // themed button (switch)
 void ThemedSvgSwitch::addFrameAll(std::shared_ptr<Svg> svg) {
     framesAll.push_back(svg);
-	if (framesAll.size() == 1) {
+	if (framesAll.size() == 2) {
 		addFrame(framesAll[0]);
+		addFrame(framesAll[1]);
 	}
 }
 
 void ThemedSvgSwitch::step() {
     if(theme != NULL && *theme != old_theme) {
-        if ((*theme) == 0 || framesAll.size() < 2) {
+        if ((*theme) == 0 || framesAll.size() < 4) {
 			frames[0]=framesAll[0];
+			frames[1]=framesAll[1];
 		}
 		else {
-			frames[0]=framesAll[1];
+			frames[0]=framesAll[2];
+			frames[1]=framesAll[3];
 		}
         old_theme = *theme;
 		onChange(*(new event::Change()));

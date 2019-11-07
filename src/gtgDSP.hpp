@@ -7,7 +7,7 @@ struct AutoFader {
 
 	bool on = true;
 	float fade = 0.f;
-	int last_speed = 20;   // can be checked to see if a fade speed has changed
+	int last_speed = 26;   // can be checked to see if a fade speed has changed
 
 	void setSpeed(int speed) {   // uses sampleRate and gain to keep time consistent
 		last_speed = speed;

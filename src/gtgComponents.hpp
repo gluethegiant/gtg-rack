@@ -132,7 +132,19 @@ int loadDefaultTheme();
 struct gtgBlackButton : ThemedSvgSwitch {
 	gtgBlackButton() {
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlackButton_0.svg")));
+		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlackButton_1.svg")));
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlackButton_Night_0.svg")));
+		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlackButton_Night_1.svg")));
+		momentary = true;
+	}
+};
+
+struct gtgBlackTinyButton : ThemedSvgSwitch {
+	gtgBlackTinyButton() {
+		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlackTinyButton_0.svg")));
+		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlackTinyButton_1.svg")));
+		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlackTinyButton_Night_0.svg")));
+		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlackTinyButton_Night_1.svg")));
 		momentary = true;
 	}
 };
