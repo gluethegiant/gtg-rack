@@ -373,7 +373,7 @@ struct MetroCityBusWidget : ModuleWidget {
 		addParam(createThemedParamCentered<gtgGrayTinyKnob>(mm2px(Vec(11.379, 39.74)), module, MetroCityBus::SPREAD_PARAM, module ? &module->color_theme : NULL));
 		addParam(createThemedParamCentered<gtgGrayTinyKnob>(mm2px(Vec(29.06, 39.74)), module, MetroCityBus::PAN_ATT_PARAM, module ? &module->color_theme : NULL));
 		addParam(createThemedParamCentered<gtgBlackButton>(mm2px(Vec(6.95, 50.01)), module, MetroCityBus::REVERSE_PARAM, module ? &module->color_theme : NULL));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(6.95, 50.01)), module, MetroCityBus::REVERSE_LIGHT));
+		addChild(createLightCentered<MediumLight<WhiteLight>>(mm2px(Vec(6.95, 50.01)), module, MetroCityBus::REVERSE_LIGHT));
 		addParam(createThemedParamCentered<gtgGrayKnob>(mm2px(Vec(20.32, 50.01)), module, MetroCityBus::PAN_PARAM, module ? &module->color_theme : NULL));
 		addParam(createThemedParamCentered<gtgBlackButton>(mm2px(Vec(6.95, 66.46)), module, MetroCityBus::BLUE_POST_PARAM, module ? &module->color_theme : NULL));
 		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(6.95, 66.46)), module, MetroCityBus::BLUE_POST_LIGHT));
