@@ -2708,16 +2708,16 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.5017363"
-     inkscape:cx="118.28027"
-     inkscape:cy="202.37884"
+     inkscape:cx="23.162107"
+     inkscape:cy="262.66854"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1887"
-     inkscape:window-height="1052"
+     inkscape:window-width="939"
+     inkscape:window-height="1050"
      inkscape:window-x="33"
      inkscape:window-y="0"
-     inkscape:window-maximized="1"
+     inkscape:window-maximized="0"
      objecttolerance="1"
      guidetolerance="1"
      gridtolerance="1"
@@ -3303,6 +3303,17 @@
        id="path3854"
        d="m 17.105979,195.71703 4.622765,2.93438"
        style="display:inline;fill:none;stroke:#333333;stroke-width:0.34999999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.34999999, 0.34999998999999998;stroke-dashoffset:0;stroke-opacity:1" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:1.76388884px;line-height:1;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#333333;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="15.232061"
+       y="189.93359"
+       id="text5509"><tspan
+         sodipodi:role="line"
+         x="15.232061"
+         y="189.93359"
+         style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:1.76388884px;line-height:1;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';text-align:center;text-anchor:middle;fill:#333333;stroke-width:0.26458332"
+         id="tspan5507">8.5</tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"
