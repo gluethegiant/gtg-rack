@@ -31,12 +31,12 @@ struct Road : Module {
 
 	Road() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-		configParam(ON_PARAMS + 0, 0.f, 1.f, 0.f, "Bus in 1 on (hold to audition)");
-		configParam(ON_PARAMS + 1, 0.f, 1.f, 0.f, "Bus in 2 on (hold to audition)");
-		configParam(ON_PARAMS + 2, 0.f, 1.f, 0.f, "Bus in 3 on (hold to audition)");
-		configParam(ON_PARAMS + 3, 0.f, 1.f, 0.f, "Bus in 4 on (hold to audition)");
-		configParam(ON_PARAMS + 4, 0.f, 1.f, 0.f, "Bus in 5 on (hold to audition)");
-		configParam(ON_PARAMS + 5, 0.f, 1.f, 0.f, "Bus in 6 on (hold to audition)");
+		configParam(ON_PARAMS + 0, 0.f, 1.f, 0.f, "BUS IN 1 on (hold to audition)");
+		configParam(ON_PARAMS + 1, 0.f, 1.f, 0.f, "BUS IN 2 on (hold to audition)");
+		configParam(ON_PARAMS + 2, 0.f, 1.f, 0.f, "BUS IN 3 on (hold to audition)");
+		configParam(ON_PARAMS + 3, 0.f, 1.f, 0.f, "BUS IN 4 on (hold to audition)");
+		configParam(ON_PARAMS + 4, 0.f, 1.f, 0.f, "BUS IN 5 on (hold to audition)");
+		configParam(ON_PARAMS + 5, 0.f, 1.f, 0.f, "BUS IN 6 on (hold to audition)");
 		light_divider.setDivision(512);
 		for (int i = 0; i < 6; i++) {
 			road_fader[i].setSpeed(fade_speed);
@@ -48,7 +48,7 @@ struct Road : Module {
 
 	void process(const ProcessArgs &args) override {
 
-
+		// get button presses
 		for (int i = 0; i < 6; i++) {
 			switch (onauButtons[i].step(params[ON_PARAMS + i])) {
 			default:
