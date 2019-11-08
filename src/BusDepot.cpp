@@ -54,8 +54,8 @@ struct BusDepot : Module {
 		configParam(ON_PARAM, 0.f, 1.f, 0.f, "Output on");   // depot_fader defaults to on and creates a quick fade up
 		configParam(AUX_PARAM, 0.f, 1.f, 1.f, "Aux level in");
 		configParam(LEVEL_PARAM, 0.f, 1.f, 1.f, "Master level");
-		configParam(FADE_PARAM, 26, 17000, 26, "Fade out automation in milliseconds");
-		configParam(FADE_IN_PARAM, 26, 17000, 26, "Fade in automation in milliseconds");
+		configParam(FADE_PARAM, 26, 34000, 26, "Fade out automation in milliseconds");
+		configParam(FADE_IN_PARAM, 26, 34000, 26, "Fade in automation in milliseconds");
 		vu_meters[0].lambda = 25.f;
 		vu_meters[1].lambda = 25.f;
 		vu_divider.setDivision(512);
@@ -143,7 +143,7 @@ struct BusDepot : Module {
 			if (inputs[FADE_CV_INPUT].isConnected()) {
 				if (depot_fader.on) {   // fade in with CV
 					if (fade_cv_mode == 0 || fade_cv_mode == 1) {
-						depot_fader.setSpeed(std::round((clamp(inputs[FADE_CV_INPUT].getNormalVoltage(0.0f) * 0.1f, 0.0f, 1.0f) * 16974.f) + 26.f));   // 26 to 17000 milliseconds
+						depot_fader.setSpeed(std::round((clamp(inputs[FADE_CV_INPUT].getNormalVoltage(0.0f) * 0.1f, 0.0f, 1.0f) * 33974.f) + 26.f));   // 26 to 34000 milliseconds
 					} else {
 						if (params[FADE_IN_PARAM].getValue() != depot_fader.last_speed) {
 							depot_fader.setSpeed(params[FADE_IN_PARAM].getValue());
@@ -151,7 +151,7 @@ struct BusDepot : Module {
 					}
 				} else {   // fade out with CV
 					if (fade_cv_mode == 0 || fade_cv_mode == 2) {
-						depot_fader.setSpeed(std::round((clamp(inputs[FADE_CV_INPUT].getNormalVoltage(0.0f) * 0.1f, 0.0f, 1.0f) * 16974.f) + 26.f));   // 26 to 17000 milliseconds
+						depot_fader.setSpeed(std::round((clamp(inputs[FADE_CV_INPUT].getNormalVoltage(0.0f) * 0.1f, 0.0f, 1.0f) * 33974.f) + 26.f));   // 26 to 34000 milliseconds
 					} else {
 						if (params[FADE_PARAM].getValue() != depot_fader.last_speed) {
 							depot_fader.setSpeed(params[FADE_PARAM].getValue());
