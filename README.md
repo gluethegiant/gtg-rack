@@ -1,11 +1,10 @@
 # Glue the Giant's Modular Bus Mixers for VCV Rack
 
-To use these mixers, simply connect them together with the BUS IN and BUS OUT ports.
+Build your own mixer by connecting these modules together with the BUS IN and BUS OUT ports.
 The audio is routed along three stereo buses: red, orange, and blue.
-The Bus Depot module can create mix groups and provide a final stereo mix out.
 
 The bus design makes it easy to patch together modules while creating simple or complex routing.
-With features like pop filters, polyphonic stereo spread, fade automation, mix groups, and integrated latency compensation, they're also fun to use.
+With features like pop filters, fade automation, send effects, mix groups, polyphonic stereo spread, effect and bus auditioning, and integrated latency compensation, they can also help you make your next patch sound amazing.
 
 ![Modular bus mixers from Glue the Giant](https://github.com/gluethegiant/gtg-rack/blob/master/design/screenshot.png)
 
@@ -17,18 +16,18 @@ A [User's Guide](https://github.com/gluethegiant/gtg-rack/wiki) for these module
 
 "Glue the Giant" is the name of a band and a software developer.
 Do your best to not steal it (we know it's cool).
-The designs under the res/ and designs/ directories help to give these modules a unique look and are automatically copyrighted (c) 2019 in some jurisdictions.
+The visual designs under the res/ and designs/ directories help to give these modules a unique look and are automatically copyrighted (c) 2019 in some jurisdictions.
 Try to not copy them too closely.
 All the code is released to use under the GPL 3 license and above.
 
 ## Acknowledgments 
 
 Thanks to Andrew Belt for accepting a tiny page of code for a library that VCV Rack uses.
-That encouraged the coding of these modules.
+That encouraged the creation of these modules.
 
 Thanks to all the other Rack coders, especially those who share their code.
 You are too numerous to thank individually, but I tried to star all of your repos and have started to include acknowledgments in the code.
-Thanks for the early encouragement from users, like Aria_Salvatrice, dag2099, and chaircrusher, who displayed the use of the modular bus mixers in published songs and videos.
+Thanks for the early encouragement from users, like Aria_Salvatrice, dag2099, browneditor, and chaircrusher, who displayed the use of the modular bus mixers in published songs and videos.
 While these modules are still a work in progress, that early encouragement made me want to make them more feature complete with better code under the hood.
 Thanks to rsmus7 for beta testing.
 Thanks to Omri Cohen for the videos that helped inspire these modules.
@@ -39,6 +38,18 @@ Finally, thanks always to Rebecca.
 To build these rack modules, see the official [VCV Rack documentation](https://vcvrack.com/manual/Building.html).
 
 ## Release Notes
+
+v. 1.0.5 The Audition Release (November 11, 2019)
+
+- Fade in automation and three fade modulation modes added to Bus Depot
+- Bus Depot fade automation time increased to 34 seconds
+- Bus Route includes on/audition buttons to easily audition or bypass send effects
+- No need to connect cables for pass through with Bus Depot (accomplished with on button)
+- Bus Route now provides a stereo mix out (easier to add fade automation before send effects and easier to add limiters or other mastering effects and visuals after Bus Route)
+- Road now includes on/audition buttons to quickly work with mix groups (with or without a Bus Depot) and to audition (solo) groups and individual mixers (thanks to browneditor for the push to implement this feature)
+- All on/audition buttons on Road and Bus Route are click free for live use
+- Filters added to post send buttons on School Bus Mixer and Metro City Bus Mixer to remove clicks during live use
+- Minor visual improvements to some panels
 
 v. 1.0.4 The Halloween Release (October 31, 2019)
 
