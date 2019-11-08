@@ -2707,17 +2707,17 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="3.0034722"
-     inkscape:cx="47.794595"
-     inkscape:cy="260.01491"
+     inkscape:zoom="1.5017361"
+     inkscape:cx="-101.59262"
+     inkscape:cy="229.00876"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="956"
-     inkscape:window-height="1050"
-     inkscape:window-x="960"
+     inkscape:window-width="1920"
+     inkscape:window-height="1052"
+     inkscape:window-x="1920"
      inkscape:window-y="0"
-     inkscape:window-maximized="0"
+     inkscape:window-maximized="1"
      objecttolerance="1"
      guidetolerance="1"
      gridtolerance="1"
@@ -2794,23 +2794,23 @@
          sodipodi:role="line">R</tspan></text>
     <text
        id="text5546"
-       y="237.42987"
+       y="237.92987"
        x="8.0271244"
        style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;line-height:1.25;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';letter-spacing:0px;word-spacing:0px;fill:#333333;fill-opacity:1;stroke:none;stroke-width:0.26458332"
        xml:space="preserve"><tspan
          style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';fill:#333333;stroke-width:0.26458332"
-         y="237.42987"
+         y="237.92987"
          x="8.0271244"
          id="tspan5544"
          sodipodi:role="line">PAN</tspan></text>
     <text
        id="text5577"
-       y="262.77109"
+       y="263.27109"
        x="6.8740678"
        style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;line-height:1.25;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';letter-spacing:0px;word-spacing:0px;fill:#333333;fill-opacity:1;stroke:none;stroke-width:0.26458332"
        xml:space="preserve"><tspan
          style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';fill:#333333;stroke-width:0.26458332"
-         y="262.77109"
+         y="263.27109"
          x="6.8740678"
          id="tspan5575"
          sodipodi:role="line">LEVEL</tspan></text>
@@ -2887,22 +2887,22 @@
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:1.76388884px;line-height:1;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#333333;fill-opacity:1;stroke:none;stroke-width:0.26458332"
        x="5.3579655"
-       y="246.99887"
+       y="247.49887"
        id="text3783"><tspan
          sodipodi:role="line"
          x="5.3579655"
-         y="246.99887"
+         y="247.49887"
          style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:1.76388884px;line-height:1;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';text-align:center;text-anchor:middle;fill:#333333;stroke-width:0.26458332"
          id="tspan1512">SEND</tspan></text>
     <text
        id="text1518"
-       y="246.99887"
+       y="247.49887"
        x="14.857966"
        style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:1.76388884px;line-height:1;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#333333;fill-opacity:1;stroke:none;stroke-width:0.26458332"
        xml:space="preserve"><tspan
          id="tspan1516"
          style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:1.76388884px;line-height:1;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';text-align:center;text-anchor:middle;fill:#333333;stroke-width:0.26458332"
-         y="246.99887"
+         y="247.49887"
          x="14.857966"
          sodipodi:role="line">SEND</tspan></text>
     <g
@@ -2935,7 +2935,7 @@
        inkscape:connector-curvature="0" />
     <g
        id="g1850"
-       transform="translate(42.887879,9.7800743)">
+       transform="translate(42.887879,10.280074)">
       <path
          id="path1766"
          transform="matrix(0.26458333,0,0,0.26458333,0,168.5)"
@@ -3010,7 +3010,7 @@
     </g>
     <g
        id="g1876"
-       transform="translate(33.387878,9.7800743)">
+       transform="translate(33.387878,10.280074)">
       <path
          style="opacity:1;fill:#333333;fill-opacity:1;stroke:none;stroke-width:0.39422485;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
          d="m -121.9082,239.15039 v 0.94141 h 1.9375 a 14.243501,14.243501 0 0 1 -0.0156,-0.47071 14.243501,14.243501 0 0 1 0.0234,-0.4707 z"
@@ -3086,7 +3086,7 @@
     <g
        style="display:inline"
        id="g1609-3"
-       transform="translate(37.347866,-0.40394104)">
+       transform="translate(37.347866,0.09605896)">
       <path
          id="path1594-6"
          transform="matrix(0.26458333,0,0,0.26458333,0,168.5)"
@@ -3133,7 +3133,7 @@
     <g
        style="display:inline"
        id="g1609"
-       transform="translate(37.408271,24.815621)">
+       transform="translate(37.408271,25.315621)">
       <path
          id="path1594"
          transform="matrix(0.26458333,0,0,0.26458333,0,168.5)"
@@ -3379,12 +3379,12 @@
     </g>
     <circle
        r="5.7505164"
-       cy="61.95871"
+       cy="62.45871"
        cx="10.127304"
        id="circle7117"
        style="display:inline;fill:#000000;fill-opacity:0.09803922;stroke:none;stroke-width:1.07013404;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.56593407" />
     <g
-       transform="matrix(1.0736263,0,0,1.0736263,4.2223614,-252.14236)"
+       transform="matrix(1.0736263,0,0,1.0736263,4.2223614,-251.64236)"
        id="g7960">
       <path
          inkscape:connector-curvature="0"
@@ -3406,12 +3406,12 @@
     </g>
     <circle
        r="5.8128076"
-       cy="87.114761"
+       cy="87.614761"
        cx="10.187709"
        id="circle7117-3"
        style="display:inline;fill:#000000;fill-opacity:0.09803922;stroke:none;stroke-width:1.08172596;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.56593407" />
     <g
-       transform="matrix(1.0736263,0,0,1.0736263,4.2827658,-226.9228)"
+       transform="matrix(1.0736263,0,0,1.0736263,4.2827658,-226.4228)"
        id="g9808">
       <path
          inkscape:connector-curvature="0"
@@ -3483,7 +3483,7 @@
        d="M 8.5254046,126.4947 H 6.7145941 v -0.4 h 1.8108105 z" />
     <circle
        r="3.4582784"
-       cy="73.95578"
+       cy="74.45578"
        cx="14.910001"
        id="circle2809"
        style="display:inline;fill:#000000;fill-opacity:0.09890113;stroke:none;stroke-width:0.64356333;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.56593407" />
@@ -3491,7 +3491,7 @@
        style="display:inline;fill:#000000;fill-opacity:0.09890113;stroke:none;stroke-width:0.64356333;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.56593407"
        id="circle2811"
        cx="5.4100003"
-       cy="73.95578"
+       cy="74.45578"
        r="3.4582784" />
     <g
        style="display:inline"
@@ -3557,7 +3557,7 @@
     </g>
     <g
        style="display:inline"
-       transform="matrix(1.115262,0,0,1.115262,11.285399,-254.42871)"
+       transform="matrix(1.115262,0,0,1.115262,11.285399,-253.92871)"
        id="g3851">
       <circle
          r="3.0575776"
@@ -3586,7 +3586,7 @@
     </g>
     <g
        style="display:inline"
-       transform="matrix(1.1152448,0,0,1.1152448,1.7854548,-254.42366)"
+       transform="matrix(1.1152448,0,0,1.1152448,1.7854548,-253.92366)"
        id="g3818">
       <circle
          r="3.0575776"

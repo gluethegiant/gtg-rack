@@ -39,8 +39,8 @@ struct GigBus : Module {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		configParam(ON_PARAM, 0.f, 1.f, 0.f, "Input on");
 		configParam(PAN_PARAM, -1.f, 1.f, 0.f, "Pan");
-		configParam(LEVEL_PARAMS + 0, 0.f, 1.f, 0.f, "Post red level to blue stereo bus");
-		configParam(LEVEL_PARAMS + 1, 0.f, 1.f, 0.f, "Post red level to orange stereo bus");
+		configParam(LEVEL_PARAMS + 0, 0.f, 1.f, 0.f, "Post red level send to blue stereo bus");
+		configParam(LEVEL_PARAMS + 1, 0.f, 1.f, 0.f, "Post red level send to orange stereo bus");
 		configParam(LEVEL_PARAMS + 2, 0.f, 1.f, 1.f, "Master level to red stereo bus");
 		pan_divider.setDivision(3);
 		gig_fader.setSpeed(fade_speed);
@@ -146,10 +146,10 @@ struct GigBusWidget : ModuleWidget {
 
 		addParam(createThemedParamCentered<gtgBlackButton>(mm2px(Vec(10.13, 15.20)), module, GigBus::ON_PARAM, module ? &module->color_theme : NULL));
 		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(10.13, 15.20)), module, GigBus::ON_LIGHT));
-		addParam(createThemedParamCentered<gtgGrayKnob>(mm2px(Vec(10.13, 60.75)), module, GigBus::PAN_PARAM, module ? &module->color_theme : NULL));
-		addParam(createThemedParamCentered<gtgBlueTinyKnob>(mm2px(Vec(5.4, 73.2)), module, GigBus::LEVEL_PARAMS + 0, module ? &module->color_theme : NULL));
-		addParam(createThemedParamCentered<gtgOrangeTinyKnob>(mm2px(Vec(14.90, 73.2)), module, GigBus::LEVEL_PARAMS + 1, module ? &module->color_theme : NULL));
-		addParam(createThemedParamCentered<gtgRedKnob>(mm2px(Vec(10.13, 86.02)), module, GigBus::LEVEL_PARAMS + 2, module ? &module->color_theme : NULL));
+		addParam(createThemedParamCentered<gtgGrayKnob>(mm2px(Vec(10.13, 61.25)), module, GigBus::PAN_PARAM, module ? &module->color_theme : NULL));
+		addParam(createThemedParamCentered<gtgBlueTinyKnob>(mm2px(Vec(5.4, 73.7)), module, GigBus::LEVEL_PARAMS + 0, module ? &module->color_theme : NULL));
+		addParam(createThemedParamCentered<gtgOrangeTinyKnob>(mm2px(Vec(14.90, 73.7)), module, GigBus::LEVEL_PARAMS + 1, module ? &module->color_theme : NULL));
+		addParam(createThemedParamCentered<gtgRedKnob>(mm2px(Vec(10.13, 86.52)), module, GigBus::LEVEL_PARAMS + 2, module ? &module->color_theme : NULL));
 
 		addInput(createThemedPortCentered<gtgKeyPort>(mm2px(Vec(10.13, 23.233)), true, module, GigBus::ON_CV_INPUT, module ? &module->color_theme : NULL));
 		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(10.13, 35.583)), true, module, GigBus::LMP_INPUT, module ? &module->color_theme : NULL));
