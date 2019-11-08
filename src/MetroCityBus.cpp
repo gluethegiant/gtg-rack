@@ -49,6 +49,7 @@ struct MetroCityBus : Module {
 	AutoFader metro_fader;
 	ConstantPan metro_pan[16];
 	SimpleSlewer level_smoother[3];
+	SimpleSlewer post_btn_filters[2];
 
 	const int fade_speed = 26;   // milliseconds from 0 to gain
 	const int smooth_speed = 86;   // milliseconds from full left to full right
@@ -87,6 +88,10 @@ struct MetroCityBus : Module {
 		for (int i = 0; i < 3; i++) {
 			level_smoother[i].setSlewSpeed(level_speed);
 		}
+		for (int i = 0; i < 2; i++) {
+			post_btn_filters[i].setSlewSpeed(level_speed);
+			post_btn_filters[i].value = 1.f;
+		}
 		color_theme = loadDefaultTheme();
 	}
 
@@ -121,7 +126,9 @@ struct MetroCityBus : Module {
 		// set post fades on levels
 		for (int i = 0; i < 2; i++) {
 			if (post_fades[i]) {
-				in_levels[i] *= in_levels[2];
+				in_levels[i] *= post_btn_filters[i].slew(in_levels[2]);
+			} else {
+				in_levels[i] *= post_btn_filters[i].slew(1.f);
 			}
 		}
 
@@ -321,6 +328,9 @@ struct MetroCityBus : Module {
 		pan_rate = (APP->engine->getSampleRate() / pan_division);   // used by pan follow, accounts for pan clock divider
 		for (int i = 0; i < 3; i++) {
 			level_smoother[i].setSlewSpeed(level_speed);
+		}
+		for (int i = 0; i < 2; i++) {
+			post_btn_filters[i].setSlewSpeed(level_speed);
 		}
 	}
 

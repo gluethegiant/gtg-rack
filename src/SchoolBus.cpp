@@ -41,6 +41,7 @@ struct SchoolBus : Module {
 	AutoFader school_fader;
 	ConstantPan school_pan;
 	SimpleSlewer level_smoother[3];
+	SimpleSlewer post_btn_filters[2];
 
 	const int fade_speed = 26;
 	const int pan_speed = 52;   // milliseconds from left to right
@@ -65,6 +66,10 @@ struct SchoolBus : Module {
 		school_pan.setSmoothSpeed(pan_speed);
 		for (int i = 0; i < 3; i++) {
 			level_smoother[i].setSlewSpeed(level_speed);
+		}
+		for (int i = 0; i < 2; i++) {
+			post_btn_filters[i].setSlewSpeed(level_speed);
+			post_btn_filters[i].value = 1.f;
 		}
 		color_theme = loadDefaultTheme();
 	}
@@ -98,7 +103,9 @@ struct SchoolBus : Module {
 		// set post fades on levels
 		for (int i = 0; i < 2; i++) {
 			if (post_fades[i]) {
-				in_levels[i] *= in_levels[2];
+				in_levels[i] *= post_btn_filters[i].slew(in_levels[2]);
+			} else {
+				in_levels[i] *= post_btn_filters[i].slew(1.f);
 			}
 		}
 
@@ -189,6 +196,9 @@ struct SchoolBus : Module {
 		school_pan.setSmoothSpeed(pan_speed);
 		for (int i = 0; i < 3; i++) {
 			level_smoother[i].setSlewSpeed(level_speed);
+		}
+		for (int i = 0; i < 2; i++) {
+			post_btn_filters[i].setSlewSpeed(level_speed);
 		}
 	}
 
