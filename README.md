@@ -44,7 +44,7 @@ v. 1.0.5 The Audition Release (November 11, 2019)
 - Fade in automation and three fade modulation modes added to Bus Depot
 - Bus Depot fade automation time increased to 34 seconds
 - Bus Route includes on/audition buttons to easily audition or bypass send effects
-- No need to connect cables for pass through with Bus Depot (accomplished with on button)
+- No need to connect cables for pass through on Bus Route (accomplished with on button)
 - Bus Route now provides a stereo mix out (easier to add fade automation before send effects and easier to add limiters or other mastering effects and visuals after Bus Route)
 - Road now includes on/audition buttons to quickly work with mix groups (with or without a Bus Depot) and to audition (solo) groups and individual mixers (thanks to browneditor for the push to implement this feature)
 - All on/audition buttons on Road and Bus Route are click free for live use
