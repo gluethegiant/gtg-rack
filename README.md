@@ -1,6 +1,6 @@
 # Glue the Giant's Modular Bus Mixers for VCV Rack
 
-Build your own mixer by connecting these modules together with the BUS IN and BUS OUT ports.
+Build your own custom mixer by connecting these modules together with the BUS IN and BUS OUT ports.
 The audio is routed along three stereo buses: red, orange, and blue.
 
 The bus design makes it easy to patch together modules while creating simple or complex routing.
@@ -44,9 +44,9 @@ v. 1.0.5 The Audition Release (November 11, 2019)
 - Fade in automation and three fade modulation modes added to Bus Depot
 - Bus Depot fade automation time increased to 34 seconds
 - Bus Route includes on/audition buttons to easily audition or bypass send effects
-- No need to connect cables for pass through on Bus Route (accomplished with on button)
-- Bus Route now provides a stereo mix out (easier to add fade automation before send effects and easier to add limiters or other mastering effects and visuals after Bus Route)
-- Road now includes on/audition buttons to quickly work with mix groups (with or without a Bus Depot) and to audition (solo) groups and individual mixers (thanks to browneditor for the push to implement this feature)
+- No need to connect cables for pass through on Bus Route (accomplished with the on/audition buttons)
+- Bus Route now provides a stereo mix out (making it easier to add limiters or other mastering effects directly after Bus Route)
+- Road now includes on/audition buttons to quickly work with mix groups and to audition (solo) groups and individual mixers (thanks to browneditor for the push to implement this feature)
 - All on/audition buttons on Road and Bus Route are click free for live use
 - Filters added to post send buttons on School Bus Mixer and Metro City Bus Mixer to remove clicks during live use
 - Minor visual improvements to some panels
