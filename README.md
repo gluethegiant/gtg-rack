@@ -1,6 +1,6 @@
 # Glue the Giant's Modular Bus Mixers for VCV Rack
 
-Build your own custom mixer by connecting these modules together with the BUS IN and BUS OUT ports.
+Build your own lightweight, powerful mixer by connecting these modules together with the BUS IN and BUS OUT ports.
 The audio is routed along three stereo buses: red, orange, and blue.
 
 The bus design makes it easy to patch together modules while creating simple or complex routing.
