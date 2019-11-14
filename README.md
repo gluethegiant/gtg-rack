@@ -41,7 +41,7 @@ To build these rack modules, see the official [VCV Rack documentation](https://v
 
 v. 1.0.6 A Chilly November Release (November 15, 2019)
 
-- Fix issue with Bus Depot where fade out settings did not take immediately
+- Fix issue with Bus Depot where fade out settings did not take immediately (the quickest work around is to move the fade in knob)
 - Added post fader send to orange and blue on Mini Bus Mixer (through context menu)
 - Added ability to always default mixer strips to use post fader sends
 
