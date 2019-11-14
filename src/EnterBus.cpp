@@ -27,7 +27,7 @@ struct EnterBus : Module {
 		configParam(LEVEL_PARAMS + 0, 0.f, 1.f, 1.f, "Blue stereo input level");
 		configParam(LEVEL_PARAMS + 1, 0.f, 1.f, 1.f, "Orange stereo input level");
 		configParam(LEVEL_PARAMS + 2, 0.f, 1.f, 1.f, "Red stereo input level");
-		color_theme = loadDefaultTheme();
+		color_theme = loadGtgPluginDefault("default_theme", 0);
 	}
 
 	void process(const ProcessArgs &args) override {
@@ -106,12 +106,19 @@ struct EnterBusWidget : ModuleWidget {
 		struct DefaultThemeItem : MenuItem {
 			EnterBus* module;
 			void onAction(const event::Action &e) override {
-				saveDefaultTheme(rightText.empty());
+				saveGtgPluginDefault("default_theme", rightText.empty());
+			}
+		};
+
+		struct DefaultSendItem : MenuItem {
+			EnterBus* module;
+			void onAction(const event::Action &e) override {
+				saveGtgPluginDefault("default_post_fader", rightText.empty());
 			}
 		};
 
 		menu->addChild(new MenuEntry);
-		menu->addChild(createMenuLabel("Color Themes"));
+		menu->addChild(createMenuLabel("Panel Theme"));
 
 		std::string themeTitles[2] = {"70's Cream", "Night Ride"};
 		for (int i = 0; i < 2; i++) {
@@ -126,9 +133,14 @@ struct EnterBusWidget : ModuleWidget {
 		menu->addChild(createMenuLabel("All Modular Bus Mixers"));
 
 		DefaultThemeItem* defaultThemeItem = createMenuItem<DefaultThemeItem>("Default to Night Ride theme");
-		defaultThemeItem->rightText = CHECKMARK(loadDefaultTheme());
+		defaultThemeItem->rightText = CHECKMARK(loadGtgPluginDefault("default_theme", 0));
 		defaultThemeItem->module = module;
 		menu->addChild(defaultThemeItem);
+
+		DefaultSendItem* defaultSendItem = createMenuItem<DefaultSendItem>("Default to post fader sends");
+		defaultSendItem->rightText = CHECKMARK(loadGtgPluginDefault("default_post_fader", 0));
+		defaultSendItem->module = module;
+		menu->addChild(defaultSendItem);
 }
 
 	// display the panel based on the theme

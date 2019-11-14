@@ -71,7 +71,9 @@ struct SchoolBus : Module {
 			post_btn_filters[i].setSlewSpeed(level_speed);
 			post_btn_filters[i].value = 1.f;
 		}
-		color_theme = loadDefaultTheme();
+		post_fades[0] = loadGtgPluginDefault("default_post_fader", 0);
+		post_fades[1] = post_fades[0];
+		color_theme = loadGtgPluginDefault("default_theme", 0);
 	}
 
 	void process(const ProcessArgs &args) override {
@@ -206,8 +208,8 @@ struct SchoolBus : Module {
 	void onReset() override {
 		school_fader.on = true;
 		school_fader.setGain(1.f);
-		post_fades[0] = false;
-		post_fades[1] = false;
+		post_fades[0] = loadGtgPluginDefault("default_post_fader", 0);
+		post_fades[1] = post_fades[0];
 		pan_cv_filter = true;
 		level_cv_filter = true;
 	}
@@ -295,13 +297,20 @@ struct SchoolBusWidget : ModuleWidget {
 		struct DefaultThemeItem : MenuItem {
 			SchoolBus* module;
 			void onAction(const event::Action &e) override {
-				saveDefaultTheme(rightText.empty());
+				saveGtgPluginDefault("default_theme", rightText.empty());
+			}
+		};
+
+		struct DefaultSendItem : MenuItem {
+			SchoolBus* module;
+			void onAction(const event::Action &e) override {
+				saveGtgPluginDefault("default_post_fader", rightText.empty());
 			}
 		};
 
 		// color themes
 		menu->addChild(new MenuEntry);
-		menu->addChild(createMenuLabel("Color Theme"));
+		menu->addChild(createMenuLabel("Panel Theme"));
 
 		std::string themeTitles[2] = {"70's Cream", "Night Ride"};
 		for (int i = 0; i < 2; i++) {
@@ -345,9 +354,14 @@ struct SchoolBusWidget : ModuleWidget {
 		menu->addChild(createMenuLabel("All Modular Bus Mixers"));
 
 		DefaultThemeItem* defaultThemeItem = createMenuItem<DefaultThemeItem>("Default to Night Ride theme");
-		defaultThemeItem->rightText = CHECKMARK(loadDefaultTheme());
+		defaultThemeItem->rightText = CHECKMARK(loadGtgPluginDefault("default_theme", 0));
 		defaultThemeItem->module = module;
 		menu->addChild(defaultThemeItem);
+
+		DefaultSendItem* defaultSendItem = createMenuItem<DefaultSendItem>("Default to post fader sends");
+		defaultSendItem->rightText = CHECKMARK(loadGtgPluginDefault("default_post_fader", 0));
+		defaultSendItem->module = module;
+		menu->addChild(defaultSendItem);
 	}
 
 	// display panel based on theme

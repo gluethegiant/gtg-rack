@@ -44,7 +44,7 @@ struct GigBus : Module {
 		configParam(LEVEL_PARAMS + 2, 0.f, 1.f, 1.f, "Master level to red stereo bus");
 		pan_divider.setDivision(3);
 		gig_fader.setSpeed(fade_speed);
-		color_theme = loadDefaultTheme();
+		color_theme = loadGtgPluginDefault("default_theme", 0);
 	}
 
 	void process(const ProcessArgs &args) override {
@@ -182,13 +182,21 @@ struct GigBusWidget : ModuleWidget {
 		struct DefaultThemeItem : MenuItem {
 			GigBus* module;
 			void onAction(const event::Action &e) override {
-				saveDefaultTheme(rightText.empty());
+				saveGtgPluginDefault("default_theme", rightText.empty());
+			}
+		};
+
+		// load default theme
+		struct DefaultSendItem : MenuItem {
+			GigBus* module;
+			void onAction(const event::Action &e) override {
+				saveGtgPluginDefault("default_post_fader", rightText.empty());
 			}
 		};
 
 		// color theme
 		menu->addChild(new MenuEntry);
-		menu->addChild(createMenuLabel("Color Themes"));
+		menu->addChild(createMenuLabel("Panel Theme"));
 
 		std::string themeTitles[2] = {"70's Cream", "Night Ride"};
 		for (int i = 0; i < 2; i++) {
@@ -216,9 +224,14 @@ struct GigBusWidget : ModuleWidget {
 		menu->addChild(createMenuLabel("All Modular Bus Mixers"));
 
 		DefaultThemeItem* defaultThemeItem = createMenuItem<DefaultThemeItem>("Default to Night Ride theme");
-		defaultThemeItem->rightText = CHECKMARK(loadDefaultTheme());
+		defaultThemeItem->rightText = CHECKMARK(loadGtgPluginDefault("default_theme", 0));
 		defaultThemeItem->module = module;
 		menu->addChild(defaultThemeItem);
+
+		DefaultSendItem* defaultSendItem = createMenuItem<DefaultSendItem>("Default to post fader sends");
+		defaultSendItem->rightText = CHECKMARK(loadGtgPluginDefault("default_post_fader", 0));
+		defaultSendItem->module = module;
+		menu->addChild(defaultSendItem);
 	}
 
 	// display panel based on theme

@@ -124,9 +124,9 @@ struct LongPressButton {
 
 // saving and loading default theme
 
-void saveDefaultTheme(int default_theme);
+void saveGtgPluginDefault(const char* setting, int value);
 
-int loadDefaultTheme();
+int loadGtgPluginDefault(const char* setting, int default_value);
 
 // custom components
 struct gtgBlackButton : ThemedSvgSwitch {

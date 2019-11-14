@@ -105,38 +105,49 @@ void ThemedSvgScrew::step() {
 	SvgScrew::step();
 }
 
-// save default theme
-void saveDefaultTheme(int theme) {
+// save a plugin default integer
+void saveGtgPluginDefault(const char* plugin_setting, int setting_value) {
 	json_t *settingsJ = json_object();
-	json_object_set_new(settingsJ, "default_theme", json_integer(theme));
 	std::string settingsFilename = asset::user("GlueTheGiant.json");
-	FILE *file = fopen(settingsFilename.c_str(), "w");
+
+	FILE *file = fopen(settingsFilename.c_str(), "r");
+	if (file) {
+		json_error_t error;
+		settingsJ = json_loadf(file, 0, &error);
+	}
+	fclose(file);
+
+	json_object_set_new(settingsJ, plugin_setting, json_integer(setting_value));
+
+	file = fopen(settingsFilename.c_str(), "w");
 	if (file) {
 		json_dumpf(settingsJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
 		fclose(file);
 	}
+
 	json_decref(settingsJ);
 }
 
-// load default theme
-int loadDefaultTheme() {
-	int theme = 0;
+// load a plugin default integer
+int loadGtgPluginDefault(const char* plugin_setting, int default_value) {
 	std::string settingsFilename = asset::user("GlueTheGiant.json");
+
 	FILE *file = fopen(settingsFilename.c_str(), "r");
 	if (!file) {   // file does not exist
-		return theme;
+		return default_value;
 	}
+
 	json_error_t error;
 	json_t *settingsJ = json_loadf(file, 0, &error);
 	if (!settingsJ) {   // file invalid
 		fclose(file);
-		return theme;
+		return default_value;
 	}
-	json_t *default_themeJ = json_object_get(settingsJ, "default_theme");
-	if (default_themeJ)
-		theme = json_integer_value(default_themeJ);
+
+	json_t *default_valueJ = json_object_get(settingsJ, plugin_setting);
+	if (default_valueJ) default_value = json_integer_value(default_valueJ);
 	fclose(file);
 
 	json_decref(settingsJ);
-	return theme;
+	return default_value;
 }

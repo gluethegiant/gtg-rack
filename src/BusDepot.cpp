@@ -62,7 +62,7 @@ struct BusDepot : Module {
 		light_divider.setDivision(64);
 		depot_fader.setSpeed(26);
 		level_smoother.setSlewSpeed(level_speed);   // for level cv filter
-		color_theme = loadDefaultTheme();
+		color_theme = loadGtgPluginDefault("default_theme", 0);
 	}
 
 	void process(const ProcessArgs &args) override {
@@ -323,12 +323,19 @@ struct BusDepotWidget : ModuleWidget {
 		struct DefaultThemeItem : MenuItem {
 			BusDepot* module;
 			void onAction(const event::Action &e) override {
-				saveDefaultTheme(rightText.empty());
+				saveGtgPluginDefault("default_theme", rightText.empty());
+			}
+		};
+
+		struct DefaultSendItem : MenuItem {
+			BusDepot* module;
+			void onAction(const event::Action &e) override {
+				saveGtgPluginDefault("default_post_fader", rightText.empty());
 			}
 		};
 
 		menu->addChild(new MenuEntry);
-		menu->addChild(createMenuLabel("Color Theme"));
+		menu->addChild(createMenuLabel("Panel Theme"));
 
 		std::string themeTitles[2] = {"70's Cream", "Night Ride"};
 		for (int i = 0; i < 2; i++) {
@@ -365,9 +372,14 @@ struct BusDepotWidget : ModuleWidget {
 		menu->addChild(createMenuLabel("All Modular Bus Mixers"));
 
 		DefaultThemeItem* defaultThemeItem = createMenuItem<DefaultThemeItem>("Default Night Ride theme");
-		defaultThemeItem->rightText = CHECKMARK(loadDefaultTheme());
+		defaultThemeItem->rightText = CHECKMARK(loadGtgPluginDefault("default_theme", 0));
 		defaultThemeItem->module = module;
 		menu->addChild(defaultThemeItem);
+
+		DefaultSendItem* defaultSendItem = createMenuItem<DefaultSendItem>("Default to post fader sends");
+		defaultSendItem->rightText = CHECKMARK(loadGtgPluginDefault("default_post_fader", 0));
+		defaultSendItem->module = module;
+		menu->addChild(defaultSendItem);
 	}
 
 	// display the panel based on the theme
