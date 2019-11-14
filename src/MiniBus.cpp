@@ -27,8 +27,11 @@ struct MiniBus : Module {
 	dsp::SchmittTrigger on_trigger;
 	dsp::SchmittTrigger on_cv_trigger;
 	AutoFader mini_fader;
+	SimpleSlewer post_fade_filter;
 
 	const int fade_speed = 26;
+	const int smooth_speed = 26;
+	bool post_fades = false;
 	int color_theme = 0;
 
 	MiniBus() {
@@ -38,7 +41,10 @@ struct MiniBus : Module {
 		configParam(LEVEL_PARAMS + 1, 0.f, 1.f, 0.f, "Level to orange bus");
 		configParam(LEVEL_PARAMS + 2, 0.f, 1.f, 1.f, "Level to red bus");
 		mini_fader.setSpeed(fade_speed);
-		color_theme = loadDefaultTheme();
+		post_fade_filter.setSlewSpeed(smooth_speed);
+		post_fade_filter.value = 1.f;
+		post_fades = loadGtgPluginDefault("default_post_fader", false);
+		color_theme = loadGtgPluginDefault("default_theme", 0);
 	}
 
 	void process(const ProcessArgs &args) override {
@@ -52,17 +58,39 @@ struct MiniBus : Module {
 
 		lights[ON_LIGHT].value = mini_fader.getFade();
 
-		// process inputs
+		// get inputs
 		float mono_in = inputs[MP_INPUT].getVoltageSum() * mini_fader.getFade();
 
-		// process outputs
-		for (int sb = 0; sb < 3; sb++) {   // sb = stereo bus
-			float in_level = params[LEVEL_PARAMS + sb].getValue();
-			for (int c = 0; c < 2; c++) {
-				int bus_channel = (2 * sb) + c;
-				outputs[BUS_OUTPUT].setVoltage((mono_in * in_level) + inputs[BUS_INPUT].getPolyVoltage(bus_channel), bus_channel);
-			}
+		// get levels
+		float in_levels[3];
+
+		// get red level
+		in_levels[2] = params[LEVEL_PARAMS + 2].getValue();
+
+		// slew post fader level and apply to blue and orange levels
+		float post_amount = 1.f;
+		if (post_fades) {
+			post_amount = post_fade_filter.slew(in_levels[2]);
+		} else {
+			post_amount = post_fade_filter.slew(1.f);
 		}
+		for (int sb = 0; sb < 2; sb++) {   // sb = stereo bus
+			in_levels[sb] = params[LEVEL_PARAMS + sb].getValue() * post_amount;
+		}
+
+		// calculate three mono outputs
+		float bus_outs[3];
+		for (int sb = 0; sb < 3; sb++) {
+			bus_outs[sb] = mono_in * in_levels[sb];
+		}
+
+		// step through all outputs
+		outputs[BUS_OUTPUT].setVoltage(bus_outs[0] + inputs[BUS_INPUT].getPolyVoltage(0), 0);
+		outputs[BUS_OUTPUT].setVoltage(bus_outs[0] + inputs[BUS_INPUT].getPolyVoltage(1), 1);
+		outputs[BUS_OUTPUT].setVoltage(bus_outs[1] + inputs[BUS_INPUT].getPolyVoltage(2), 2);
+		outputs[BUS_OUTPUT].setVoltage(bus_outs[1] + inputs[BUS_INPUT].getPolyVoltage(3), 3);
+		outputs[BUS_OUTPUT].setVoltage(bus_outs[2] + inputs[BUS_INPUT].getPolyVoltage(4), 4);
+		outputs[BUS_OUTPUT].setVoltage(bus_outs[2] + inputs[BUS_INPUT].getPolyVoltage(5), 5);
 
 		// set bus outputs for 3 stereo buses out
 		outputs[BUS_OUTPUT].setChannels(6);
@@ -72,6 +100,7 @@ struct MiniBus : Module {
 	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
 		json_object_set_new(rootJ, "input_on", json_integer(mini_fader.on));
+		json_object_set_new(rootJ, "post_fades", json_integer(post_fades));
 		json_object_set_new(rootJ, "gain", json_real(mini_fader.getGain()));
 		json_object_set_new(rootJ, "color_theme", json_integer(color_theme));
 		return rootJ;
@@ -81,6 +110,12 @@ struct MiniBus : Module {
 	void dataFromJson(json_t *rootJ) override {
 		json_t *input_onJ = json_object_get(rootJ, "input_on");
 		if (input_onJ) mini_fader.on = json_integer_value(input_onJ);
+		json_t *post_fadesJ = json_object_get(rootJ, "post_fades");
+		if (post_fadesJ) {
+			post_fades = json_integer_value(post_fadesJ);
+		} else {
+			if (input_onJ) post_fades = false;   // do not change existing patches
+		}
 		json_t *gainJ = json_object_get(rootJ, "gain");
 		if (gainJ) mini_fader.setGain((float)json_real_value(gainJ));
 		json_t *color_themeJ = json_object_get(rootJ, "color_theme");
@@ -90,12 +125,14 @@ struct MiniBus : Module {
 	// reset fader speed
 	void onSampleRateChange() override {
 		mini_fader.setSpeed(fade_speed);
+		post_fade_filter.setSlewSpeed(smooth_speed);
 	}
 
 	// reset fader on state when initialized
 	void onReset() override {
 		mini_fader.on = true;
 		mini_fader.setGain(1.f);
+		post_fades = loadGtgPluginDefault("default_post_fader", 0);
 	}
 };
 
@@ -145,7 +182,16 @@ struct MiniBusWidget : ModuleWidget {
 			}
 		};
 
-		// add gain levels to context menu
+		// set post fader sends on blue or orange buses
+		struct PostFaderItem : MenuItem {
+			MiniBus* module;
+			int post_fade;
+			void onAction(const event::Action& e) override {
+				module->post_fades = !module->post_fades;
+			}
+		};
+
+	// add gain levels to context menu
 		struct GainItem : MenuItem {
 			MiniBus* module;
 			float gain;
@@ -158,11 +204,20 @@ struct MiniBusWidget : ModuleWidget {
 		struct DefaultThemeItem : MenuItem {
 			MiniBus* module;
 			void onAction(const event::Action &e) override {
-				saveDefaultTheme(rightText.empty());
+				saveGtgPluginDefault("default_theme", rightText.empty());
 			}
 		};
+
+		// default to post fader sends
+		struct DefaultSendItem : MenuItem {
+			MiniBus* module;
+			void onAction(const event::Action &e) override {
+				saveGtgPluginDefault("default_post_fader", rightText.empty());
+			}
+		};
+
 		menu->addChild(new MenuEntry);
-		menu->addChild(createMenuLabel("Color Themes"));
+		menu->addChild(createMenuLabel("Panel Theme"));
 
 		std::string themeTitles[2] = {"70's Cream", "Night Ride"};
 		for (int i = 0; i < 2; i++) {
@@ -187,12 +242,25 @@ struct MiniBusWidget : ModuleWidget {
 		}
 
 		menu->addChild(new MenuEntry);
+		menu->addChild(createMenuLabel("Blue and Orange Input Levels"));
+
+		PostFaderItem* postFaderItem = createMenuItem<PostFaderItem>("Post red fader sends");
+		postFaderItem->rightText = CHECKMARK(module->post_fades == true);
+		postFaderItem->module = module;
+		menu->addChild(postFaderItem);
+
+		menu->addChild(new MenuEntry);
 		menu->addChild(createMenuLabel("All Modular Bus Mixers"));
 
 		DefaultThemeItem* defaultThemeItem = createMenuItem<DefaultThemeItem>("Default to Night Ride theme");
-		defaultThemeItem->rightText = CHECKMARK(loadDefaultTheme());
+		defaultThemeItem->rightText = CHECKMARK(loadGtgPluginDefault("default_theme", 0));
 		defaultThemeItem->module = module;
 		menu->addChild(defaultThemeItem);
+
+		DefaultSendItem* defaultSendItem = createMenuItem<DefaultSendItem>("Default to post fader sends");
+		defaultSendItem->rightText = CHECKMARK(loadGtgPluginDefault("default_post_fader", 0));
+		defaultSendItem->module = module;
+		menu->addChild(defaultSendItem);
 	}
 
 	// display panel based on theme
