@@ -159,10 +159,12 @@ struct BusDepot : Module {
 					}
 				}
 			} else {   // fade without CV
-				if (params[FADE_IN_PARAM].getValue() != depot_fader.last_speed) {
-					if (depot_fader.on) {   // calculate fade in speed
+				if (depot_fader.on) {
+					if (params[FADE_IN_PARAM].getValue() != depot_fader.last_speed) {
 						depot_fader.setSpeed(params[FADE_IN_PARAM].getValue());
-					} else {   // calculate fade out speed
+					}
+				} else {
+					if (params[FADE_PARAM].getValue() != depot_fader.last_speed) {
 						depot_fader.setSpeed(params[FADE_PARAM].getValue());
 					}
 				}
