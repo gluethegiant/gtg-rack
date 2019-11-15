@@ -23,9 +23,14 @@ struct GigBus : Module {
 	};
 	enum LightIds {
 		ON_LIGHT,
+		ENUMS(LEFT_LIGHTS, 11),
+		ENUMS(RIGHT_LIGHTS, 11),
 		NUM_LIGHTS
 	};
 
+	dsp::VuMeter2 vu_meters[2];
+	dsp::ClockDivider vu_divider;
+	dsp::ClockDivider light_divider;
 	dsp::SchmittTrigger on_trigger;
 	dsp::SchmittTrigger on_cv_trigger;
 	dsp::ClockDivider pan_divider;
@@ -33,6 +38,7 @@ struct GigBus : Module {
 	ConstantPan gig_pan;
 
 	const int fade_speed = 26;
+	float peak_stereo[2] = {0.f, 0.f};
 	int color_theme = 0;
 
 	GigBus() {
@@ -42,6 +48,10 @@ struct GigBus : Module {
 		configParam(LEVEL_PARAMS + 0, 0.f, 1.f, 0.f, "Post red level send to blue stereo bus");
 		configParam(LEVEL_PARAMS + 1, 0.f, 1.f, 0.f, "Post red level send to orange stereo bus");
 		configParam(LEVEL_PARAMS + 2, 0.f, 1.f, 1.f, "Master level to red stereo bus");
+		vu_meters[0].lambda = 25.f;
+		vu_meters[1].lambda = 25.f;
+		vu_divider.setDivision(500);
+		light_divider.setDivision(240);
 		pan_divider.setDivision(3);
 		gig_fader.setSpeed(fade_speed);
 		color_theme = loadGtgPluginDefault("default_theme", 0);
@@ -63,11 +73,9 @@ struct GigBus : Module {
 			in_levels[sb] = params[LEVEL_PARAMS + sb].getValue() * in_levels[2];   // multiply by master for post levels
 		}
 
-		// get stereo pan levels and set lights
+		// get stereo pan levels
 		if (pan_divider.process()) {   // optimized by checking pan every few samples
 			gig_pan.setPan(params[PAN_PARAM].getValue());
-
-			lights[ON_LIGHT].value = gig_fader.getFade();   // sets lights less frequently
 		}
 
 		// process inputs
@@ -82,6 +90,11 @@ struct GigBus : Module {
 			}
 		}
 
+		// check for peaks
+		for (int c = 0; c < 2; c++) {
+			if (stereo_in[c] * in_levels[2] > 10.f) peak_stereo[c] = 1.f;
+		}
+
 		// process outputs
 		for (int sb = 0; sb < 3; sb++) {   // sb = stereo bus
 			for (int c = 0; c < 2; c++) {
@@ -92,6 +105,34 @@ struct GigBus : Module {
 
 		// set bus outputs for 3 stereo buses out
 		outputs[BUS_OUTPUT].setChannels(6);
+
+		// get levels for lights
+		if (vu_divider.process()) {   // check levels for lights infrequently
+			for (int i = 0; i < 2; i++) {
+				float red_level = stereo_in[i] * in_levels[2];
+				vu_meters[i].process(args.sampleTime * vu_divider.getDivision(), red_level / 10.f);
+			}
+		}
+
+		// set lights infrequently
+		if (light_divider.process()) {   // set lights infrequently
+
+			lights[ON_LIGHT].value = gig_fader.getFade();
+
+			// make peak lights stay on when hit
+			for (int c = 0; c < 2; c++) {
+				if (peak_stereo[c] > 0) peak_stereo[c] -= 60.f /args.sampleRate; else peak_stereo[c] = 0.f;
+			}
+			lights[LEFT_LIGHTS + 0].setBrightness(peak_stereo[0]);
+			lights[RIGHT_LIGHTS + 0].setBrightness(peak_stereo[1]);
+
+			// green and yellow lights
+			for (int i = 1; i < 11; i++) {
+				lights[LEFT_LIGHTS + i].setBrightness(vu_meters[0].getBrightness((-6 * i), -6 * (i - 1)));
+				lights[RIGHT_LIGHTS + i].setBrightness(vu_meters[1].getBrightness((-6 * i), -6 * (i - 1)));
+			}
+		}
+
 	}
 
 	// save on button and gain states
@@ -157,6 +198,24 @@ struct GigBusWidget : ModuleWidget {
 		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(10.13, 103.863)), true, module, GigBus::BUS_INPUT, module ? &module->color_theme : NULL));
 
 		addOutput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(10.13, 114.108)), false, module, GigBus::BUS_OUTPUT, module ? &module->color_theme : NULL));
+
+		// create vu lights
+		for (int i = 0; i < 11; i++) {
+			float spacing = i * 3.5;
+			float top = 15;
+			if (i < 1 ) {
+				addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(3.27, top + spacing)), module, GigBus::LEFT_LIGHTS + i));
+				addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(17.0, top + spacing)), module, GigBus::RIGHT_LIGHTS + i));
+			} else {
+				if (i < 2) {
+					addChild(createLightCentered<SmallLight<YellowLight>>(mm2px(Vec(3.27, top + spacing)), module, GigBus::LEFT_LIGHTS + i));
+					addChild(createLightCentered<SmallLight<YellowLight>>(mm2px(Vec(17.0, top + spacing)), module, GigBus::RIGHT_LIGHTS + i));
+				} else {
+					addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(3.27, top + spacing)), module, GigBus::LEFT_LIGHTS + i));
+					addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(17.0, top + spacing)), module, GigBus::RIGHT_LIGHTS + i));
+				}
+			}
+		}
 	}
 
 	// build the context menu

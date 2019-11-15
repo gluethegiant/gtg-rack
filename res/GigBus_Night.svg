@@ -2729,17 +2729,17 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="3.0034722"
-     inkscape:cx="5.1623367"
-     inkscape:cy="212.96803"
+     inkscape:zoom="1.5017361"
+     inkscape:cx="27.304851"
+     inkscape:cy="211.42682"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1920"
-     inkscape:window-height="1052"
-     inkscape:window-x="1920"
+     inkscape:window-width="939"
+     inkscape:window-height="1050"
+     inkscape:window-x="33"
      inkscape:window-y="0"
-     inkscape:window-maximized="1"
+     inkscape:window-maximized="0"
      objecttolerance="1"
      guidetolerance="1"
      gridtolerance="1"
@@ -2890,11 +2890,13 @@
     <g
        aria-label="R"
        style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;line-height:1.25;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';letter-spacing:0px;word-spacing:0px;fill:#ececec;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-       id="text5538">
+       id="text5538"
+       transform="translate(9.2499459,-0.50036)">
       <path
          d="m 4.8688541,211.71223 q -0.021167,0 -0.035983,-0.0148 -0.014817,-0.0148 -0.014817,-0.036 v -1.37795 q 0,-0.0233 0.0127,-0.0381 0.014817,-0.0148 0.0381,-0.0148 h 0.5482166 q 0.2582333,0 0.4042833,0.12065 0.1481667,0.12065 0.1481667,0.3429 0,0.15451 -0.0762,0.26035 -0.074083,0.10371 -0.2074333,0.15028 l 0.3090333,0.53975 q 0.00635,0.0127 0.00635,0.0233 0,0.019 -0.014817,0.0318 -0.0127,0.0127 -0.029633,0.0127 H 5.764204 q -0.033867,0 -0.052917,-0.0148 -0.016933,-0.0148 -0.03175,-0.0423 l -0.27305,-0.50165 H 5.1122707 v 0.508 q 0,0.0212 -0.014817,0.036 -0.0127,0.0148 -0.035983,0.0148 z m 0.5418666,-0.79798 q 0.127,0 0.1905,-0.0572 0.065617,-0.0572 0.065617,-0.1651 0,-0.10795 -0.065617,-0.16722 -0.0635,-0.0593 -0.1905,-0.0593 h -0.29845 v 0.44873 z"
          style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';fill:#ececec;stroke-width:0.26458332"
-         id="path3603" />
+         id="path3603"
+         inkscape:connector-curvature="0" />
     </g>
     <g
        aria-label="PAN"
@@ -3413,6 +3415,24 @@
          d="m -93.185547,246.32812 a 14.243501,14.243501 0 0 1 -0.478515,0.80665 l 1.6875,0.97461 0.46875,-0.8125 z"
          transform="matrix(0.26458333,0,0,0.26458333,0,168.5)"
          id="path15902" />
+    </g>
+    <g
+       aria-label="_"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.11666656px;line-height:1.25;font-family:Rubik;-inkscape-font-specification:Rubik;letter-spacing:0px;word-spacing:0px;display:inline;fill:#cccccc;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       id="text1583">
+      <path
+         d="m 4.3638,185.37799 q -0.021167,0 -0.035983,-0.0148 Q 4.313,185.35048 4.313,185.32719 v -0.1397 q 0,-0.0212 0.014817,-0.036 0.014817,-0.0148 0.035983,-0.0148 h 1.2424832 q 0.021167,0 0.035983,0.0148 0.014817,0.0148 0.014817,0.036 v 0.1397 q 0,0.0233 -0.014817,0.036 -0.0127,0.0148 -0.035983,0.0148 z"
+         style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';fill:#cccccc;stroke-width:0.26458332"
+         id="path16458" />
+    </g>
+    <g
+       aria-label="_"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.11666656px;line-height:1.25;font-family:Rubik;-inkscape-font-specification:Rubik;letter-spacing:0px;word-spacing:0px;display:inline;fill:#cccccc;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       id="text16456">
+      <path
+         d="m 14.6138,185.37799 q -0.02117,0 -0.03598,-0.0148 -0.01482,-0.0127 -0.01482,-0.036 v -0.1397 q 0,-0.0212 0.01482,-0.036 0.01482,-0.0148 0.03598,-0.0148 h 1.242484 q 0.02117,0 0.03598,0.0148 0.01482,0.0148 0.01482,0.036 v 0.1397 q 0,0.0233 -0.01482,0.036 -0.0127,0.0148 -0.03598,0.0148 z"
+         style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';fill:#cccccc;stroke-width:0.26458332"
+         id="path16461" />
     </g>
   </g>
 </svg>
