@@ -128,8 +128,8 @@ struct GigBus : Module {
 
 			// green and yellow lights
 			for (int i = 1; i < 11; i++) {
-				lights[LEFT_LIGHTS + i].setBrightness(vu_meters[0].getBrightness((-6 * i), -6 * (i - 1)));
-				lights[RIGHT_LIGHTS + i].setBrightness(vu_meters[1].getBrightness((-6 * i), -6 * (i - 1)));
+				lights[LEFT_LIGHTS + i].setBrightness(vu_meters[0].getBrightness((-3 * i), -3 * (i - 1)));
+				lights[RIGHT_LIGHTS + i].setBrightness(vu_meters[1].getBrightness((-3 * i), -3 * (i - 1)));
 			}
 		}
 
@@ -201,8 +201,8 @@ struct GigBusWidget : ModuleWidget {
 
 		// create vu lights
 		for (int i = 0; i < 11; i++) {
-			float spacing = i * 3.5;
-			float top = 15;
+			float spacing = i * 3.25f;
+			float top = 15.12f;
 			if (i < 1 ) {
 				addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(3.27, top + spacing)), module, GigBus::LEFT_LIGHTS + i));
 				addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(17.0, top + spacing)), module, GigBus::RIGHT_LIGHTS + i));
