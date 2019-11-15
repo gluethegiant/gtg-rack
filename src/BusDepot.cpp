@@ -28,12 +28,10 @@ struct BusDepot : Module {
 	};
 	enum LightIds {
 		ON_LIGHT,
-		ENUMS(LEFT_LIGHTS, 9),
-		ENUMS(RIGHT_LIGHTS, 9),
+		ENUMS(LEFT_LIGHTS, 11),
+		ENUMS(RIGHT_LIGHTS, 11),
 		NUM_LIGHTS
 	};
-
-	int color_theme = 0;
 
 	dsp::VuMeter2 vu_meters[2];
 	dsp::ClockDivider vu_divider;
@@ -44,10 +42,11 @@ struct BusDepot : Module {
 	SimpleSlewer level_smoother;
 
 	const int level_speed = 26;   // for level cv filter
-	float peak_left = 0;
-	float peak_right = 0;
+	float peak_left = 0.f;
+	float peak_right = 0.f;
 	bool level_cv_filter = true;
 	int fade_cv_mode = 0;
+	int color_theme = 0;
 
 	BusDepot() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -58,8 +57,8 @@ struct BusDepot : Module {
 		configParam(FADE_IN_PARAM, 26, 34000, 26, "Fade in automation in milliseconds");
 		vu_meters[0].lambda = 25.f;
 		vu_meters[1].lambda = 25.f;
-		vu_divider.setDivision(512);
-		light_divider.setDivision(64);
+		vu_divider.setDivision(500);
+		light_divider.setDivision(240);
 		depot_fader.setSpeed(26);
 		level_smoother.setSlewSpeed(level_speed);   // for level cv filter
 		color_theme = loadGtgPluginDefault("default_theme", 0);
@@ -178,13 +177,13 @@ struct BusDepot : Module {
 			}
 
 			// make peak lights stay on when hit
-			if (peak_left > 0) peak_left -= 15.f / args.sampleRate; else peak_left = 0.f;
-			if (peak_right > 0) peak_right -= 15.f / args.sampleRate; else peak_right = 0.f;
+			if (peak_left > 0) peak_left -= 60.f / args.sampleRate; else peak_left = 0.f;
+			if (peak_right > 0) peak_right -= 60.f / args.sampleRate; else peak_right = 0.f;
 			lights[LEFT_LIGHTS + 0].setBrightness(peak_left);
 			lights[RIGHT_LIGHTS + 0].setBrightness(peak_right);
 
 			// green and yellow lights
-			for (int i = 1; i < 9; i++) {
+			for (int i = 1; i < 11; i++) {
 				lights[LEFT_LIGHTS + i].setBrightness(vu_meters[0].getBrightness((-6 * i), -6 * (i - 1)));
 				lights[RIGHT_LIGHTS + i].setBrightness(vu_meters[1].getBrightness((-6 * i), -6 * (i - 1)));
 			}
@@ -258,13 +257,13 @@ struct BusDepotWidget : ModuleWidget {
 
 		addParam(createThemedParamCentered<gtgBlackButton>(mm2px(Vec(15.24, 15.20)), module, BusDepot::ON_PARAM, module ? &module->color_theme : NULL));
 		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(15.24, 15.20)), module, BusDepot::ON_LIGHT));
-		addParam(createThemedParamCentered<gtgBlackTinyKnob>(mm2px(Vec(15.24, 60.48)), module, BusDepot::AUX_PARAM, module ? &module->color_theme : NULL));
+		addParam(createThemedParamCentered<gtgBlackTinyKnob>(mm2px(Vec(15.24, 59.48)), module, BusDepot::AUX_PARAM, module ? &module->color_theme : NULL));
 		addParam(createThemedParamCentered<gtgBlackKnob>(mm2px(Vec(15.24, 83.88)), module, BusDepot::LEVEL_PARAM, module ? &module->color_theme : NULL));
 		addParam(createThemedParamCentered<gtgGrayTinySnapKnob>(mm2px(Vec(15.24, 42.54)), module, BusDepot::FADE_PARAM, module ? &module->color_theme : NULL));
 		addParam(createThemedParamCentered<gtgGrayTinySnapKnob>(mm2px(Vec(15.24, 26.15)), module, BusDepot::FADE_IN_PARAM, module ? &module->color_theme : NULL));
 
 		addInput(createThemedPortCentered<gtgKeyPort>(mm2px(Vec(23.6, 21.1)), true, module, BusDepot::ON_CV_INPUT, module ? &module->color_theme : NULL));
-		addInput(createThemedPortCentered<gtgKeyPort>(mm2px(Vec(15.24, 71.63)), true, module, BusDepot::LEVEL_CV_INPUT, module ? &module->color_theme : NULL));
+		addInput(createThemedPortCentered<gtgKeyPort>(mm2px(Vec(15.24, 71.13)), true, module, BusDepot::LEVEL_CV_INPUT, module ? &module->color_theme : NULL));
 		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(6.95, 21.1)), true, module, BusDepot::LMP_INPUT, module ? &module->color_theme : NULL));
 		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(6.95, 31.2)), true, module, BusDepot::R_INPUT, module ? &module->color_theme : NULL));
 		addInput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(7.45, 114.1)), true, module, BusDepot::BUS_INPUT, module ? &module->color_theme : NULL));
@@ -275,22 +274,22 @@ struct BusDepotWidget : ModuleWidget {
 		addOutput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(7.45, 103.85)), false, module, BusDepot::BUS_OUTPUT, module ? &module->color_theme : NULL));
 
 		// create vu lights
-		for (int i = 0; i < 9; i++) {
-			float spacing = i * 5.25;
-			float top = 50.0;
+		for (int i = 0; i < 11; i++) {
+			float spacing = i * 4.25;
+			float top = 49.5;
 			if (i < 1 ) {
-				addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(5.45, top + spacing)), module, BusDepot::LEFT_LIGHTS + i));
-				addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(25.1, top + spacing)), module, BusDepot::RIGHT_LIGHTS + i));
+				addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(4.95, top + spacing)), module, BusDepot::LEFT_LIGHTS + i));
+				addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(25.6, top + spacing)), module, BusDepot::RIGHT_LIGHTS + i));
 			} else {
 				if (i < 2) {
-					addChild(createLightCentered<MediumLight<YellowLight>>(mm2px(Vec(5.45, top + spacing)), module, BusDepot::LEFT_LIGHTS + i));
-					addChild(createLightCentered<MediumLight<YellowLight>>(mm2px(Vec(25.1, top + spacing)), module, BusDepot::RIGHT_LIGHTS + i));
+					addChild(createLightCentered<MediumLight<YellowLight>>(mm2px(Vec(4.95, top + spacing)), module, BusDepot::LEFT_LIGHTS + i));
+					addChild(createLightCentered<MediumLight<YellowLight>>(mm2px(Vec(25.6, top + spacing)), module, BusDepot::RIGHT_LIGHTS + i));
 				} else {
-					addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(5.45, top + spacing)), module, BusDepot::LEFT_LIGHTS + i));
-					addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(25.1, top + spacing)), module, BusDepot::RIGHT_LIGHTS + i));
+					addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(4.95, top + spacing)), module, BusDepot::LEFT_LIGHTS + i));
+					addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(25.6, top + spacing)), module, BusDepot::RIGHT_LIGHTS + i));
 				}
 			}
-			}
+		}
 	}
 
 	// build the menu
