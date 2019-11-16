@@ -10,7 +10,7 @@ With features like pop filters, fade automation, send effects, mix groups, polyp
 
 ## User's Guide
 
-A [User's Guide](https://github.com/gluethegiant/gtg-rack/wiki) for these modules, including a VCV Rack tutorial, is available in the [Wiki](https://github.com/gluethegiant/gtg-rack/wiki).
+A [User's Guide](https://github.com/gluethegiant/gtg-rack/wiki), including a VCV Rack tutorial, is available in the [Wiki](https://github.com/gluethegiant/gtg-rack/wiki).
 
 ## Licenses, Copyrights, Etc.
 
@@ -22,8 +22,7 @@ All the code is released to use under the GPL 3 license and above.
 
 ## Acknowledgments 
 
-Thanks to Andrew Belt for accepting a tiny page of code for a library that VCV Rack uses.
-That encouraged the creation of these modules.
+Thanks to Andrew Belt (Vortico) for the VCV Rack software and its community of developers, tweakers, and musicians.
 
 Thanks to all the other Rack coders, especially those who share their code.
 You are too numerous to thank individually, but I tried to star all of your repos and have started to include acknowledgments in the code.
@@ -99,7 +98,6 @@ v. 1.0.0 Initial VCV Rack Library Release (September 6, 2019)
 
 - Peak indicators on Bus Depot are now sample accurate
 - Peak indicators stay on longer
-- Text fixed on Bus Route
 
 v. 1.0.0 Initial Release (September 3, 2019)
 
