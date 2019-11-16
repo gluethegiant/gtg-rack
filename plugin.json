@@ -11,6 +11,7 @@
   "manualUrl": "https://github.com/gluethegiant/gtg-rack/wiki",
   "sourceUrl": "https://github.com/gluethegiant/gtg-rack",
   "donateUrl": "",
+  "changelogUrl": "https://github.com/gluethegiant/gtg-rack/#release-notes",
   "modules": [
     {
       "slug": "MiniBus",
