@@ -168,7 +168,7 @@ struct GigBus : Module {
 
 
 struct GigBusWidget : ModuleWidget {
-	SvgPanel* night_panel;
+	SvgPanel *night_panel;
 
 	GigBusWidget(GigBus *module) {
 		setModule(module);
@@ -201,8 +201,8 @@ struct GigBusWidget : ModuleWidget {
 
 		// create vu lights
 		for (int i = 0; i < 11; i++) {
-			float spacing = i * 3.25f;
-			float top = 15.12f;
+			float spacing = i * 3.5f;
+			float top = 15.f;
 			if (i < 1 ) {
 				addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(3.27, top + spacing)), module, GigBus::LEFT_LIGHTS + i));
 				addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(17.0, top + spacing)), module, GigBus::RIGHT_LIGHTS + i));
