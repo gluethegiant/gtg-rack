@@ -4,7 +4,7 @@ Build your own lightweight, powerful mixer by connecting these modules together 
 The audio is routed along three stereo buses: red, orange, and blue.
 
 The bus design makes it easy to patch together modules while creating simple or complex routing.
-With features like pop filters, fade automation, send effects, mix groups, polyphonic stereo spread, effect and bus auditioning, and integrated latency compensation, they can also help you make your next patch sound amazing.
+With features like pop filters, fade automation, send effects, mix groups, effect and bus auditioning, polyphonic stereo spread, and integrated latency compensation, they can also help you make your next patch sound amazing.
 
 ![Modular bus mixers from Glue the Giant](https://github.com/gluethegiant/gtg-rack/blob/master/design/screenshot.png)
 
@@ -40,7 +40,7 @@ To build these rack modules, see the official [VCV Rack documentation](https://v
 
 v. 1.0.6 A Chilly November Release (November 15, 2019)
 
-- Fix issue with Bus Depot where fade out settings did not take immediately (the quickest work around is to move the fade in knob)
+- Fix issue with Bus Depot where the fade out time did not change until the fade in knob was moved or the patch was restarted.
 - Added post fader send to orange and blue on Mini Bus Mixer (through context menu)
 - Added ability to always default mixer strips to use post fader sends
 
@@ -90,7 +90,7 @@ v. 1.0.1 Metro City Bus Release (September 23, 2019)
 - Minor CPU optimizations
 - Small UI enhancements, including a better 70's cream color
 
-Note: Some VCV patches saved with version 1.0.0 of the modular bus mixers will need to have levels reset after loading the patches in 1.0.1.
+Note: Some VCV patches saved with version 1.0.0 of the modular bus mixers will need to have levels reset after loading the patches in later versions.
 The developer thought parameters were being saved by their names.
 He now knows parameters are saved by their order.
 
