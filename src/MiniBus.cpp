@@ -115,7 +115,10 @@ struct MiniBus : Module {
 	// load on button, gain states, and color theme
 	void dataFromJson(json_t *rootJ) override {
 		json_t *input_onJ = json_object_get(rootJ, "input_on");
-		if (input_onJ) mini_fader.on = json_integer_value(input_onJ);
+		if (input_onJ) {
+			mini_fader.on = json_integer_value(input_onJ);
+			lights[ON_LIGHT].value = mini_fader.on;
+		}
 		json_t *post_fadesJ = json_object_get(rootJ, "post_fades");
 		if (post_fadesJ) {
 			post_fades = json_integer_value(post_fadesJ);
@@ -137,6 +140,7 @@ struct MiniBus : Module {
 	// reset fader on state when initialized
 	void onReset() override {
 		mini_fader.on = true;
+		lights[ON_LIGHT].value = 1.f;
 		mini_fader.setGain(1.f);
 		post_fades = loadGtgPluginDefault("default_post_fader", 0);
 	}
