@@ -58,45 +58,39 @@ struct MiniBus : Module {
 
 		mini_fader.process();
 
+		// get inputs
+		float mono_in = inputs[MP_INPUT].getVoltageSum() * mini_fader.getFade();
+
+		// get levels
+		float in_levels[3];
+
+		// get red level
+		in_levels[2] = params[LEVEL_PARAMS + 2].getValue();
+
+		// slew post fader level
+		float post_amount = 1.f;
+		if (post_fades) {
+			post_amount = post_fade_filter.slew(in_levels[2]);
+		} else {
+			post_amount = post_fade_filter.slew(1.f);
+		}
+		for (int sb = 0; sb < 2; sb++) {   // apply post fader level to blue and orange
+			in_levels[sb] = params[LEVEL_PARAMS + sb].getValue() * post_amount;
+		}
+
+		// calculate three mono outputs
 		float bus_outs[3] = {0.f, 0.f, 0.f};
-
-		if (inputs[MP_INPUT].isConnected()) {
-
-			// get inputs
-			float mono_in = inputs[MP_INPUT].getVoltageSum() * mini_fader.getFade();
-
-			// get levels
-			float in_levels[3];
-
-			// get red level
-			in_levels[2] = params[LEVEL_PARAMS + 2].getValue();
-
-			// slew post fader level
-			float post_amount = 1.f;
-			if (post_fades) {
-				post_amount = post_fade_filter.slew(in_levels[2]);
-			} else {
-				post_amount = post_fade_filter.slew(1.f);
-			}
-			for (int sb = 0; sb < 2; sb++) {   // apply post fader level to blue and orange
-				in_levels[sb] = params[LEVEL_PARAMS + sb].getValue() * post_amount;
-			}
-
-			// calculate three mono outputs
-			for (int sb = 0; sb < 3; sb++) {
-				bus_outs[sb] = mono_in * in_levels[sb];
-			}
+		for (int sb = 0; sb < 3; sb++) {
+			bus_outs[sb] = mono_in * in_levels[sb];
 		}
 
 		// step through all outputs
-		if (outputs[BUS_OUTPUT].isConnected()) {
-			outputs[BUS_OUTPUT].setVoltage(bus_outs[0] + inputs[BUS_INPUT].getPolyVoltage(0), 0);
-			outputs[BUS_OUTPUT].setVoltage(bus_outs[0] + inputs[BUS_INPUT].getPolyVoltage(1), 1);
-			outputs[BUS_OUTPUT].setVoltage(bus_outs[1] + inputs[BUS_INPUT].getPolyVoltage(2), 2);
-			outputs[BUS_OUTPUT].setVoltage(bus_outs[1] + inputs[BUS_INPUT].getPolyVoltage(3), 3);
-			outputs[BUS_OUTPUT].setVoltage(bus_outs[2] + inputs[BUS_INPUT].getPolyVoltage(4), 4);
-			outputs[BUS_OUTPUT].setVoltage(bus_outs[2] + inputs[BUS_INPUT].getPolyVoltage(5), 5);
-		}
+		outputs[BUS_OUTPUT].setVoltage(bus_outs[0] + inputs[BUS_INPUT].getPolyVoltage(0), 0);
+		outputs[BUS_OUTPUT].setVoltage(bus_outs[0] + inputs[BUS_INPUT].getPolyVoltage(1), 1);
+		outputs[BUS_OUTPUT].setVoltage(bus_outs[1] + inputs[BUS_INPUT].getPolyVoltage(2), 2);
+		outputs[BUS_OUTPUT].setVoltage(bus_outs[1] + inputs[BUS_INPUT].getPolyVoltage(3), 3);
+		outputs[BUS_OUTPUT].setVoltage(bus_outs[2] + inputs[BUS_INPUT].getPolyVoltage(4), 4);
+		outputs[BUS_OUTPUT].setVoltage(bus_outs[2] + inputs[BUS_INPUT].getPolyVoltage(5), 5);
 
 		// always set bus outputs for 3 stereo buses out
 		outputs[BUS_OUTPUT].setChannels(6);
