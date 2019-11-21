@@ -48,6 +48,7 @@ struct GigBus : Module {
 		configParam(LEVEL_PARAMS + 0, 0.f, 1.f, 0.f, "Post red level send to blue stereo bus");
 		configParam(LEVEL_PARAMS + 1, 0.f, 1.f, 0.f, "Post red level send to orange stereo bus");
 		configParam(LEVEL_PARAMS + 2, 0.f, 1.f, 1.f, "Master level to red stereo bus");
+		lights[ON_LIGHT].value = 1.f;
 		vu_meters[0].lambda = 25.f;
 		vu_meters[1].lambda = 25.f;
 		vu_divider.setDivision(500);
@@ -62,15 +63,16 @@ struct GigBus : Module {
 		// on off button controls auto fader to avoid pops
 		if (on_trigger.process(params[ON_PARAM].getValue()) + on_cv_trigger.process(inputs[ON_CV_INPUT].getVoltage())) {
 			gig_fader.on = !gig_fader.on;
+			lights[ON_LIGHT].value = gig_fader.on;
 		}
 
 		gig_fader.process();
 
 		// get input levels
 		float in_levels[3] = {0.f, 0.f, 0.f};
-		in_levels[2] = params[LEVEL_PARAMS + 2].getValue();   // master level
+		in_levels[2] = params[LEVEL_PARAMS + 2].getValue();   // master red level
 		for (int sb = 0; sb < 2; sb++) {   // send levels
-			in_levels[sb] = params[LEVEL_PARAMS + sb].getValue() * in_levels[2];   // multiply by master for post levels
+			in_levels[sb] = params[LEVEL_PARAMS + sb].getValue() * in_levels[2];   // multiply by master for post send levels
 		}
 
 		// get stereo pan levels
@@ -90,21 +92,10 @@ struct GigBus : Module {
 			}
 		}
 
-		// check for peaks
+		// check for peaks on red
 		for (int c = 0; c < 2; c++) {
 			if (stereo_in[c] * in_levels[2] > 10.f) peak_stereo[c] = 1.f;
 		}
-
-		// process outputs
-		for (int sb = 0; sb < 3; sb++) {   // sb = stereo bus
-			for (int c = 0; c < 2; c++) {
-				int bus_channel = (2 * sb) + c;
-				outputs[BUS_OUTPUT].setVoltage((stereo_in[c] * in_levels[sb]) + inputs[BUS_INPUT].getPolyVoltage(bus_channel), bus_channel);
-			}
-		}
-
-		// set bus outputs for 3 stereo buses out
-		outputs[BUS_OUTPUT].setChannels(6);
 
 		// get levels for lights
 		if (vu_divider.process()) {   // check levels for lights infrequently
@@ -116,8 +107,6 @@ struct GigBus : Module {
 
 		// set lights infrequently
 		if (light_divider.process()) {   // set lights infrequently
-
-			lights[ON_LIGHT].value = gig_fader.getFade();
 
 			// make peak lights stay on when hit
 			for (int c = 0; c < 2; c++) {
@@ -133,6 +122,16 @@ struct GigBus : Module {
 			}
 		}
 
+		// process outputs
+		outputs[BUS_OUTPUT].setVoltage((stereo_in[0] * in_levels[0]) + inputs[BUS_INPUT].getPolyVoltage(0), 0);
+		outputs[BUS_OUTPUT].setVoltage((stereo_in[1] * in_levels[0]) + inputs[BUS_INPUT].getPolyVoltage(1), 1);
+		outputs[BUS_OUTPUT].setVoltage((stereo_in[0] * in_levels[1]) + inputs[BUS_INPUT].getPolyVoltage(2), 2);
+		outputs[BUS_OUTPUT].setVoltage((stereo_in[1] * in_levels[1]) + inputs[BUS_INPUT].getPolyVoltage(3), 3);
+		outputs[BUS_OUTPUT].setVoltage((stereo_in[0] * in_levels[2]) + inputs[BUS_INPUT].getPolyVoltage(4), 4);
+		outputs[BUS_OUTPUT].setVoltage((stereo_in[1] * in_levels[2]) + inputs[BUS_INPUT].getPolyVoltage(5), 5);
+
+		// set bus outputs for 3 stereo buses out
+		outputs[BUS_OUTPUT].setChannels(6);
 	}
 
 	// save on button and gain states
@@ -147,7 +146,10 @@ struct GigBus : Module {
 	// load on button and gain states
 	void dataFromJson(json_t *rootJ) override {
 		json_t *input_onJ = json_object_get(rootJ, "input_on");
-		if (input_onJ) gig_fader.on = json_integer_value(input_onJ);
+		if (input_onJ) {
+			gig_fader.on = json_integer_value(input_onJ);
+			lights[ON_LIGHT].value = gig_fader.on;
+		}
 		json_t *gainJ = json_object_get(rootJ, "gain");
 		if (gainJ) gig_fader.setGain((float)json_real_value(gainJ));
 		json_t *color_themeJ = json_object_get(rootJ, "color_theme");
@@ -162,6 +164,7 @@ struct GigBus : Module {
 	// reset on state on initialize
 	void onReset() override {
 		gig_fader.on = true;
+		lights[ON_LIGHT].value = 1.f;
 		gig_fader.setGain(1.f);
 	}
 };
