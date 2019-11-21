@@ -40,6 +40,7 @@ struct MiniBus : Module {
 		configParam(LEVEL_PARAMS + 0, 0.f, 1.f, 0.f, "Level to blue bus");
 		configParam(LEVEL_PARAMS + 1, 0.f, 1.f, 0.f, "Level to orange bus");
 		configParam(LEVEL_PARAMS + 2, 0.f, 1.f, 1.f, "Level to red bus");
+		lights[ON_LIGHT].value = 1.f;
 		mini_fader.setSpeed(fade_speed);
 		post_fade_filter.setSlewSpeed(smooth_speed);
 		post_fade_filter.value = 1.f;
@@ -52,47 +53,52 @@ struct MiniBus : Module {
 		// on off button controls auto fader to prevent pops
 		if (on_trigger.process(params[ON_PARAM].getValue()) + on_cv_trigger.process(inputs[ON_CV_INPUT].getVoltage())) {
 			mini_fader.on = !mini_fader.on;
+			lights[ON_LIGHT].value = mini_fader.on;
 		}
 
 		mini_fader.process();
 
-		lights[ON_LIGHT].value = mini_fader.getFade();
+		float bus_outs[3] = {0.f, 0.f, 0.f};
 
-		// get inputs
-		float mono_in = inputs[MP_INPUT].getVoltageSum() * mini_fader.getFade();
+		if (inputs[MP_INPUT].isConnected()) {
 
-		// get levels
-		float in_levels[3];
+			// get inputs
+			float mono_in = inputs[MP_INPUT].getVoltageSum() * mini_fader.getFade();
 
-		// get red level
-		in_levels[2] = params[LEVEL_PARAMS + 2].getValue();
+			// get levels
+			float in_levels[3];
 
-		// slew post fader level and apply to blue and orange levels
-		float post_amount = 1.f;
-		if (post_fades) {
-			post_amount = post_fade_filter.slew(in_levels[2]);
-		} else {
-			post_amount = post_fade_filter.slew(1.f);
-		}
-		for (int sb = 0; sb < 2; sb++) {   // sb = stereo bus
-			in_levels[sb] = params[LEVEL_PARAMS + sb].getValue() * post_amount;
-		}
+			// get red level
+			in_levels[2] = params[LEVEL_PARAMS + 2].getValue();
 
-		// calculate three mono outputs
-		float bus_outs[3];
-		for (int sb = 0; sb < 3; sb++) {
-			bus_outs[sb] = mono_in * in_levels[sb];
+			// slew post fader level
+			float post_amount = 1.f;
+			if (post_fades) {
+				post_amount = post_fade_filter.slew(in_levels[2]);
+			} else {
+				post_amount = post_fade_filter.slew(1.f);
+			}
+			for (int sb = 0; sb < 2; sb++) {   // apply post fader level to blue and orange
+				in_levels[sb] = params[LEVEL_PARAMS + sb].getValue() * post_amount;
+			}
+
+			// calculate three mono outputs
+			for (int sb = 0; sb < 3; sb++) {
+				bus_outs[sb] = mono_in * in_levels[sb];
+			}
 		}
 
 		// step through all outputs
-		outputs[BUS_OUTPUT].setVoltage(bus_outs[0] + inputs[BUS_INPUT].getPolyVoltage(0), 0);
-		outputs[BUS_OUTPUT].setVoltage(bus_outs[0] + inputs[BUS_INPUT].getPolyVoltage(1), 1);
-		outputs[BUS_OUTPUT].setVoltage(bus_outs[1] + inputs[BUS_INPUT].getPolyVoltage(2), 2);
-		outputs[BUS_OUTPUT].setVoltage(bus_outs[1] + inputs[BUS_INPUT].getPolyVoltage(3), 3);
-		outputs[BUS_OUTPUT].setVoltage(bus_outs[2] + inputs[BUS_INPUT].getPolyVoltage(4), 4);
-		outputs[BUS_OUTPUT].setVoltage(bus_outs[2] + inputs[BUS_INPUT].getPolyVoltage(5), 5);
+		if (outputs[BUS_OUTPUT].isConnected()) {
+			outputs[BUS_OUTPUT].setVoltage(bus_outs[0] + inputs[BUS_INPUT].getPolyVoltage(0), 0);
+			outputs[BUS_OUTPUT].setVoltage(bus_outs[0] + inputs[BUS_INPUT].getPolyVoltage(1), 1);
+			outputs[BUS_OUTPUT].setVoltage(bus_outs[1] + inputs[BUS_INPUT].getPolyVoltage(2), 2);
+			outputs[BUS_OUTPUT].setVoltage(bus_outs[1] + inputs[BUS_INPUT].getPolyVoltage(3), 3);
+			outputs[BUS_OUTPUT].setVoltage(bus_outs[2] + inputs[BUS_INPUT].getPolyVoltage(4), 4);
+			outputs[BUS_OUTPUT].setVoltage(bus_outs[2] + inputs[BUS_INPUT].getPolyVoltage(5), 5);
+		}
 
-		// set bus outputs for 3 stereo buses out
+		// always set bus outputs for 3 stereo buses out
 		outputs[BUS_OUTPUT].setChannels(6);
 	}
 
