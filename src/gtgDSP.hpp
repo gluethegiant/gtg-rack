@@ -29,21 +29,19 @@ struct AutoFader {
 	}
 
 	float getExpFade(double power) {   // exponential curve on fade
-		return std::pow(fade, power);
+		return std::pow(fade / gain, power) * gain;
 	}
 
 	void process() {   // increments or decreases fade value
 		if (on) {
 			if (fade < gain) {
 				fade += delta;
-			} else {
-				fade = gain;
+				if (fade > gain) fade = gain;
 			}
 		} else {
-			if (fade > 0) {
+			if (fade > 0.f) {
 				fade -= delta;
-			} else {
-				fade = 0.f;
+				if (fade < 0.f) fade = 0.f;
 			}
 		}
 	}
