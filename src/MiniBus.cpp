@@ -20,17 +20,21 @@ struct MiniBus : Module {
 		NUM_OUTPUTS
 	};
 	enum LightIds {
-		ON_LIGHT,
+		ENUMS(ON_LIGHT, 2),   // single red and green light
 		NUM_LIGHTS
 	};
 
-	dsp::SchmittTrigger on_trigger;
+	LongPressButton on_button;
 	dsp::SchmittTrigger on_cv_trigger;
+	dsp::ClockDivider light_divider;
 	AutoFader mini_fader;
 	SimpleSlewer post_fade_filter;
 
-	const int fade_speed = 26;
+	const int bypass_speed = 26;
 	const int smooth_speed = 26;
+	float fade_in = 26.f;
+	float fade_out = 26.f;
+	bool auto_override = false;
 	bool post_fades = false;
 	int color_theme = 0;
 
@@ -40,8 +44,8 @@ struct MiniBus : Module {
 		configParam(LEVEL_PARAMS + 0, 0.f, 1.f, 0.f, "Level to blue bus");
 		configParam(LEVEL_PARAMS + 1, 0.f, 1.f, 0.f, "Level to orange bus");
 		configParam(LEVEL_PARAMS + 2, 0.f, 1.f, 1.f, "Level to red bus");
-		lights[ON_LIGHT].value = 1.f;
-		mini_fader.setSpeed(fade_speed);
+		light_divider.setDivision(512);
+		mini_fader.setSpeed(fade_in);
 		post_fade_filter.setSlewSpeed(smooth_speed);
 		post_fade_filter.value = 1.f;
 		post_fades = loadGtgPluginDefault("default_post_fader", false);
@@ -50,16 +54,63 @@ struct MiniBus : Module {
 
 	void process(const ProcessArgs &args) override {
 
-		// on off button controls auto fader to prevent pops
-		if (on_trigger.process(params[ON_PARAM].getValue()) + on_cv_trigger.process(inputs[ON_CV_INPUT].getVoltage())) {
+		// on off button
+		switch (on_button.step(params[ON_PARAM])) {
+		default:
+		case LongPressButton::NO_PRESS:
+			break;
+		case LongPressButton::SHORT_PRESS:
+			auto_override = false;
 			mini_fader.on = !mini_fader.on;
-			lights[ON_LIGHT].value = mini_fader.on;
+			if (mini_fader.on) {
+				mini_fader.setSpeed(int(fade_in));
+			} else {
+				mini_fader.setSpeed(int(fade_out));
+			}
+			break;
+		case LongPressButton::LONG_PRESS:   // long press to bypass fade automation
+			auto_override = true;
+			mini_fader.setSpeed(bypass_speed);
+			if (mini_fader.on) {   // bypass the fade underway
+				mini_fader.on = (mini_fader.getFade() != mini_fader.getGain());
+			} else {
+				mini_fader.on = (mini_fader.getFade() == 0.f);
+			}
+			break;
+		}
+
+		// process cv trigger
+		if (on_cv_trigger.process(inputs[ON_CV_INPUT].getVoltage())) {
+			auto_override = false;
+			mini_fader.on = !mini_fader.on;
 		}
 
 		mini_fader.process();
 
+		// process on light and fade speeds
+		if (light_divider.process()) {
+			if (mini_fader.getFade() == mini_fader.getGain()) {
+				lights[ON_LIGHT + 0].value = 1.f;   // green light when on
+				lights[ON_LIGHT + 1].value = 0.f;
+			} else {   // yellow light when fading
+				lights[ON_LIGHT + 0].value = mini_fader.getFade();
+				lights[ON_LIGHT + 1].value = mini_fader.getFade();
+			}
+			if (!auto_override) {   // process fade speed if dragging slider
+				if (mini_fader.on) {
+					if (int(fade_in) != mini_fader.getFade()) {
+						mini_fader.setSpeed(int(fade_in));
+					}
+				} else {
+					if (int(fade_out) != mini_fader.getFade()) {
+						mini_fader.setSpeed(int(fade_out));
+					}
+				}
+			}
+		}
+
 		// get inputs
-		float mono_in = inputs[MP_INPUT].getVoltageSum() * mini_fader.getFade();
+		float mono_in = inputs[MP_INPUT].getVoltageSum() * mini_fader.getExpFade(2.5);
 
 		// get levels
 		float in_levels[3];
@@ -102,6 +153,8 @@ struct MiniBus : Module {
 		json_object_set_new(rootJ, "input_on", json_integer(mini_fader.on));
 		json_object_set_new(rootJ, "post_fades", json_integer(post_fades));
 		json_object_set_new(rootJ, "gain", json_real(mini_fader.getGain()));
+		json_object_set_new(rootJ, "fade_in", json_real(fade_in));
+		json_object_set_new(rootJ, "fade_out", json_real(fade_out));
 		json_object_set_new(rootJ, "color_theme", json_integer(color_theme));
 		return rootJ;
 	}
@@ -109,10 +162,7 @@ struct MiniBus : Module {
 	// load on button, gain states, and color theme
 	void dataFromJson(json_t *rootJ) override {
 		json_t *input_onJ = json_object_get(rootJ, "input_on");
-		if (input_onJ) {
-			mini_fader.on = json_integer_value(input_onJ);
-			lights[ON_LIGHT].value = mini_fader.on;
-		}
+		if (input_onJ) mini_fader.on = json_integer_value(input_onJ);
 		json_t *post_fadesJ = json_object_get(rootJ, "post_fades");
 		if (post_fadesJ) {
 			post_fades = json_integer_value(post_fadesJ);
@@ -121,28 +171,33 @@ struct MiniBus : Module {
 		}
 		json_t *gainJ = json_object_get(rootJ, "gain");
 		if (gainJ) mini_fader.setGain((float)json_real_value(gainJ));
+		json_t *fade_inJ = json_object_get(rootJ, "fade_in");
+		if (fade_inJ) fade_in = json_real_value(fade_inJ);
+		json_t *fade_outJ = json_object_get(rootJ, "fade_out");
+		if (fade_outJ) fade_out = json_real_value(fade_outJ);
 		json_t *color_themeJ = json_object_get(rootJ, "color_theme");
 		if (color_themeJ) color_theme = json_integer_value(color_themeJ);
 	}
 
 	// reset fader speed
 	void onSampleRateChange() override {
-		mini_fader.setSpeed(fade_speed);
+		mini_fader.setSpeed(fade_in);
 		post_fade_filter.setSlewSpeed(smooth_speed);
 	}
 
 	// reset fader on state when initialized
 	void onReset() override {
 		mini_fader.on = true;
-		lights[ON_LIGHT].value = 1.f;
 		mini_fader.setGain(1.f);
+		fade_in = 26.f;
+		fade_out = 26.f;
 		post_fades = loadGtgPluginDefault("default_post_fader", 0);
 	}
 };
 
 
 struct MiniBusWidget : ModuleWidget {
-	SvgPanel* night_panel;
+	SvgPanel *night_panel;
 
 	MiniBusWidget(MiniBus *module) {
 		setModule(module);
@@ -160,7 +215,7 @@ struct MiniBusWidget : ModuleWidget {
 		addChild(createThemedWidget<gtgScrewUp>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), module ? &module->color_theme : NULL));
 
 		addParam(createThemedParamCentered<gtgBlackButton>(mm2px(Vec(7.62, 15.20)), module, MiniBus::ON_PARAM, module ? &module->color_theme : NULL));
-		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(7.62, 15.20)), module, MiniBus::ON_LIGHT));
+		addChild(createLightCentered<MediumLight<GreenRedLight>>(mm2px(Vec(7.62, 15.20)), module, MiniBus::ON_LIGHT));
 		addParam(createThemedParamCentered<gtgBlueKnob>(mm2px(Vec(7.62, 51.0)), module, MiniBus::LEVEL_PARAMS + 0, module ? &module->color_theme : NULL));
 		addParam(createThemedParamCentered<gtgOrangeKnob>(mm2px(Vec(7.62, 67.75)), module, MiniBus::LEVEL_PARAMS + 1, module ? &module->color_theme : NULL));
 		addParam(createThemedParamCentered<gtgRedKnob>(mm2px(Vec(7.62, 84.5)), module, MiniBus::LEVEL_PARAMS + 2, module ? &module->color_theme : NULL));
@@ -174,8 +229,99 @@ struct MiniBusWidget : ModuleWidget {
 
 	// build the menu
 	void appendContextMenu(Menu* menu) override {
-		MiniBus* module = dynamic_cast<MiniBus*>(this->module);
+		MiniBus *module = dynamic_cast<MiniBus*>(this->module);
 
+		struct FadeDuration : Quantity {
+			float *srcFadeRate = NULL;
+			std::string label = "";
+
+			FadeDuration(float *_srcFadeRate, std::string fade_label) {
+				srcFadeRate = _srcFadeRate;
+				label = fade_label;
+			}
+			void setValue(float value) override {
+                *srcFadeRate = math::clamp(value, getMinValue(), getMaxValue());
+			}
+			float getValue() override {
+				return *srcFadeRate;
+			}
+			float getMinValue() override {return 26.0f;}
+			float getMaxValue() override {return 34000.0f;}
+			float getDefaultValue() override {return 26.0f;}
+			float getDisplayValue() override {return getValue();}
+			std::string getDisplayValueString() override {
+                float value = getDisplayValue();
+				return string::f("%.f", value);
+			}
+			void setDisplayValue(float displayValue) override {setValue(displayValue);}
+			std::string getLabel() override {return label;}
+			std::string getUnit() override {return " mil";}
+		};
+
+
+		// fade automation sliders
+		struct FadeSliderItem : ui::Slider {
+			FadeSliderItem(float *fade_rate, std::string fade_label) {
+				quantity = new FadeDuration(fade_rate, fade_label);
+			}
+			~FadeSliderItem() {
+				delete quantity;
+			}
+		};
+
+		// add gain levels
+		struct GainLevelItem : MenuItem {
+			MiniBus *module;
+			float gain;
+			void onAction(const event::Action &e) override {
+				module->mini_fader.setGain(gain);
+			}
+		};
+
+		struct GainsItem : MenuItem {
+			MiniBus *module;
+			Menu *createChildMenu() override {
+				Menu *menu = new Menu;
+				std::string gain_titles[4] = {"No gain (default)", "2x gain", "4x gain", "6x gain"};
+				float gain_amounts[4] = {1.f, 2.f, 4.f, 6.f};
+				for (int i = 0; i < 4; i++) {
+					GainLevelItem *gain_item = new GainLevelItem;
+					gain_item->text = gain_titles[i];
+					gain_item->rightText = CHECKMARK(module->mini_fader.getGain() == gain_amounts[i]);
+					gain_item->module = module;
+					gain_item->gain = gain_amounts[i];
+					menu->addChild(gain_item);
+				}
+				return menu;
+			}
+		};
+
+		// set post fader sends on blue and orange buses
+		struct PostToggleItem : MenuItem {
+			MiniBus *module;
+			int post_fade;
+			void onAction(const event::Action &e) override {
+				module->post_fades = post_fade;
+			}
+		};
+
+		struct PostFadesItem : MenuItem {
+			MiniBus *module;
+			Menu *createChildMenu() override {
+				Menu *menu = new Menu;
+				std::string fade_titles[2] = {"Normal (default)", "Post red fader sends"};
+				int post_mode[2] = {0, 1};
+				for (int i = 0; i < 2; i++) {
+					PostToggleItem *post_item = new PostToggleItem;
+					post_item->text = fade_titles[i];
+					post_item->rightText = CHECKMARK(module->post_fades == post_mode[i]);
+					post_item->module = module;
+					post_item->post_fade = post_mode[i];
+					menu->addChild(post_item);
+				}
+				return menu;
+			}
+		};
 
 		// add theme items to context menu
 		struct ThemeItem : MenuItem {
@@ -183,24 +329,6 @@ struct MiniBusWidget : ModuleWidget {
 			int theme;
 			void onAction(const event::Action& e) override {
 				module->color_theme = theme;
-			}
-		};
-
-		// set post fader sends on blue or orange buses
-		struct PostFaderItem : MenuItem {
-			MiniBus* module;
-			int post_fade;
-			void onAction(const event::Action& e) override {
-				module->post_fades = !module->post_fades;
-			}
-		};
-
-	// add gain levels to context menu
-		struct GainItem : MenuItem {
-			MiniBus* module;
-			float gain;
-			void onAction(const event::Action& e) override {
-				module->mini_fader.setGain(gain);
 			}
 		};
 
@@ -221,7 +349,31 @@ struct MiniBusWidget : ModuleWidget {
 		};
 
 		menu->addChild(new MenuEntry);
-		menu->addChild(createMenuLabel("Panel Theme"));
+		menu->addChild(createMenuLabel("Fade Automation"));
+
+		FadeSliderItem *fadeInSliderItem = new FadeSliderItem(&(module->fade_in), "In");
+		fadeInSliderItem->box.size.x = 190.f;
+		menu->addChild(fadeInSliderItem);
+
+		FadeSliderItem *fadeOutSliderItem = new FadeSliderItem(&(module->fade_out), "Out");
+		fadeOutSliderItem->box.size.x = 190.f;
+		menu->addChild(fadeOutSliderItem);
+
+		menu->addChild(new MenuEntry);
+		menu->addChild(createMenuLabel("Mixer Settings"));
+
+		GainsItem *gainsItem = createMenuItem<GainsItem>("Preamp on M/P Input");
+		gainsItem->rightText = RIGHT_ARROW;
+		gainsItem->module = module;
+		menu->addChild(gainsItem);
+
+		PostFadesItem *postFadesItem = createMenuItem<PostFadesItem>("Blue and Orange Levels");
+		postFadesItem->rightText = RIGHT_ARROW;
+		postFadesItem->module = module;
+		menu->addChild(postFadesItem);
+
+		menu->addChild(new MenuEntry);
+		menu->addChild(createMenuLabel("Panel Themes"));
 
 		std::string themeTitles[2] = {"70's Cream", "Night Ride"};
 		for (int i = 0; i < 2; i++) {
@@ -231,27 +383,6 @@ struct MiniBusWidget : ModuleWidget {
 			themeItem->theme = i;
 			menu->addChild(themeItem);
 		}
-
-		menu->addChild(new MenuEntry);
-		menu->addChild(createMenuLabel("Preamp on M/P Input"));
-
-		std::string gainTitles[3] = {"No gain (default)", "2x gain", "4x gain"};
-		float gainAmounts[3] = {1.f, 2.f, 4.f};
-		for (int i = 0; i < 3; i++) {
-			GainItem* gainItem = createMenuItem<GainItem>(gainTitles[i]);
-			gainItem->rightText = CHECKMARK(module->mini_fader.getGain() == gainAmounts[i]);
-			gainItem->module = module;
-			gainItem->gain = gainAmounts[i];
-			menu->addChild(gainItem);
-		}
-
-		menu->addChild(new MenuEntry);
-		menu->addChild(createMenuLabel("Blue and Orange Input Levels"));
-
-		PostFaderItem* postFaderItem = createMenuItem<PostFaderItem>("Post red fader sends");
-		postFaderItem->rightText = CHECKMARK(module->post_fades == true);
-		postFaderItem->module = module;
-		menu->addChild(postFaderItem);
 
 		menu->addChild(new MenuEntry);
 		menu->addChild(createMenuLabel("All Modular Bus Mixers"));
