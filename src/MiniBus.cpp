@@ -36,6 +36,7 @@ struct MiniBus : Module {
 	float fade_out = 26.f;
 	bool auto_override = false;
 	bool post_fades = false;
+	bool auditioned = false;
 	int color_theme = 0;
 
 	MiniBus() {
@@ -60,43 +61,87 @@ struct MiniBus : Module {
 		case LongPressButton::NO_PRESS:
 			break;
 		case LongPressButton::SHORT_PRESS:
-			auto_override = false;
-			mini_fader.on = !mini_fader.on;
-			if (mini_fader.on) {
-				mini_fader.setSpeed(int(fade_in));
+			if (audition_mixer) {
+				audition_mixer = false;   // always turn off audition with single click
 			} else {
-				mini_fader.setSpeed(int(fade_out));
+				if ((APP->window->getMods() & RACK_MOD_MASK) == RACK_MOD_CTRL) {   // bypass fades with ctrl click
+					auto_override = true;
+					mini_fader.setSpeed(bypass_speed);
+
+					// bypass the fade even if the fade is already underway
+					if (mini_fader.on) {
+						mini_fader.on = (mini_fader.getFade() != mini_fader.getGain());
+					} else {
+						mini_fader.on = (mini_fader.getFade() == 0.f);
+					}
+
+				} else {   // normal single click
+					auto_override = false;   // do not override automation
+					mini_fader.on = !mini_fader.on;
+					if (mini_fader.on) {
+						mini_fader.setSpeed(int(fade_in));
+					} else {
+						mini_fader.setSpeed(int(fade_out));
+					}
+				}
 			}
 			break;
-		case LongPressButton::LONG_PRESS:   // long press to bypass fade automation
-			auto_override = true;
-			mini_fader.setSpeed(bypass_speed);
-			if (mini_fader.on) {   // bypass the fade underway
-				mini_fader.on = (mini_fader.getFade() != mini_fader.getGain());
-			} else {
-				mini_fader.on = (mini_fader.getFade() == 0.f);
+		case LongPressButton::LONG_PRESS:   // long press to audition
+
+			audition_mixer = true;   // all mixers to audition mode
+			auditioned = true;
+
+			if (!mini_fader.on) {
+				mini_fader.temped = !mini_fader.temped;   // remember if auditioned mixer is off
 			}
 			break;
 		}
 
 		// process cv trigger
 		if (on_cv_trigger.process(inputs[ON_CV_INPUT].getVoltage())) {
-			auto_override = false;
+			auto_override = false;   // do not override automation
 			mini_fader.on = !mini_fader.on;
 		}
 
 		mini_fader.process();
 
-		// process on light and fade speeds
+		// process fade states and light
 		if (light_divider.process()) {
-			if (mini_fader.getFade() == mini_fader.getGain()) {
-				lights[ON_LIGHT + 0].value = 1.f;   // green light when on
-				lights[ON_LIGHT + 1].value = 0.f;
-			} else {   // yellow light when fading
-				lights[ON_LIGHT + 0].value = mini_fader.getFade();
-				lights[ON_LIGHT + 1].value = mini_fader.getFade();
+
+			if (audition_mixer) {   // all mixers are in audition state
+
+				// bypass all fade automation
+				auto_override = true;
+				mini_fader.setSpeed(bypass_speed);
+
+				if (auditioned) {   // this mixer is being auditioned
+					mini_fader.on =  true;
+				} else {   // mute the mixers
+					if (mini_fader.on) {
+						mini_fader.temped = true;   // remember this mixer was on
+					}
+					mini_fader.on = false;
+				}
+			} else {   // stop auditions
+
+				// return to states before auditions
+				if (mini_fader.temped) {
+					mini_fader.temped = false;
+					auto_override = true;
+					mini_fader.setSpeed(bypass_speed);
+					if (auditioned) {
+						mini_fader.on = false;
+					} else {
+						mini_fader.on = true;
+					}
+				}
+
+				// turn off auditions
+				auditioned = false;
 			}
-			if (!auto_override) {   // process fade speed if dragging slider
+
+			// process fade speed changes if dragging slider
+			if (!auto_override) {
 				if (mini_fader.on) {
 					if (int(fade_in) != mini_fader.getFade()) {
 						mini_fader.setSpeed(int(fade_in));
@@ -105,6 +150,25 @@ struct MiniBus : Module {
 					if (int(fade_out) != mini_fader.getFade()) {
 						mini_fader.setSpeed(int(fade_out));
 					}
+				}
+			}
+
+			// set lights
+			if (mini_fader.getFade() == mini_fader.getGain()) {
+				if (audition_mixer) {
+					lights[ON_LIGHT + 0].value = 1.f;   // yellow when auditioned
+					lights[ON_LIGHT + 1].value = 1.f;
+				} else {
+					lights[ON_LIGHT + 0].value = 1.f;   // green light when on
+					lights[ON_LIGHT + 1].value = 0.f;
+				}
+			} else {
+				if (mini_fader.temped) {
+					lights[ON_LIGHT + 0].value = 0.f;   // red when temporarily muted
+					lights[ON_LIGHT + 1].value = 1.f;
+				} else {
+					lights[ON_LIGHT + 0].value = mini_fader.getFade();  // yellow dimmer when fading
+					lights[ON_LIGHT + 1].value = mini_fader.getFade();
 				}
 			}
 		}
@@ -155,6 +219,8 @@ struct MiniBus : Module {
 		json_object_set_new(rootJ, "gain", json_real(mini_fader.getGain()));
 		json_object_set_new(rootJ, "fade_in", json_real(fade_in));
 		json_object_set_new(rootJ, "fade_out", json_real(fade_out));
+		json_object_set_new(rootJ, "auditioned", json_integer(auditioned));
+		json_object_set_new(rootJ, "temped", json_integer(mini_fader.temped));
 		json_object_set_new(rootJ, "color_theme", json_integer(color_theme));
 		return rootJ;
 	}
@@ -175,6 +241,13 @@ struct MiniBus : Module {
 		if (fade_inJ) fade_in = json_real_value(fade_inJ);
 		json_t *fade_outJ = json_object_get(rootJ, "fade_out");
 		if (fade_outJ) fade_out = json_real_value(fade_outJ);
+		json_t *auditionedJ = json_object_get(rootJ, "auditioned");
+		if (auditionedJ) {
+			auditioned = json_integer_value(auditionedJ);
+			if (!audition_mixer) audition_mixer = auditioned;
+		}
+		json_t *tempedJ = json_object_get(rootJ, "temped");
+		if (tempedJ) mini_fader.temped = json_integer_value(tempedJ);
 		json_t *color_themeJ = json_object_get(rootJ, "color_theme");
 		if (color_themeJ) color_theme = json_integer_value(color_themeJ);
 	}

@@ -3,6 +3,9 @@
 
 Plugin *pluginInstance;
 
+// variables used by all modules
+bool audition_mixer = false;
+bool audition_depot = false;
 
 void init(Plugin *p) {
 	pluginInstance = p;
