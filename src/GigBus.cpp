@@ -22,7 +22,7 @@ struct GigBus : Module {
 		NUM_OUTPUTS
 	};
 	enum LightIds {
-		ON_LIGHT,
+		ENUMS(ON_LIGHT, 2),
 		ENUMS(LEFT_LIGHTS, 11),
 		ENUMS(RIGHT_LIGHTS, 11),
 		NUM_LIGHTS
@@ -31,13 +31,18 @@ struct GigBus : Module {
 	dsp::VuMeter2 vu_meters[2];
 	dsp::ClockDivider vu_divider;
 	dsp::ClockDivider light_divider;
-	dsp::SchmittTrigger on_trigger;
+	dsp::ClockDivider audition_divider;
+	LongPressButton on_button;
 	dsp::SchmittTrigger on_cv_trigger;
 	dsp::ClockDivider pan_divider;
 	AutoFader gig_fader;
 	ConstantPan gig_pan;
 
-	const int fade_speed = 26;
+	const int bypass_speed = 26;
+	float fade_in = 26.f;
+	float fade_out = 26.f;
+	bool auto_override = false;
+	bool auditioned = false;
 	float peak_stereo[2] = {0.f, 0.f};
 	int color_theme = 0;
 
@@ -48,25 +53,114 @@ struct GigBus : Module {
 		configParam(LEVEL_PARAMS + 0, 0.f, 1.f, 0.f, "Post red level send to blue stereo bus");
 		configParam(LEVEL_PARAMS + 1, 0.f, 1.f, 0.f, "Post red level send to orange stereo bus");
 		configParam(LEVEL_PARAMS + 2, 0.f, 1.f, 1.f, "Master level to red stereo bus");
-		lights[ON_LIGHT].value = 1.f;
 		vu_meters[0].lambda = 25.f;
 		vu_meters[1].lambda = 25.f;
 		vu_divider.setDivision(500);
 		light_divider.setDivision(240);
+		audition_divider.setDivision(512);
 		pan_divider.setDivision(3);
-		gig_fader.setSpeed(fade_speed);
+		gig_fader.setSpeed(fade_in);
 		color_theme = loadGtgPluginDefault("default_theme", 0);
 	}
 
 	void process(const ProcessArgs &args) override {
 
-		// on off button controls auto fader to avoid pops
-		if (on_trigger.process(params[ON_PARAM].getValue()) + on_cv_trigger.process(inputs[ON_CV_INPUT].getVoltage())) {
+		// on off button
+		switch (on_button.step(params[ON_PARAM])) {
+		default:
+		case LongPressButton::NO_PRESS:
+			break;
+		case LongPressButton::SHORT_PRESS:
+			if (audition_mixer) {
+				audition_mixer = false;   // single click turns off auditions
+			} else {
+				if ((APP->window->getMods() & RACK_MOD_MASK) == RACK_MOD_CTRL) {   // bypass fades with ctrl click
+					auto_override = true;
+					gig_fader.setSpeed(bypass_speed);
+
+					// bypass the fade even if the fade is already underway
+					if (gig_fader.on) {
+						gig_fader.on = (gig_fader.getFade() != gig_fader.getGain());
+					} else {
+						gig_fader.on = (gig_fader.getFade() == 0.f);
+					}
+
+				} else {   // normal single click
+					auto_override = false;   // do not override automation
+					gig_fader.on = !gig_fader.on;
+					if (gig_fader.on) {
+						gig_fader.setSpeed(int(fade_in));
+					} else {
+						gig_fader.setSpeed(int(fade_out));
+					}
+				}
+			}
+			break;
+		case LongPressButton::LONG_PRESS:   // long press to audition
+
+			audition_mixer = true;   // all mixers to audition mode
+			auditioned = true;
+
+			if (!gig_fader.on) {
+				gig_fader.temped = !gig_fader.temped;   // remember if auditioned mixer is off
+			}
+			break;
+		}
+
+		// process cv trigger
+		if (on_cv_trigger.process(inputs[ON_CV_INPUT].getVoltage())) {
+			auto_override = false;   // do not override automation
 			gig_fader.on = !gig_fader.on;
-			lights[ON_LIGHT].value = gig_fader.on;
 		}
 
 		gig_fader.process();
+
+		if (audition_divider.process()) {
+			if (audition_mixer) {   // all mixers are in audition state
+
+				// bypass all fade automation
+				auto_override = true;
+				gig_fader.setSpeed(bypass_speed);
+
+				if (auditioned) {   // this mixer is being auditioned
+					gig_fader.on =  true;
+				} else {   // mute the mixers
+					if (gig_fader.on) {
+						gig_fader.temped = true;   // remember this mixer was on
+					}
+					gig_fader.on = false;
+				}
+			} else {   // stop auditions
+
+				// return to states before auditions
+				if (gig_fader.temped) {
+					gig_fader.temped = false;
+					auto_override = true;
+					gig_fader.setSpeed(bypass_speed);
+					if (auditioned) {
+						gig_fader.on = false;
+					} else {
+						gig_fader.on = true;
+					}
+				}
+
+				// turn off auditions
+				auditioned = false;
+			}
+
+			// process fade speed changes if dragging slider
+			if (!auto_override) {
+				if (gig_fader.on) {
+					if (int(fade_in) != gig_fader.getFade()) {
+						gig_fader.setSpeed(int(fade_in));
+					}
+				} else {
+					if (int(fade_out) != gig_fader.getFade()) {
+						gig_fader.setSpeed(int(fade_out));
+					}
+				}
+			}
+		}
 
 		// get input levels
 		float in_levels[3] = {0.f, 0.f, 0.f};
@@ -102,6 +196,25 @@ struct GigBus : Module {
 			for (int i = 0; i < 2; i++) {
 				float red_level = stereo_in[i] * in_levels[2];
 				vu_meters[i].process(args.sampleTime * vu_divider.getDivision(), red_level / 10.f);
+			}
+
+			// set on light
+			if (gig_fader.getFade() == gig_fader.getGain()) {
+				if (audition_mixer) {
+					lights[ON_LIGHT + 0].value = 1.f;   // yellow when auditioned
+					lights[ON_LIGHT + 1].value = 1.f;
+				} else {
+					lights[ON_LIGHT + 0].value = 1.f;   // green when on
+					lights[ON_LIGHT + 1].value = 0.f;
+				}
+			} else {
+				if (gig_fader.temped) {
+					lights[ON_LIGHT + 0].value = 0.f;   // red when muted by audition
+					lights[ON_LIGHT + 1].value = 1.f;
+				} else {
+					lights[ON_LIGHT + 0].value = gig_fader.getFade();   // yellow dimmer when fading
+					lights[ON_LIGHT + 1].value = gig_fader.getFade() * 0.5f;
+				}
 			}
 		}
 
@@ -140,32 +253,49 @@ struct GigBus : Module {
 		json_object_set_new(rootJ, "input_on", json_integer(gig_fader.on));
 		json_object_set_new(rootJ, "gain", json_real(gig_fader.getGain()));
 		json_object_set_new(rootJ, "color_theme", json_integer(color_theme));
+		json_object_set_new(rootJ, "fade_in", json_real(fade_in));
+		json_object_set_new(rootJ, "fade_out", json_real(fade_out));
+		json_object_set_new(rootJ, "auditioned", json_integer(auditioned));
+		json_object_set_new(rootJ, "temped", json_integer(gig_fader.temped));
 		return rootJ;
 	}
 
 	// load on button and gain states
 	void dataFromJson(json_t *rootJ) override {
 		json_t *input_onJ = json_object_get(rootJ, "input_on");
-		if (input_onJ) {
-			gig_fader.on = json_integer_value(input_onJ);
-			lights[ON_LIGHT].value = gig_fader.on;
-		}
+		if (input_onJ) gig_fader.on = json_integer_value(input_onJ);
 		json_t *gainJ = json_object_get(rootJ, "gain");
 		if (gainJ) gig_fader.setGain((float)json_real_value(gainJ));
+		json_t *fade_inJ = json_object_get(rootJ, "fade_in");
+		if (fade_inJ) fade_in = json_real_value(fade_inJ);
+		json_t *fade_outJ = json_object_get(rootJ, "fade_out");
+		if (fade_outJ) fade_out = json_real_value(fade_outJ);
+		json_t *auditionedJ = json_object_get(rootJ, "auditioned");
+		if (auditionedJ) {
+			auditioned = json_integer_value(auditionedJ);
+			if (!audition_mixer) audition_mixer = auditioned;   // turn on if one mixer is auditioned
+		}
+		json_t *tempedJ = json_object_get(rootJ, "temped");
+		if (tempedJ) gig_fader.temped = json_integer_value(tempedJ);
 		json_t *color_themeJ = json_object_get(rootJ, "color_theme");
 		if (color_themeJ) color_theme = json_integer_value(color_themeJ);
 	}
 
 	// reset fader speed with new sample rate
 	void onSampleRateChange() override {
-		gig_fader.setSpeed(fade_speed);
+		if (gig_fader.on) {
+			gig_fader.setSpeed(fade_in);
+		} else {
+			gig_fader.setSpeed(fade_out);
+		}
 	}
 
 	// reset on state on initialize
 	void onReset() override {
 		gig_fader.on = true;
-		lights[ON_LIGHT].value = 1.f;
 		gig_fader.setGain(1.f);
+		fade_in = 26.f;
+		fade_out = 26.f;
 	}
 };
 
@@ -189,7 +319,7 @@ struct GigBusWidget : ModuleWidget {
 		addChild(createThemedWidget<gtgScrewUp>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), module ? &module->color_theme : NULL));
 
 		addParam(createThemedParamCentered<gtgBlackButton>(mm2px(Vec(10.13, 15.20)), module, GigBus::ON_PARAM, module ? &module->color_theme : NULL));
-		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(10.13, 15.20)), module, GigBus::ON_LIGHT));
+		addChild(createLightCentered<MediumLight<GreenRedLight>>(mm2px(Vec(10.13, 15.20)), module, GigBus::ON_LIGHT));
 		addParam(createThemedParamCentered<gtgGrayKnob>(mm2px(Vec(10.13, 61.25)), module, GigBus::PAN_PARAM, module ? &module->color_theme : NULL));
 		addParam(createThemedParamCentered<gtgBlueTinyKnob>(mm2px(Vec(5.4, 73.7)), module, GigBus::LEVEL_PARAMS + 0, module ? &module->color_theme : NULL));
 		addParam(createThemedParamCentered<gtgOrangeTinyKnob>(mm2px(Vec(14.90, 73.7)), module, GigBus::LEVEL_PARAMS + 1, module ? &module->color_theme : NULL));
@@ -225,19 +355,37 @@ struct GigBusWidget : ModuleWidget {
 	void appendContextMenu(Menu* menu) override {
 		GigBus* module = dynamic_cast<GigBus*>(this->module);
 
+		struct GainLevelItem : MenuItem {
+			GigBus* module;
+			float gain;
+			void onAction(const event::Action& e) override {
+				module->gig_fader.setGain(gain);
+			}
+		};
+
+		struct GainsItem : MenuItem {
+			GigBus *module;
+			Menu *createChildMenu() override {
+				Menu *menu = new Menu;
+				std::string gain_titles[4] = {"No gain (default)", "2x gain", "4x gain", "6x gain"};
+				float gain_amounts[4] = {1.f, 2.f, 4.f, 6.f};
+				for (int i = 0; i < 4; i++) {
+					GainLevelItem *gain_item = new GainLevelItem;
+					gain_item->text = gain_titles[i];
+					gain_item->rightText = CHECKMARK(module->gig_fader.getGain() == gain_amounts[i]);
+					gain_item->module = module;
+					gain_item->gain = gain_amounts[i];
+					menu->addChild(gain_item);
+				}
+				return menu;
+			}
+		};
+
 		struct ThemeItem : MenuItem {
 			GigBus* module;
 			int theme;
 			void onAction(const event::Action& e) override {
 				module->color_theme = theme;
-			}
-		};
-
-		struct GainItem : MenuItem {
-			GigBus* module;
-			float gain;
-			void onAction(const event::Action& e) override {
-				module->gig_fader.setGain(gain);
 			}
 		};
 
@@ -256,7 +404,28 @@ struct GigBusWidget : ModuleWidget {
 			}
 		};
 
-		// color theme
+		// fade automation
+		menu->addChild(new MenuEntry);
+		menu->addChild(createMenuLabel("Fade Automation"));
+
+		FadeSliderItem *fadeInSliderItem = new FadeSliderItem(&(module->fade_in), "In");
+		fadeInSliderItem->box.size.x = 190.f;
+		menu->addChild(fadeInSliderItem);
+
+		FadeSliderItem *fadeOutSliderItem = new FadeSliderItem(&(module->fade_out), "Out");
+		fadeOutSliderItem->box.size.x = 190.f;
+		menu->addChild(fadeOutSliderItem);
+
+		// mixer settings
+		menu->addChild(new MenuEntry);
+		menu->addChild(createMenuLabel("Mixer Settings"));
+
+		GainsItem *gainsItem = createMenuItem<GainsItem>("Preamps on L/M/P/R Inputs");
+		gainsItem->rightText = RIGHT_ARROW;
+		gainsItem->module = module;
+		menu->addChild(gainsItem);
+
+		// panel themes
 		menu->addChild(new MenuEntry);
 		menu->addChild(createMenuLabel("Panel Theme"));
 
@@ -267,19 +436,6 @@ struct GigBusWidget : ModuleWidget {
 			themeItem->module = module;
 			themeItem->theme = i;
 			menu->addChild(themeItem);
-		}
-
-		menu->addChild(new MenuEntry);
-		menu->addChild(createMenuLabel("Preamp on L/M/P/R Inputs"));
-
-		std::string gainTitles[3] = {"No gain (default)", "2x gain", "4x gain"};
-		float gainAmounts[3] = {1.f, 2.f, 4.f};
-		for (int i = 0; i < 3; i++) {
-			GainItem* gainItem = createMenuItem<GainItem>(gainTitles[i]);
-			gainItem->rightText = CHECKMARK(module->gig_fader.getGain() == gainAmounts[i]);
-			gainItem->module = module;
-			gainItem->gain = gainAmounts[i];
-			menu->addChild(gainItem);
 		}
 
 		menu->addChild(new MenuEntry);
