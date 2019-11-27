@@ -31,7 +31,7 @@ struct MetroCityBus : Module {
 		NUM_OUTPUTS
 	};
 	enum LightIds {
-		ON_LIGHT,
+		ENUMS(ON_LIGHT, 2),
 		ENUMS(PAN_LIGHTS, 9),
 		REVERSE_LIGHT,
 		BLUE_POST_LIGHT,
@@ -39,21 +39,26 @@ struct MetroCityBus : Module {
 		NUM_LIGHTS
 	};
 
-	dsp::SchmittTrigger on_trigger;
+	LongPressButton on_button;
 	dsp::SchmittTrigger on_cv_trigger;
 	dsp::SchmittTrigger reverse_poly_trigger;
 	dsp::SchmittTrigger blue_post_trigger;
 	dsp::SchmittTrigger orange_post_trigger;
 	dsp::ClockDivider pan_divider;
+	dsp::ClockDivider pan_light_divider;
 	dsp::ClockDivider light_divider;
 	AutoFader metro_fader;
 	ConstantPan metro_pan[16];
 	SimpleSlewer level_smoother[3];
 	SimpleSlewer post_btn_filters[2];
 
-	const int fade_speed = 26;   // milliseconds from 0 to gain
+	const int bypass_speed = 26;   // milliseconds from 0 to gain
 	const int smooth_speed = 86;   // milliseconds from full left to full right
 	const int level_speed = 26;
+	float fade_in = 26.f;
+	float fade_out = 26.f;
+	bool auto_override = false;
+	bool auditioned = false;
 	float pan_history[HISTORY_CAP] = {};
 	long hist_i = 0;
 	long hist_size = 0;
@@ -82,8 +87,9 @@ struct MetroCityBus : Module {
 		configParam(BLUE_POST_PARAM, 0.f, 1.f, 0.f, "Post red fader send");
 		configParam(ORANGE_POST_PARAM, 0.f, 1.f, 0.f, "Post red fader send");
 		pan_divider.setDivision(pan_division);
-		light_divider.setDivision(64);
-		metro_fader.setSpeed(fade_speed);
+		pan_light_divider.setDivision(499);
+		light_divider.setDivision(512);
+		metro_fader.setSpeed(fade_in);
 		initializePanObjects();
 		for (int i = 0; i < 3; i++) {
 			level_smoother[i].setSlewSpeed(level_speed);
@@ -98,8 +104,52 @@ struct MetroCityBus : Module {
 	}
 
 	void process(const ProcessArgs &args) override {
-		// on off button controls auto fader to avoid pops
-		if (on_trigger.process(params[ON_PARAM].getValue()) + on_cv_trigger.process(inputs[ON_CV_INPUT].getVoltage())) {
+
+		// on off button
+		switch (on_button.step(params[ON_PARAM])) {
+		default:
+		case LongPressButton::NO_PRESS:
+			break;
+		case LongPressButton::SHORT_PRESS:
+			if (audition_mixer) {
+				audition_mixer = false;   // single click turns off auditions
+			} else {
+				if ((APP->window->getMods() & RACK_MOD_MASK) == RACK_MOD_CTRL) {   // bypass fades with ctrl click
+					auto_override = true;
+					metro_fader.setSpeed(bypass_speed);
+
+					// bypass the fade even if the fade is already underway
+					if (metro_fader.on) {
+						metro_fader.on = (metro_fader.getFade() != metro_fader.getGain());
+					} else {
+						metro_fader.on = (metro_fader.getFade() == 0.f);
+					}
+
+				} else {   // normal single click
+					auto_override = false;   // do not override automation
+					metro_fader.on = !metro_fader.on;
+					if (metro_fader.on) {
+						metro_fader.setSpeed(int(fade_in));
+					} else {
+						metro_fader.setSpeed(int(fade_out));
+					}
+				}
+			}
+			break;
+		case LongPressButton::LONG_PRESS:   // long press to audition
+
+			audition_mixer = true;   // all mixers to audition mode
+			auditioned = true;
+
+			if (!metro_fader.on) {
+				metro_fader.temped = !metro_fader.temped;   // remember if auditioned mixer is off
+			}
+			break;
+		}
+
+		// process cv trigger
+		if (on_cv_trigger.process(inputs[ON_CV_INPUT].getVoltage())) {
+			auto_override = false;   // do not override automation
 			metro_fader.on = !metro_fader.on;
 		}
 
@@ -111,6 +161,78 @@ struct MetroCityBus : Module {
 		// post fader send buttons
 		if (blue_post_trigger.process(params[BLUE_POST_PARAM].getValue())) post_fades[0] = !post_fades[0];
 		if (orange_post_trigger.process(params[ORANGE_POST_PARAM].getValue())) post_fades[1] = !post_fades[1];
+
+		if (light_divider.process()) {
+
+			if (audition_mixer) {   // all mixers are in audition state
+
+				// bypass all fade automation
+				auto_override = true;
+				metro_fader.setSpeed(bypass_speed);
+
+				if (auditioned) {   // this mixer is being auditioned
+					metro_fader.on =  true;
+				} else {   // mute the mixers
+					if (metro_fader.on) {
+						metro_fader.temped = true;   // remember this mixer was on
+					}
+					metro_fader.on = false;
+				}
+			} else {   // stop auditions
+
+				// return to states before auditions
+				if (metro_fader.temped) {
+					metro_fader.temped = false;
+					auto_override = true;
+					metro_fader.setSpeed(bypass_speed);
+					if (auditioned) {
+						metro_fader.on = false;
+					} else {
+						metro_fader.on = true;
+					}
+				}
+
+				// turn off auditions
+				auditioned = false;
+			}
+
+			// process fade speed changes if dragging slider
+			if (!auto_override) {
+				if (metro_fader.on) {
+					if (int(fade_in) != metro_fader.getFade()) {
+						metro_fader.setSpeed(int(fade_in));
+					}
+				} else {
+					if (int(fade_out) != metro_fader.getFade()) {
+						metro_fader.setSpeed(int(fade_out));
+					}
+				}
+			}
+
+			// set on light
+			if (metro_fader.getFade() == metro_fader.getGain()) {
+				if (audition_mixer) {
+					lights[ON_LIGHT + 0].value = 1.f;   // yellow when auditioned
+					lights[ON_LIGHT + 1].value = 1.f;
+				} else {
+					lights[ON_LIGHT + 0].value = 1.f;   // green light when on
+					lights[ON_LIGHT + 1].value = 0.f;
+				}
+			} else {
+				if (metro_fader.temped) {
+					lights[ON_LIGHT + 0].value = 0.f;   // red when temporarily muted
+					lights[ON_LIGHT + 1].value = 1.f;
+				} else {
+					lights[ON_LIGHT + 0].value = metro_fader.getFade();  // yellow dimmer when fading
+					lights[ON_LIGHT + 1].value = metro_fader.getFade() * 0.5f;
+				}
+			}
+
+			// other button light states
+			lights[REVERSE_LIGHT].value = reverse_poly;
+			lights[BLUE_POST_LIGHT].value = post_fades[0];
+			lights[ORANGE_POST_LIGHT].value = post_fades[1];
+		}
 
 		// get level knobs
 		float in_levels[3] = {0.f, 0.f, 0.f};
@@ -238,49 +360,44 @@ struct MetroCityBus : Module {
 		outputs[BUS_OUTPUT].setChannels(6);
 
 		// set lights
-		if (light_divider.process()) {   // set lights infrequently
+		if (pan_light_divider.process()) {   // set lights infrequently
 
-			// button light states
-			lights[ON_LIGHT].value = metro_fader.getFade();
-			lights[REVERSE_LIGHT].value = reverse_poly;
-			lights[BLUE_POST_LIGHT].value = post_fades[0];
-			lights[ORANGE_POST_LIGHT].value = post_fades[1];
-
-			if (metro_fader.on) {   // only process pan lights if input is on
-				for (int c = 0; c < channel_no; c++) {
-					for (int l = 0; l < 9; l++) {
-						float light_pos = (l * light_delta) - 1 - (light_delta / 2.f);
-
-						// roll back lights when out of bounds
-						if (light_pan[c] > 1) {
-							light_pan[c] = 1.f - (light_pan[c] - 1.f);
-						} else {
-							if (light_pan[c] < -1) {
-								light_pan[c] = std::abs(light_pan[c] + 1.f) + -1.f;
-							}
-						}
-
-						// set initial pan light brightness
-						if (light_pan[c] >= light_pos && light_pan[c] < light_pos + light_delta) {
-							int flipper = c;   // used to flip lights when reverse channel button is on
-							if (reverse_poly) flipper = channel_no - 1 - c;   // channel flipping for reverse poly
-							if (inputs[POLY_INPUT].getVoltage(flipper) * 0.1f > light_brights[l]) {
-								light_brights[l] = inputs[POLY_INPUT].getVoltage(flipper) * 0.12f; 
-							} else {
-								if (light_brights[l] < 0.12f) light_brights[l] = 0.12f;   // light visible for quiet channel
-							}
-						}
-					}   // for l lights
-				}   // for c channels
-
-				// process changes to pan light brightness
+			for (int c = 0; c < channel_no; c++) {
 				for (int l = 0; l < 9; l++) {
-					if (light_brights[l] > 0) {
-						lights[PAN_LIGHTS + l].value = light_brights[l];
-						light_brights[l] -= 1000 / args.sampleRate;
+					float light_pos = (l * light_delta) - 1 - (light_delta / 2.f);
+
+					// roll back lights when out of bounds
+					if (light_pan[c] > 1) {
+						light_pan[c] = 1.f - (light_pan[c] - 1.f);
+					} else {
+						if (light_pan[c] < -1) {
+							light_pan[c] = std::abs(light_pan[c] + 1.f) + -1.f;
+						}
 					}
+
+					// set initial pan light brightness
+					if (light_pan[c] >= light_pos && light_pan[c] < light_pos + light_delta) {
+						int flipper = c;   // used to flip lights when reverse channel button is on
+						if (reverse_poly) flipper = channel_no - 1 - c;   // channel flipping for reverse poly
+						if (inputs[POLY_INPUT].getVoltage(flipper) * 0.075f > light_brights[l]) {
+							light_brights[l] = inputs[POLY_INPUT].getVoltage(flipper) * 0.5f;
+						} else {
+							if (light_brights[l] < 0.15f) light_brights[l] = 0.15f;   // light visible for quiet channel
+						}
+					}
+				}   // for l lights
+			}   // for c channels
+
+			// process changes to pan light brightness
+			for (int l = 0; l < 9; l++) {
+				if (light_brights[l] > 0) {
+					lights[PAN_LIGHTS + l].value = light_brights[l];
+					light_brights[l] -= 1000 / args.sampleRate;
 				}
-			} else {   // turn off pan lights if input is off
+			}
+
+			// turn off pan lights if input is off
+			if (metro_fader.getFade() == 0.f) {
 				for (int l = 0; l < 9; l++) lights[PAN_LIGHTS + l].value = 0;
 			}
 		}   // light divider
@@ -295,6 +412,10 @@ struct MetroCityBus : Module {
 		json_object_set_new(rootJ, "orange_post_fade", json_integer(post_fades[1]));
 		json_object_set_new(rootJ, "gain", json_real(metro_fader.getGain()));
 		json_object_set_new(rootJ, "level_cv_filter", json_integer(level_cv_filter));
+		json_object_set_new(rootJ, "fade_in", json_real(fade_in));
+		json_object_set_new(rootJ, "fade_out", json_real(fade_out));
+		json_object_set_new(rootJ, "auditioned", json_integer(auditioned));
+		json_object_set_new(rootJ, "temped", json_integer(metro_fader.temped));
 		json_object_set_new(rootJ, "color_theme", json_integer(color_theme));
 		return rootJ;
 	}
@@ -317,13 +438,28 @@ struct MetroCityBus : Module {
 		} else {
 			if (input_onJ) level_cv_filter = false;   // do not change existing patches
 		}
+		json_t *fade_inJ = json_object_get(rootJ, "fade_in");
+		if (fade_inJ) fade_in = json_real_value(fade_inJ);
+		json_t *fade_outJ = json_object_get(rootJ, "fade_out");
+		if (fade_outJ) fade_out = json_real_value(fade_outJ);
+		json_t *auditionedJ = json_object_get(rootJ, "auditioned");
+		if (auditionedJ) {
+			auditioned = json_integer_value(auditionedJ);
+			if (!audition_mixer) audition_mixer = auditioned;   // if just one mixer is auditioned
+		}
+		json_t *tempedJ = json_object_get(rootJ, "temped");
+		if (tempedJ) metro_fader.temped = json_integer_value(tempedJ);
 		json_t *color_themeJ = json_object_get(rootJ, "color_theme");
 		if (color_themeJ) color_theme = json_integer_value(color_themeJ);
 	}
 
 	// recalculate fader, pan smoothing, and pan_rate (used by pan follow)
 	void onSampleRateChange() override {
-		metro_fader.setSpeed(fade_speed);
+		if (metro_fader.on) {
+			metro_fader.setSpeed(fade_in);
+		} else {
+			metro_fader.setSpeed(fade_out);
+		}
 		for (int i = 0; i < 16; i++) {
 			metro_pan[i].setSmoothSpeed(smooth_speed);
 		}
@@ -340,6 +476,8 @@ struct MetroCityBus : Module {
 	void onReset() override {
 		metro_fader.on = true;
 		metro_fader.setGain(1.f);
+		fade_in = 26.f;
+		fade_out = 26.f;
 		reverse_poly = false;
 		post_fades[0] = loadGtgPluginDefault("default_post_fader", 0);
 		post_fades[1] = post_fades[0];
@@ -381,7 +519,7 @@ struct MetroCityBusWidget : ModuleWidget {
 		addChild(createThemedWidget<gtgScrewUp>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), module ? &module->color_theme : NULL));
 
 		addParam(createThemedParamCentered<gtgBlackButton>(mm2px(Vec(20.32, 15.20)), module, MetroCityBus::ON_PARAM, module ? &module->color_theme : NULL));
-		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(20.32, 15.20)), module, MetroCityBus::ON_LIGHT));
+		addChild(createLightCentered<MediumLight<GreenRedLight>>(mm2px(Vec(20.32, 15.20)), module, MetroCityBus::ON_LIGHT));
 		addParam(createThemedParamCentered<gtgGrayTinyKnob>(mm2px(Vec(11.379, 39.74)), module, MetroCityBus::SPREAD_PARAM, module ? &module->color_theme : NULL));
 		addParam(createThemedParamCentered<gtgGrayTinyKnob>(mm2px(Vec(29.06, 39.74)), module, MetroCityBus::PAN_ATT_PARAM, module ? &module->color_theme : NULL));
 		addParam(createThemedParamCentered<gtgBlackButton>(mm2px(Vec(6.95, 50.01)), module, MetroCityBus::REVERSE_PARAM, module ? &module->color_theme : NULL));
@@ -420,15 +558,7 @@ struct MetroCityBusWidget : ModuleWidget {
 	void appendContextMenu(Menu* menu) override {
 		MetroCityBus* module = dynamic_cast<MetroCityBus*>(this->module);
 
-		struct ThemeItem : MenuItem {
-			MetroCityBus* module;
-			int theme;
-			void onAction(const event::Action& e) override {
-				module->color_theme = theme;
-			}
-		};
-
-		struct GainItem : MenuItem {
+		struct GainLevelItem : MenuItem {
 			MetroCityBus* module;
 			float gain;
 			void onAction(const event::Action& e) override {
@@ -436,10 +566,55 @@ struct MetroCityBusWidget : ModuleWidget {
 			}
 		};
 
-		struct LevelCvFilterItem : MenuItem {
+		struct GainsItem : MenuItem {
+			MetroCityBus *module;
+			Menu *createChildMenu() override {
+				Menu *menu = new Menu;
+				std::string gain_titles[4] = {"No gain (default)", "2x gain", "4x gain", "6x gain"};
+				float gain_amounts[4] = {1.f, 2.f, 4.f, 6.f};
+				for (int i = 0; i < 4; i++) {
+					GainLevelItem *gain_item = new GainLevelItem;
+					gain_item->text = gain_titles[i];
+					gain_item->rightText = CHECKMARK(module->metro_fader.getGain() == gain_amounts[i]);
+					gain_item->module = module;
+					gain_item->gain = gain_amounts[i];
+					menu->addChild(gain_item);
+				}
+				return menu;
+			}
+		};
+
+		struct LevelCvItem : MenuItem {
+			MetroCityBus *module;
+			int cv_filter;
+			void onAction(const event::Action &e) override {
+				module->level_cv_filter = cv_filter;
+			}
+		};
+
+		struct LevelCvFiltersItem : MenuItem {
+			MetroCityBus *module;
+			Menu *createChildMenu() override {
+				Menu *menu = new Menu;
+				std::string filter_titles[2] = {"No filter", "Smoothing (default)"};
+				int cv_filter_mode[2] = {0, 1};
+				for (int i = 0; i < 2; i++) {
+					LevelCvItem *cv_filter_item = new LevelCvItem;
+					cv_filter_item->text = filter_titles[i];
+					cv_filter_item->rightText = CHECKMARK(module->level_cv_filter == cv_filter_mode[i]);
+					cv_filter_item->module = module;
+					cv_filter_item->cv_filter = cv_filter_mode[i];
+					menu->addChild(cv_filter_item);
+				}
+				return menu;
+			}
+		};
+
+		struct ThemeItem : MenuItem {
 			MetroCityBus* module;
+			int theme;
 			void onAction(const event::Action& e) override {
-				module->level_cv_filter = !module->level_cv_filter;
+				module->color_theme = theme;
 			}
 		};
 
@@ -458,6 +633,30 @@ struct MetroCityBusWidget : ModuleWidget {
 		};
 
 		menu->addChild(new MenuEntry);
+		menu->addChild(createMenuLabel("Fade Automation"));
+
+		FadeSliderItem *fadeInSliderItem = new FadeSliderItem(&(module->fade_in), "In");
+		fadeInSliderItem->box.size.x = 190.f;
+		menu->addChild(fadeInSliderItem);
+
+		FadeSliderItem *fadeOutSliderItem = new FadeSliderItem(&(module->fade_out), "Out");
+		fadeOutSliderItem->box.size.x = 190.f;
+		menu->addChild(fadeOutSliderItem);
+
+		menu->addChild(new MenuEntry);
+		menu->addChild(createMenuLabel("Mixer Settings"));
+
+		GainsItem *gainsItem = createMenuItem<GainsItem>("Preamp on Polyphonic Input");
+		gainsItem->rightText = RIGHT_ARROW;
+		gainsItem->module = module;
+		menu->addChild(gainsItem);
+
+		LevelCvFiltersItem *levelCvFiltersItem = createMenuItem<LevelCvFiltersItem>("Level CV Filters");
+		levelCvFiltersItem->rightText = RIGHT_ARROW;
+		levelCvFiltersItem->module = module;
+		menu->addChild(levelCvFiltersItem);
+
+		menu->addChild(new MenuEntry);
 		menu->addChild(createMenuLabel("Panel Theme"));
 
 		std::string themeTitles[2] = {"70's Cream", "Night Ride"};
@@ -468,28 +667,6 @@ struct MetroCityBusWidget : ModuleWidget {
 			themeItem->theme = i;
 			menu->addChild(themeItem);
 		}
-
-		menu->addChild(new MenuEntry);
-		menu->addChild(createMenuLabel("Preamp on Polyphonic Input"));
-
-		std::string gainTitles[3] = {"No gain (default)", "2x gain", "4x gain"};
-		float gainAmounts[3] = {1.f, 2.f, 4.f};
-		for (int i = 0; i < 3; i++) {
-			GainItem* gainItem = createMenuItem<GainItem>(gainTitles[i]);
-			gainItem->rightText = CHECKMARK(module->metro_fader.getGain() == gainAmounts[i]);
-			gainItem->module = module;
-			gainItem->gain = gainAmounts[i];
-			menu->addChild(gainItem);
-		}
-
-		// CV filters
-		menu->addChild(new MenuEntry);
-		menu->addChild(createMenuLabel("CV Input Filters"));
-
-		LevelCvFilterItem* levelCvFilterItem = createMenuItem<LevelCvFilterItem>("Smoothing on level CVs");
-		levelCvFilterItem->rightText = CHECKMARK(module->level_cv_filter);
-		levelCvFilterItem->module = module;
-		menu->addChild(levelCvFilterItem);
 
 		menu->addChild(new MenuEntry);
 		menu->addChild(createMenuLabel("All Modular Bus Mixers"));
