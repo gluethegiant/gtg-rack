@@ -128,6 +128,46 @@ void saveGtgPluginDefault(const char* setting, int value);
 
 int loadGtgPluginDefault(const char* setting, int default_value);
 
+// menu helpers
+
+// fade duration for fade slider menu item
+struct FadeDuration : Quantity {
+	float *srcFadeRate = NULL;
+	std::string label = "";
+
+	FadeDuration(float *_srcFadeRate, std::string fade_label) {
+		srcFadeRate = _srcFadeRate;
+		label = fade_label;
+	}
+	void setValue(float value) override {
+		*srcFadeRate = math::clamp(value, getMinValue(), getMaxValue());
+	}
+	float getValue() override {
+		return *srcFadeRate;
+	}
+	float getMinValue() override {return 26.0f;}
+	float getMaxValue() override {return 34000.0f;}
+	float getDefaultValue() override {return 26.0f;}
+	float getDisplayValue() override {return getValue() / 1000;}
+	std::string getDisplayValueString() override {
+		float value = getDisplayValue();
+		return string::f("%.1f", value);
+	}
+	void setDisplayValue(float displayValue) override {setValue(displayValue);}
+	std::string getLabel() override {return label;}
+	std::string getUnit() override {return " sec";}
+};
+
+// fade automation sliders
+struct FadeSliderItem : ui::Slider {
+	FadeSliderItem(float *fade_rate, std::string fade_label) {
+		quantity = new FadeDuration(fade_rate, fade_label);
+	}
+	~FadeSliderItem() {
+		delete quantity;
+	}
+};
+
 // custom components
 struct gtgBlackButton : ThemedSvgSwitch {
 	gtgBlackButton() {
