@@ -27,25 +27,30 @@ struct SchoolBus : Module {
 		NUM_OUTPUTS
 	};
 	enum LightIds {
-		ON_LIGHT,
+		ENUMS(ON_LIGHT, 2),   // single red and green light
 		BLUE_POST_LIGHT,
 		ORANGE_POST_LIGHT,
 		NUM_LIGHTS
 	};
 
-	dsp::SchmittTrigger on_trigger;
+	LongPressButton on_button;
 	dsp::SchmittTrigger on_cv_trigger;
 	dsp::SchmittTrigger blue_post_trigger;
 	dsp::SchmittTrigger orange_post_trigger;
 	dsp::ClockDivider pan_divider;
+	dsp::ClockDivider light_divider;
 	AutoFader school_fader;
 	ConstantPan school_pan;
 	SimpleSlewer level_smoother[3];
 	SimpleSlewer post_btn_filters[2];
 
-	const int fade_speed = 26;
+	const int bypass_speed = 26;
 	const int pan_speed = 52;   // milliseconds from left to right
 	const int level_speed = 26;   // for level cv filter
+	float fade_in = 26.f;
+	float fade_out = 26.f;
+	bool auto_override = false;
+	bool auditioned = false;
 	bool post_fades[2] = {false, false};
 	bool pan_cv_filter = true;
 	bool level_cv_filter = true;
@@ -62,7 +67,8 @@ struct SchoolBus : Module {
 		configParam(BLUE_POST_PARAM, 0.f, 1.f, 0.f, "Post red fader send");
 		configParam(ORANGE_POST_PARAM, 0.f, 1.f, 0.f, "Post red fader send");
 		pan_divider.setDivision(3);
-		school_fader.setSpeed(fade_speed);
+		light_divider.setDivision(512);
+		school_fader.setSpeed(fade_in);
 		school_pan.setSmoothSpeed(pan_speed);
 		for (int i = 0; i < 3; i++) {
 			level_smoother[i].setSlewSpeed(level_speed);
@@ -78,8 +84,51 @@ struct SchoolBus : Module {
 
 	void process(const ProcessArgs &args) override {
 
-		// on off button uses auto fader to filter pops
-		if (on_trigger.process(params[ON_PARAM].getValue()) + on_cv_trigger.process(inputs[ON_CV_INPUT].getVoltage())) {
+		// on off button
+		switch (on_button.step(params[ON_PARAM])) {
+		default:
+		case LongPressButton::NO_PRESS:
+			break;
+		case LongPressButton::SHORT_PRESS:
+			if (audition_mixer) {
+				audition_mixer = false;   // single click turns off auditions
+			} else {
+				if ((APP->window->getMods() & RACK_MOD_MASK) == RACK_MOD_CTRL) {   // bypass fades with ctrl click
+					auto_override = true;
+					school_fader.setSpeed(bypass_speed);
+
+					// bypass the fade even if the fade is already underway
+					if (school_fader.on) {
+						school_fader.on = (school_fader.getFade() != school_fader.getGain());
+					} else {
+						school_fader.on = (school_fader.getFade() == 0.f);
+					}
+
+				} else {   // normal single click
+					auto_override = false;   // do not override automation
+					school_fader.on = !school_fader.on;
+					if (school_fader.on) {
+						school_fader.setSpeed(int(fade_in));
+					} else {
+						school_fader.setSpeed(int(fade_out));
+					}
+				}
+			}
+			break;
+		case LongPressButton::LONG_PRESS:   // long press to audition
+
+			audition_mixer = true;   // all mixers to audition mode
+			auditioned = true;
+
+			if (!school_fader.on) {
+				school_fader.temped = !school_fader.temped;   // remember if auditioned mixer is off
+			}
+			break;
+		}
+
+		// process cv trigger
+		if (on_cv_trigger.process(inputs[ON_CV_INPUT].getVoltage())) {
+			auto_override = false;   // do not override automation
 			school_fader.on = !school_fader.on;
 		}
 
@@ -88,6 +137,77 @@ struct SchoolBus : Module {
 		// post fader send buttons
 		if (blue_post_trigger.process(params[BLUE_POST_PARAM].getValue())) post_fades[0] = !post_fades[0];
 		if (orange_post_trigger.process(params[ORANGE_POST_PARAM].getValue())) post_fades[1] = !post_fades[1];
+
+		// process fade states and light
+		if (light_divider.process()) {
+
+			if (audition_mixer) {   // all mixers are in audition state
+
+				// bypass all fade automation
+				auto_override = true;
+				school_fader.setSpeed(bypass_speed);
+
+				if (auditioned) {   // this mixer is being auditioned
+					school_fader.on =  true;
+				} else {   // mute the mixers
+					if (school_fader.on) {
+						school_fader.temped = true;   // remember this mixer was on
+					}
+					school_fader.on = false;
+				}
+			} else {   // stop auditions
+
+				// return to states before auditions
+				if (school_fader.temped) {
+					school_fader.temped = false;
+					auto_override = true;
+					school_fader.setSpeed(bypass_speed);
+					if (auditioned) {
+						school_fader.on = false;
+					} else {
+						school_fader.on = true;
+					}
+				}
+
+				// turn off auditions
+				auditioned = false;
+			}
+
+			// process fade speed changes if dragging slider
+			if (!auto_override) {
+				if (school_fader.on) {
+					if (int(fade_in) != school_fader.getFade()) {
+						school_fader.setSpeed(int(fade_in));
+					}
+				} else {
+					if (int(fade_out) != school_fader.getFade()) {
+						school_fader.setSpeed(int(fade_out));
+					}
+				}
+			}
+
+			// set lights
+			lights[BLUE_POST_LIGHT].value = post_fades[0];
+			lights[ORANGE_POST_LIGHT].value = post_fades[1];
+
+			if (school_fader.getFade() == school_fader.getGain()) {
+				if (audition_mixer) {
+					lights[ON_LIGHT + 0].value = 1.f;   // yellow when auditioned
+					lights[ON_LIGHT + 1].value = 1.f;
+				} else {
+					lights[ON_LIGHT + 0].value = 1.f;   // green light when on
+					lights[ON_LIGHT + 1].value = 0.f;
+				}
+			} else {
+				if (school_fader.temped) {
+					lights[ON_LIGHT + 0].value = 0.f;   // red when temporarily muted
+					lights[ON_LIGHT + 1].value = 1.f;
+				} else {
+					lights[ON_LIGHT + 0].value = school_fader.getFade();  // yellow dimmer when fading
+					lights[ON_LIGHT + 1].value = school_fader.getFade() * 0.5f;
+				}
+			}
+		}
 
 		// get input levels
 		float in_levels[3] = {0.f, 0.f, 0.f};
@@ -111,7 +231,7 @@ struct SchoolBus : Module {
 			}
 		}
 
-		// get stereo pan levels and set lights
+		// get stereo pan levels
 		if (pan_divider.process()) {   // calculate pan infrequently, useful for auto panning
 			if (inputs[PAN_CV_INPUT].isConnected()) {
 				float pan_pos = params[PAN_PARAM].getValue() + (((inputs[PAN_CV_INPUT].getNormalVoltage(0) * 2) * params[PAN_ATT_PARAM].getValue()) * 0.1);
@@ -123,10 +243,6 @@ struct SchoolBus : Module {
 			} else {
 				school_pan.setPan(params[PAN_PARAM].getValue());
 			}
-
-			lights[ON_LIGHT].value = school_fader.getFade();   // sets lights less frequently
-			lights[BLUE_POST_LIGHT].value = post_fades[0];
-			lights[ORANGE_POST_LIGHT].value = post_fades[1];
 		}
 
 		// process inputs
@@ -162,6 +278,10 @@ struct SchoolBus : Module {
 		json_object_set_new(rootJ, "gain", json_real(school_fader.getGain()));
 		json_object_set_new(rootJ, "pan_cv_filter", json_integer(pan_cv_filter));
 		json_object_set_new(rootJ, "level_cv_filter", json_integer(level_cv_filter));
+		json_object_set_new(rootJ, "fade_in", json_real(fade_in));
+		json_object_set_new(rootJ, "fade_out", json_real(fade_out));
+		json_object_set_new(rootJ, "auditioned", json_integer(auditioned));
+		json_object_set_new(rootJ, "temped", json_integer(school_fader.temped));
 		json_object_set_new(rootJ, "color_theme", json_integer(color_theme));
 		return rootJ;
 	}
@@ -188,13 +308,28 @@ struct SchoolBus : Module {
 		} else {
 			if (input_onJ) level_cv_filter = false;   // do not change existing patches
 		}
+		json_t *fade_inJ = json_object_get(rootJ, "fade_in");
+		if (fade_inJ) fade_in = json_real_value(fade_inJ);
+		json_t *fade_outJ = json_object_get(rootJ, "fade_out");
+		if (fade_outJ) fade_out = json_real_value(fade_outJ);
+		json_t *auditionedJ = json_object_get(rootJ, "auditioned");
+		if (auditionedJ) {
+			auditioned = json_integer_value(auditionedJ);
+			if (!audition_mixer) audition_mixer = auditioned;
+		}
+		json_t *tempedJ = json_object_get(rootJ, "temped");
+		if (tempedJ) school_fader.temped = json_integer_value(tempedJ);
 		json_t *color_themeJ = json_object_get(rootJ, "color_theme");
 		if (color_themeJ) color_theme = json_integer_value(color_themeJ);
 	}
 
 	// reset fader speed on sample rate change
 	void onSampleRateChange() override {
-		school_fader.setSpeed(fade_speed);
+		if (school_fader.on) {
+			school_fader.setSpeed(fade_in);
+		} else {
+			school_fader.setSpeed(fade_out);
+		}
 		school_pan.setSmoothSpeed(pan_speed);
 		for (int i = 0; i < 3; i++) {
 			level_smoother[i].setSlewSpeed(level_speed);
@@ -208,6 +343,8 @@ struct SchoolBus : Module {
 	void onReset() override {
 		school_fader.on = true;
 		school_fader.setGain(1.f);
+		fade_in = 26.f;
+		fade_out = 26.f;
 		post_fades[0] = loadGtgPluginDefault("default_post_fader", 0);
 		post_fades[1] = post_fades[0];
 		pan_cv_filter = true;
@@ -237,7 +374,7 @@ struct SchoolBusWidget : ModuleWidget {
 		addChild(createThemedWidget<gtgScrewUp>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), module ? &module->color_theme : NULL));
 
 		addParam(createThemedParamCentered<gtgBlackButton>(mm2px(Vec(15.24, 15.20)), module, SchoolBus::ON_PARAM, module ? &module->color_theme : NULL));
-		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(15.24, 15.20)), module, SchoolBus::ON_LIGHT));
+		addChild(createLightCentered<MediumLight<GreenRedLight>>(mm2px(Vec(15.24, 15.20)), module, SchoolBus::ON_LIGHT));
 		addParam(createThemedParamCentered<gtgGrayTinyKnob>(mm2px(Vec(15.24, 25.9)), module, SchoolBus::PAN_ATT_PARAM, module ? &module->color_theme : NULL));
 		addParam(createThemedParamCentered<gtgGrayKnob>(mm2px(Vec(15.24, 43.0)), module, SchoolBus::PAN_PARAM, module ? &module->color_theme : NULL));
 		addParam(createThemedParamCentered<gtgBlueKnob>(mm2px(Vec(15.24, 61.0)), module, SchoolBus::LEVEL_PARAMS + 0, module ? &module->color_theme : NULL));
@@ -264,15 +401,7 @@ struct SchoolBusWidget : ModuleWidget {
 	void appendContextMenu(Menu* menu) override {
 		SchoolBus* module = dynamic_cast<SchoolBus*>(this->module);
 
-		struct ThemeItem : MenuItem {
-			SchoolBus* module;
-			int theme;
-			void onAction(const event::Action& e) override {
-				module->color_theme = theme;
-			}
-		};
-
-		struct GainItem : MenuItem {
+		struct GainLevelItem : MenuItem {
 			SchoolBus* module;
 			float gain;
 			void onAction(const event::Action& e) override {
@@ -280,17 +409,81 @@ struct SchoolBusWidget : ModuleWidget {
 			}
 		};
 
-		struct PanCvFilterItem : MenuItem {
-			SchoolBus* module;
-			void onAction(const event::Action& e) override {
-				module->pan_cv_filter = !module->pan_cv_filter;
+		struct GainsItem : MenuItem {
+			SchoolBus *module;
+			Menu *createChildMenu() override {
+				Menu *menu = new Menu;
+				std::string gain_titles[4] = {"No gain (default)", "2x gain", "4x gain", "6x gain"};
+				float gain_amounts[4] = {1.f, 2.f, 4.f, 6.f};
+				for (int i = 0; i < 4; i++) {
+					GainLevelItem *gain_item = new GainLevelItem;
+					gain_item->text = gain_titles[i];
+					gain_item->rightText = CHECKMARK(module->school_fader.getGain() == gain_amounts[i]);
+					gain_item->module = module;
+					gain_item->gain = gain_amounts[i];
+					menu->addChild(gain_item);
+				}
+				return menu;
 			}
 		};
 
-		struct LevelCvFilterItem : MenuItem {
+		struct PanCvItem : MenuItem {
+			SchoolBus *module;
+			int cv_filter;
+			void onAction(const event::Action &e) override {
+				module->pan_cv_filter = cv_filter;
+			}
+		};
+
+		struct PanCvFiltersItem : MenuItem {
+			SchoolBus *module;
+			Menu *createChildMenu() override {
+				Menu *menu = new Menu;
+				std::string filter_titles[2] = {"No filter", "Smoothing (default)"};
+				int cv_filter_mode[2] = {0, 1};
+				for (int i = 0; i < 2; i++) {
+					PanCvItem *cv_filter_item = new PanCvItem;
+					cv_filter_item->text = filter_titles[i];
+					cv_filter_item->rightText = CHECKMARK(module->pan_cv_filter == cv_filter_mode[i]);
+					cv_filter_item->module = module;
+					cv_filter_item->cv_filter = cv_filter_mode[i];
+					menu->addChild(cv_filter_item);
+				}
+				return menu;
+			}
+		};
+
+		struct LevelCvItem : MenuItem {
+			SchoolBus *module;
+			int cv_filter;
+			void onAction(const event::Action &e) override {
+				module->level_cv_filter = cv_filter;
+			}
+		};
+
+		struct LevelCvFiltersItem : MenuItem {
+			SchoolBus *module;
+			Menu *createChildMenu() override {
+				Menu *menu = new Menu;
+				std::string filter_titles[2] = {"No filter", "Smoothing (default)"};
+				int cv_filter_mode[2] = {0, 1};
+				for (int i = 0; i < 2; i++) {
+					LevelCvItem *cv_filter_item = new LevelCvItem;
+					cv_filter_item->text = filter_titles[i];
+					cv_filter_item->rightText = CHECKMARK(module->level_cv_filter == cv_filter_mode[i]);
+					cv_filter_item->module = module;
+					cv_filter_item->cv_filter = cv_filter_mode[i];
+					menu->addChild(cv_filter_item);
+				}
+				return menu;
+			}
+		};
+
+		struct ThemeItem : MenuItem {
 			SchoolBus* module;
+			int theme;
 			void onAction(const event::Action& e) override {
-				module->level_cv_filter = !module->level_cv_filter;
+				module->color_theme = theme;
 			}
 		};
 
@@ -308,7 +501,36 @@ struct SchoolBusWidget : ModuleWidget {
 			}
 		};
 
-		// color themes
+		menu->addChild(new MenuEntry);
+		menu->addChild(createMenuLabel("Fade Automation"));
+
+		FadeSliderItem *fadeInSliderItem = new FadeSliderItem(&(module->fade_in), "In");
+		fadeInSliderItem->box.size.x = 190.f;
+		menu->addChild(fadeInSliderItem);
+
+		FadeSliderItem *fadeOutSliderItem = new FadeSliderItem(&(module->fade_out), "Out");
+		fadeOutSliderItem->box.size.x = 190.f;
+		menu->addChild(fadeOutSliderItem);
+
+		menu->addChild(new MenuEntry);
+		menu->addChild(createMenuLabel("Mixer Settings"));
+
+		GainsItem *gainsItem = createMenuItem<GainsItem>("Preamps on L/M/P/R Inputs");
+		gainsItem->rightText = RIGHT_ARROW;
+		gainsItem->module = module;
+		menu->addChild(gainsItem);
+
+		PanCvFiltersItem *panCvFiltersItem = createMenuItem<PanCvFiltersItem>("Pan CV Filter");
+		panCvFiltersItem->rightText = RIGHT_ARROW;
+		panCvFiltersItem->module = module;
+		menu->addChild(panCvFiltersItem);
+
+		LevelCvFiltersItem *levelCvFiltersItem = createMenuItem<LevelCvFiltersItem>("Level CV Filters");
+		levelCvFiltersItem->rightText = RIGHT_ARROW;
+		levelCvFiltersItem->module = module;
+		menu->addChild(levelCvFiltersItem);
+
+		// panel themes
 		menu->addChild(new MenuEntry);
 		menu->addChild(createMenuLabel("Panel Theme"));
 
@@ -320,34 +542,6 @@ struct SchoolBusWidget : ModuleWidget {
 			themeItem->theme = i;
 			menu->addChild(themeItem);
 		}
-
-		// pre amps
-		menu->addChild(new MenuEntry);
-		menu->addChild(createMenuLabel("Preamp on L/M/P/R Inputs"));
-
-		std::string gainTitles[3] = {"No gain (default)", "2x gain", "4x gain"};
-		float gainAmounts[3] = {1.f, 2.f, 4.f};
-		for (int i = 0; i < 3; i++) {
-			GainItem* gainItem = createMenuItem<GainItem>(gainTitles[i]);
-			gainItem->rightText = CHECKMARK(module->school_fader.getGain() == gainAmounts[i]);
-			gainItem->module = module;
-			gainItem->gain = gainAmounts[i];
-			menu->addChild(gainItem);
-		}
-
-		// CV filters
-		menu->addChild(new MenuEntry);
-		menu->addChild(createMenuLabel("CV Input Filters"));
-
-		PanCvFilterItem* panCvFilterItem = createMenuItem<PanCvFilterItem>("Smoothing on pan CV");
-		panCvFilterItem->rightText = CHECKMARK(module->pan_cv_filter);
-		panCvFilterItem->module = module;
-		menu->addChild(panCvFilterItem);
-
-		LevelCvFilterItem* levelCvFilterItem = createMenuItem<LevelCvFilterItem>("Smoothing on level CVs");
-		levelCvFilterItem->rightText = CHECKMARK(module->level_cv_filter);
-		levelCvFilterItem->module = module;
-		menu->addChild(levelCvFilterItem);
 
 		// plugin defaults
 		menu->addChild(new MenuEntry);
