@@ -23,26 +23,24 @@ struct Road : Module {
 	LongPressButton onauButtons[6];
 	dsp::ClockDivider light_divider;
 	AutoFader road_fader[6];
-	AutoFader mute_fader;
 
 	const int fade_speed = 26;
-	int bus_audition = 0;
+	bool bus_audition[6] = {false, false, false, false, false, false};
+	bool auditioning = false;
 	int color_theme = 0;
 
 	Road() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-		configParam(ON_PARAMS + 0, 0.f, 1.f, 0.f, "BUS IN 1 on (hold to audition)");
-		configParam(ON_PARAMS + 1, 0.f, 1.f, 0.f, "BUS IN 2 on (hold to audition)");
-		configParam(ON_PARAMS + 2, 0.f, 1.f, 0.f, "BUS IN 3 on (hold to audition)");
-		configParam(ON_PARAMS + 3, 0.f, 1.f, 0.f, "BUS IN 4 on (hold to audition)");
-		configParam(ON_PARAMS + 4, 0.f, 1.f, 0.f, "BUS IN 5 on (hold to audition)");
-		configParam(ON_PARAMS + 5, 0.f, 1.f, 0.f, "BUS IN 6 on (hold to audition)");
+		configParam(ON_PARAMS + 0, 0.f, 1.f, 0.f, "BUS IN 1 on");
+		configParam(ON_PARAMS + 1, 0.f, 1.f, 0.f, "BUS IN 2 on");
+		configParam(ON_PARAMS + 2, 0.f, 1.f, 0.f, "BUS IN 3 on");
+		configParam(ON_PARAMS + 3, 0.f, 1.f, 0.f, "BUS IN 4 on");
+		configParam(ON_PARAMS + 4, 0.f, 1.f, 0.f, "BUS IN 5 on");
+		configParam(ON_PARAMS + 5, 0.f, 1.f, 0.f, "BUS IN 6 on");
 		light_divider.setDivision(512);
 		for (int i = 0; i < 6; i++) {
 			road_fader[i].setSpeed(fade_speed);
 		}
-		mute_fader.setSpeed(fade_speed);
-		mute_fader.fade = 1.f;
 		color_theme = loadGtgPluginDefault("default_theme", 0);
 	}
 
@@ -55,53 +53,84 @@ struct Road : Module {
 			case LongPressButton::NO_PRESS:
 				break;
 			case LongPressButton::SHORT_PRESS:
-				if (!mute_fader.on) {
-					mute_fader.on = true;   // stop auditioning and unmute buses
+				if (auditioning) {
+					auditioning = false;
 				} else {
 					road_fader[i].on = !road_fader[i].on;
 				}
 				break;
 			case LongPressButton::LONG_PRESS:
-				bus_audition = i;
-				road_fader[i].on = true;
-				mute_fader.on = false;
+				auditioning = true;
+				bus_audition[i] = true;
+
+				if (!road_fader[i].on) {
+					road_fader[i].temped = !road_fader[i].temped;   // remember if bus was off
+				}
 				break;
 			}
 
 			road_fader[i].process();
 		}
 
-		mute_fader.process();
+		if (light_divider.process()) {
+
+			if (auditioning) {
+				for (int i = 0; i < 6; i++) {
+					if (bus_audition[i]) {
+						road_fader[i].on = true;
+					} else {
+						if (road_fader[i].on) {
+							road_fader[i].temped = true;   // remember this fader was on
+						}
+						road_fader[i].on = false;
+					}
+				}
+			} else {
+				for (int i = 0; i < 6; i++) {
+					if (road_fader[i].temped) {
+						road_fader[i].temped = false;
+						if (bus_audition[i]) {
+							road_fader[i].on = false;
+						} else {
+							road_fader[i].on = true;
+						}
+					}
+
+					bus_audition[i] = false;
+				}
+			}
+
+			// set lights
+			for (int i = 0; i < 6; i++) {
+				if (road_fader[i].on) {
+					if (bus_audition[i]) {
+						lights[ONAU_LIGHTS + (i * 2)].value = 1.f;   // yellow when auditioned
+						lights[ONAU_LIGHTS + (i * 2) + 1].value = 1.f;
+					} else {
+						lights[ONAU_LIGHTS + (i * 2)].value = 1.f;   // green when on
+						lights[ONAU_LIGHTS + (i * 2) + 1].value = 0.f;
+					}
+				} else {
+					if (road_fader[i].temped) {
+						lights[ONAU_LIGHTS + (i * 2)].value = 0.f;   // red when muted
+						lights[ONAU_LIGHTS + (i * 2) + 1].value = 1.f;
+					} else {
+						lights[ONAU_LIGHTS + (i * 2)].value = 0.f;   // off
+						lights[ONAU_LIGHTS + (i * 2) + 1].value = 0.f;
+					}
+				}
+			}
+
+		}   // end light_divider.process()
 
 		// sum channels from connected buses
 		float bus_sum[6] = {};
 
 		for (int b = 0; b < 6; b++) {
 			if (inputs[BUS_INPUTS + b].isConnected()) {
-				if (bus_audition == b) {
-					for (int c = 0; c < 6; c++) {
-						bus_sum[c] += inputs[BUS_INPUTS + b].getPolyVoltage(c) * road_fader[b].getFade();
-					}
-				} else {
-					for (int c = 0; c < 6; c++) {
-						bus_sum[c] += inputs[BUS_INPUTS + b].getPolyVoltage(c) * road_fader[b].getFade() * mute_fader.getFade();
-					}
+				for (int c = 0; c < 6; c++) {
+					bus_sum[c] += inputs[BUS_INPUTS + b].getPolyVoltage(c) * road_fader[b].getFade();
 				}
-			}
-		}
-
-		if (light_divider.process()) {
-			if (mute_fader.on) {   // not in audition mode
-				for (int i = 0; i < 6; i++) {
-					lights[ONAU_LIGHTS + (i * 2)].value = road_fader[i].getFade();
-					lights[ONAU_LIGHTS + 1 + (i * 2)].value = 0.f;
-				}
-			} else {
-				for (int i = 0; i < 6; i++) {
-					lights[ONAU_LIGHTS + (i * 2)].value = 0.f;
-					lights[ONAU_LIGHTS + 1 + (i * 2)].value = road_fader[i].getFade();   // turn temporarily muted bus ins red
-				}
-				lights[ONAU_LIGHTS + (bus_audition * 2)].value = 1.f;   // the auditioned channel will get green and red and turn yellow
 			}
 		}
 
@@ -123,8 +152,19 @@ struct Road : Module {
 		json_object_set_new(rootJ, "onau_4", json_integer(road_fader[3].on));
 		json_object_set_new(rootJ, "onau_5", json_integer(road_fader[4].on));
 		json_object_set_new(rootJ, "onau_6", json_integer(road_fader[5].on));
-		json_object_set_new(rootJ, "mute_fader", json_integer(mute_fader.on));
-		json_object_set_new(rootJ, "bus_audition", json_integer(bus_audition));
+		json_object_set_new(rootJ, "auditioning", json_integer(auditioning));
+		json_object_set_new(rootJ, "bus_audition1", json_integer(bus_audition[0]));
+		json_object_set_new(rootJ, "bus_audition2", json_integer(bus_audition[1]));
+		json_object_set_new(rootJ, "bus_audition3", json_integer(bus_audition[2]));
+		json_object_set_new(rootJ, "bus_audition4", json_integer(bus_audition[3]));
+		json_object_set_new(rootJ, "bus_audition5", json_integer(bus_audition[4]));
+		json_object_set_new(rootJ, "bus_audition6", json_integer(bus_audition[5]));
+		json_object_set_new(rootJ, "temped1", json_integer(road_fader[0].temped));
+		json_object_set_new(rootJ, "temped2", json_integer(road_fader[1].temped));
+		json_object_set_new(rootJ, "temped3", json_integer(road_fader[2].temped));
+		json_object_set_new(rootJ, "temped4", json_integer(road_fader[3].temped));
+		json_object_set_new(rootJ, "temped5", json_integer(road_fader[4].temped));
+		json_object_set_new(rootJ, "temped6", json_integer(road_fader[5].temped));
 		json_object_set_new(rootJ, "color_theme", json_integer(color_theme));
 		return rootJ;
 	}
@@ -143,10 +183,36 @@ struct Road : Module {
 		if (onau_5J) road_fader[4].on = json_integer_value(onau_5J);
 		json_t *onau_6J = json_object_get(rootJ, "onau_6");
 		if (onau_6J) road_fader[5].on = json_integer_value(onau_6J);
-		json_t *mute_faderJ = json_object_get(rootJ, "mute_fader");
-		if (mute_faderJ) mute_fader.on = json_integer_value(mute_faderJ);
-		json_t *bus_auditionJ = json_object_get(rootJ, "bus_audition");
-		if (bus_auditionJ) bus_audition = json_integer_value(bus_auditionJ);
+
+		json_t *auditioningJ = json_object_get(rootJ, "auditioning");
+		if (auditioningJ) auditioning = json_integer_value(auditioningJ);
+
+		json_t *bus_audition1j = json_object_get(rootJ, "bus_audition1");
+		if (bus_audition1j) bus_audition[0] = json_integer_value(bus_audition1j);
+		json_t *bus_audition2j = json_object_get(rootJ, "bus_audition2");
+		if (bus_audition2j) bus_audition[1] = json_integer_value(bus_audition2j);
+		json_t *bus_audition3j = json_object_get(rootJ, "bus_audition3");
+		if (bus_audition3j) bus_audition[2] = json_integer_value(bus_audition3j);
+		json_t *bus_audition4j = json_object_get(rootJ, "bus_audition4");
+		if (bus_audition4j) bus_audition[3] = json_integer_value(bus_audition4j);
+		json_t *bus_audition5j = json_object_get(rootJ, "bus_audition5");
+		if (bus_audition5j) bus_audition[4] = json_integer_value(bus_audition5j);
+		json_t *bus_audition6j = json_object_get(rootJ, "bus_audition6");
+		if (bus_audition6j) bus_audition[5] = json_integer_value(bus_audition6j);
+
+		json_t *temped1j = json_object_get(rootJ, "temped1");
+		if (temped1j) road_fader[0].temped = json_integer_value(temped1j);
+		json_t *temped2j = json_object_get(rootJ, "temped2");
+		if (temped2j) road_fader[1].temped = json_integer_value(temped2j);
+		json_t *temped3j = json_object_get(rootJ, "temped3");
+		if (temped3j) road_fader[2].temped = json_integer_value(temped3j);
+		json_t *temped4j = json_object_get(rootJ, "temped4");
+		if (temped4j) road_fader[3].temped = json_integer_value(temped4j);
+		json_t *temped5j = json_object_get(rootJ, "temped5");
+		if (temped5j) road_fader[4].temped = json_integer_value(temped5j);
+		json_t *temped6j = json_object_get(rootJ, "temped6");
+		if (temped6j) road_fader[5].temped = json_integer_value(temped6j);
+
 		json_t *color_themeJ = json_object_get(rootJ, "color_theme");
 		if (color_themeJ) color_theme = json_integer_value(color_themeJ);
 	}
@@ -156,16 +222,15 @@ struct Road : Module {
 		for (int i = 0; i < 6; i++) {
 			road_fader[i].setSpeed(fade_speed);
 		}
-		mute_fader.setSpeed(fade_speed);
 	}
 
 	// reset on audition states when initialized
 	void onReset() override {
-		bus_audition = 0;
+		auditioning = false;
 		for (int i = 0; i < 6; i++) {
+			bus_audition[i] = false;
 			road_fader[i].on = true;
 		}
-		mute_fader.on = true;
 	}
 };
 
