@@ -62,7 +62,7 @@ struct MiniBus : Module {
 			break;
 		case LongPressButton::SHORT_PRESS:
 			if (audition_mixer) {
-				audition_mixer = false;   // always turn off audition with single click
+				audition_mixer = false;   // single click turns off auditions
 			} else {
 				if ((APP->window->getMods() & RACK_MOD_MASK) == RACK_MOD_CTRL) {   // bypass fades with ctrl click
 					auto_override = true;
@@ -168,7 +168,7 @@ struct MiniBus : Module {
 					lights[ON_LIGHT + 1].value = 1.f;
 				} else {
 					lights[ON_LIGHT + 0].value = mini_fader.getFade();  // yellow dimmer when fading
-					lights[ON_LIGHT + 1].value = mini_fader.getFade();
+					lights[ON_LIGHT + 1].value = mini_fader.getFade() * 0.5f;
 				}
 			}
 		}
@@ -254,7 +254,11 @@ struct MiniBus : Module {
 
 	// reset fader speed
 	void onSampleRateChange() override {
-		mini_fader.setSpeed(fade_in);
+		if (mini_fader.on) {
+			mini_fader.setSpeed(fade_in);
+		} else {
+			mini_fader.setSpeed(fade_out);
+		}
 		post_fade_filter.setSlewSpeed(smooth_speed);
 	}
 
@@ -303,44 +307,6 @@ struct MiniBusWidget : ModuleWidget {
 	// build the menu
 	void appendContextMenu(Menu* menu) override {
 		MiniBus *module = dynamic_cast<MiniBus*>(this->module);
-
-		struct FadeDuration : Quantity {
-			float *srcFadeRate = NULL;
-			std::string label = "";
-
-			FadeDuration(float *_srcFadeRate, std::string fade_label) {
-				srcFadeRate = _srcFadeRate;
-				label = fade_label;
-			}
-			void setValue(float value) override {
-                *srcFadeRate = math::clamp(value, getMinValue(), getMaxValue());
-			}
-			float getValue() override {
-				return *srcFadeRate;
-			}
-			float getMinValue() override {return 26.0f;}
-			float getMaxValue() override {return 34000.0f;}
-			float getDefaultValue() override {return 26.0f;}
-			float getDisplayValue() override {return getValue();}
-			std::string getDisplayValueString() override {
-                float value = getDisplayValue();
-				return string::f("%.f", value);
-			}
-			void setDisplayValue(float displayValue) override {setValue(displayValue);}
-			std::string getLabel() override {return label;}
-			std::string getUnit() override {return " mil";}
-		};
-
-
-		// fade automation sliders
-		struct FadeSliderItem : ui::Slider {
-			FadeSliderItem(float *fade_rate, std::string fade_label) {
-				quantity = new FadeDuration(fade_rate, fade_label);
-			}
-			~FadeSliderItem() {
-				delete quantity;
-			}
-		};
 
 		// add gain levels
 		struct GainLevelItem : MenuItem {
