@@ -29,13 +29,13 @@ struct BusRoute : Module {
 	LongPressButton onauButtons[3];
 	dsp::ClockDivider light_divider;
 	AutoFader route_fader[3];
-	AutoFader mute_fader;
 
 	const int fade_speed = 26;
 	float delay_buf[1000][6] = {};
 	int delay_i = 0;
 	int delay_knobs[3] = {0, 0, 0};
-	int bus_audition = 0;
+	bool bus_audition[3] = {false, false, false};
+	bool auditioning = false;
 	int color_theme = 0;
 
 	BusRoute() {
@@ -50,8 +50,6 @@ struct BusRoute : Module {
 		for (int i = 0; i < 3; i++) {
 			route_fader[i].setSpeed(fade_speed);
 		}
-		mute_fader.setSpeed(fade_speed);
-		mute_fader.fade = 1.f;
 		color_theme = loadGtgPluginDefault("default_theme", 0);
 	}
 
@@ -64,23 +62,76 @@ struct BusRoute : Module {
 			case LongPressButton::NO_PRESS:
 				break;
 			case LongPressButton::SHORT_PRESS:
-				if (!mute_fader.on) {
-					mute_fader.on = true;   // stop auditioning and unmute buses
+				if (auditioning) {
+					auditioning = false;   // stop auditioning and unmute buses
 				} else {
 					route_fader[i].on = !route_fader[i].on;
 				}
 				break;
 			case LongPressButton::LONG_PRESS:
-				bus_audition = i;
-				route_fader[i].on = true;
-				mute_fader.on = false;
+				auditioning = true;
+				bus_audition[i] = true;
+
+				if (!route_fader[i].on) {
+					route_fader[i].temped = !route_fader[i].temped;
+				}
 				break;
 			}
 
 			route_fader[i].process();
 		}
 
-		mute_fader.process();
+		// set send or audtion button lights
+		if (light_divider.process()) {
+
+			if (auditioning) {
+				for (int i = 0; i < 3; i++) {
+					if (bus_audition[i]) {
+						route_fader[i].on = true;
+					} else {
+						if (route_fader[i].on) {
+							route_fader[i].temped = true;
+						}
+						route_fader[i].on = false;
+					}
+				}
+			} else {
+				for (int i = 0; i < 3; i++) {
+					if (route_fader[i].temped) {
+						route_fader[i].temped = false;
+						if (bus_audition[i]) {
+							route_fader[i].on = false;
+						} else {
+							route_fader[i].on = true;
+						}
+					}
+
+					bus_audition[i] = false;
+				}
+			}
+
+			// set lights
+			for (int i = 0; i < 3; i++) {
+				if (route_fader[i].on) {
+					if (bus_audition[i]) {
+						lights[ONAU_LIGHTS + (i * 2)].value = 1.f;   // yellow when auditioned
+						lights[ONAU_LIGHTS + (i * 2) + 1].value = 1.f;
+					} else {
+						lights[ONAU_LIGHTS + (i * 2)].value = 1.f;   // green when on
+						lights[ONAU_LIGHTS + (i * 2) + 1].value = 0.f;
+					}
+				} else {
+					if (route_fader[i].temped) {
+						lights[ONAU_LIGHTS + (i * 2)].value = 0.f;   // red when muted
+						lights[ONAU_LIGHTS + (i * 2) + 1].value = 1.f;
+					} else {
+						lights[ONAU_LIGHTS + (i * 2)].value = 0.f;   // off
+						lights[ONAU_LIGHTS + (i * 2) + 1].value = 0.f;
+					}
+				}
+			}
+
+		}
 
 		// record bus inputs into delay buffer
 		for (int c = 0; c < 6; c++) {
@@ -105,22 +156,12 @@ struct BusRoute : Module {
 
 			// buses to send outputs or directly to bus out if sends are not connected
 			if (outputs[SEND_OUTPUTS + chan].isConnected() || outputs[SEND_OUTPUTS + chan + 1].isConnected()) {
-				if (bus_audition == sb) {
-					outputs[SEND_OUTPUTS + chan].setVoltage(delay_buf[delay][chan] * route_fader[sb].getFade());   // left
-					outputs[SEND_OUTPUTS + chan + 1].setVoltage(delay_buf[delay][chan + 1] * route_fader[sb].getFade());   // right
-				} else {
-					outputs[SEND_OUTPUTS + chan].setVoltage(delay_buf[delay][chan] * route_fader[sb].getFade() * mute_fader.getFade());   // left
-					outputs[SEND_OUTPUTS + chan + 1].setVoltage(delay_buf[delay][chan + 1] * route_fader[sb].getFade() * mute_fader.getFade());   // right
-				}
+				outputs[SEND_OUTPUTS + chan].setVoltage(delay_buf[delay][chan] * route_fader[sb].getFade());   // left
+				outputs[SEND_OUTPUTS + chan + 1].setVoltage(delay_buf[delay][chan + 1] * route_fader[sb].getFade());   // right
 			} else {
 
-				if (bus_audition == sb) {
-					bus_out[chan] = delay_buf[delay][chan] * route_fader[sb].getFade();
-					bus_out[chan + 1] = delay_buf[delay][chan + 1] * route_fader[sb].getFade();
-				} else {
-					bus_out[chan] = delay_buf[delay][chan] * route_fader[sb].getFade() * mute_fader.getFade();   // left
-					bus_out[chan + 1] = delay_buf[delay][chan + 1] * route_fader[sb].getFade() * mute_fader.getFade();   // right
-				}
+				bus_out[chan] = delay_buf[delay][chan] * route_fader[sb].getFade();
+				bus_out[chan + 1] = delay_buf[delay][chan + 1] * route_fader[sb].getFade();
 			}
 
 			// get all returns, even if sends are not connected or off, allows hearing the tail of a return
@@ -147,22 +188,6 @@ struct BusRoute : Module {
 		// roll buffer index
 		delay_i++;
 		if (delay_i >= 1000) delay_i = 0;
-
-		// set send or audtion button lights
-		if (light_divider.process()) {
-			if (mute_fader.on) {   // not in audition mode
-				for (int i = 0; i < 3; i++) {
-					lights[ONAU_LIGHTS + (i * 2)].value = route_fader[i].getFade();
-					lights[ONAU_LIGHTS + 1 + (i * 2)].value = 0.f;
-				}
-			} else {
-				for (int i = 0; i < 3; i++) {
-					lights[ONAU_LIGHTS + (i * 2)].value = 0.f;
-					lights[ONAU_LIGHTS + 1 + (i * 2)].value = route_fader[i].getFade();   // turn temporarily muted send lights red
-				}
-				lights[ONAU_LIGHTS + (bus_audition * 2)].value = 1.f;   // the auditioned send will turn yellow
-			}
-		}
 	}
 
 	// save on color theme
@@ -171,8 +196,13 @@ struct BusRoute : Module {
 		json_object_set_new(rootJ, "onau_1", json_integer(route_fader[0].on));
 		json_object_set_new(rootJ, "onau_2", json_integer(route_fader[1].on));
 		json_object_set_new(rootJ, "onau_3", json_integer(route_fader[2].on));
-		json_object_set_new(rootJ, "mute_fader", json_integer(mute_fader.on));
-		json_object_set_new(rootJ, "bus_audition", json_integer(bus_audition));
+		json_object_set_new(rootJ, "auditioning", json_integer(auditioning));
+		json_object_set_new(rootJ, "bus_audition1", json_integer(bus_audition[0]));
+		json_object_set_new(rootJ, "bus_audition2", json_integer(bus_audition[1]));
+		json_object_set_new(rootJ, "bus_audition3", json_integer(bus_audition[2]));
+		json_object_set_new(rootJ, "temped1", json_integer(route_fader[0].temped));
+		json_object_set_new(rootJ, "temped2", json_integer(route_fader[1].temped));
+		json_object_set_new(rootJ, "temped3", json_integer(route_fader[2].temped));
 		json_object_set_new(rootJ, "color_theme", json_integer(color_theme));
 		return rootJ;
 	}
@@ -185,10 +215,24 @@ struct BusRoute : Module {
 		if (onau_2J) route_fader[1].on = json_integer_value(onau_2J);
 		json_t *onau_3J = json_object_get(rootJ, "onau_3");
 		if (onau_3J) route_fader[2].on = json_integer_value(onau_3J);
-		json_t *mute_faderJ = json_object_get(rootJ, "mute_fader");
-		if (mute_faderJ) mute_fader.on = json_integer_value(mute_faderJ);
-		json_t *bus_auditionJ = json_object_get(rootJ, "bus_audition");
-		if (bus_auditionJ) bus_audition = json_integer_value(bus_auditionJ);
+
+		json_t *auditioningJ = json_object_get(rootJ, "auditioning");
+		if (auditioningJ) auditioning = json_integer_value(auditioningJ);
+
+		json_t *bus_audition1j = json_object_get(rootJ, "bus_audition1");
+		if (bus_audition1j) bus_audition[0] = json_integer_value(bus_audition1j);
+		json_t *bus_audition2j = json_object_get(rootJ, "bus_audition2");
+		if (bus_audition2j) bus_audition[1] = json_integer_value(bus_audition2j);
+		json_t *bus_audition3j = json_object_get(rootJ, "bus_audition3");
+		if (bus_audition3j) bus_audition[2] = json_integer_value(bus_audition3j);
+
+		json_t *temped1j = json_object_get(rootJ, "temped1");
+		if (temped1j) route_fader[0].temped = json_integer_value(temped1j);
+		json_t *temped2j = json_object_get(rootJ, "temped2");
+		if (temped2j) route_fader[1].temped = json_integer_value(temped2j);
+		json_t *temped3j = json_object_get(rootJ, "temped3");
+		if (temped3j) route_fader[2].temped = json_integer_value(temped3j);
+
 		json_t *color_themeJ = json_object_get(rootJ, "color_theme");
 		if (color_themeJ) color_theme = json_integer_value(color_themeJ);
 	}
@@ -198,16 +242,15 @@ struct BusRoute : Module {
 		for (int i = 0; i < 3; i++) {
 			route_fader[i].setSpeed(fade_speed);
 		}
-		mute_fader.setSpeed(fade_speed);
 	}
 
 	// reset on audition states when initialized
 	void onReset() override {
-		bus_audition = 0;
+		auditioning = false;
 		for (int i = 0; i < 3; i++) {
 			route_fader[i].on = true;
+			bus_audition[i] = false;
 		}
-		mute_fader.on = true;
 	}
 };
 
