@@ -109,8 +109,10 @@ struct GigBus : Module {
 
 		// process cv trigger
 		if (on_cv_trigger.process(inputs[ON_CV_INPUT].getVoltage())) {
-			auto_override = false;   // do not override automation
-			gig_fader.on = !gig_fader.on;
+			if (!audition_mixer) {
+				auto_override = false;   // do not override automation
+				gig_fader.on = !gig_fader.on;
+			}
 		}
 
 		gig_fader.process();

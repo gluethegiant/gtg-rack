@@ -116,8 +116,10 @@ struct BusDepot : Module {
 
 		// process cv trigger
 		if (on_cv_trigger.process(inputs[ON_CV_INPUT].getVoltage())) {
-			auto_override = false;   // do not override automation
-			depot_fader.on = !depot_fader.on;
+			if (!audition_depot) {
+				auto_override = false;   // do not override automation
+				depot_fader.on = !depot_fader.on;
+			}
 		}
 
 		depot_fader.process();
@@ -486,7 +488,7 @@ struct BusDepotWidget : ModuleWidget {
 			BusDepot *module;
 			Menu *createChildMenu() override {
 				Menu *menu = new Menu;
-				std::string mode_titles[2] = {"Normal (default)", "Always auditioned"};
+				std::string mode_titles[2] = {"Normal (default)", "Always audition"};
 				int au_modes[2] = {0, 1};
 				for (int i = 0; i < 2; i++) {
 					AuditionItem *audition_item = new AuditionItem;

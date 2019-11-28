@@ -99,8 +99,10 @@ struct MiniBus : Module {
 
 		// process cv trigger
 		if (on_cv_trigger.process(inputs[ON_CV_INPUT].getVoltage())) {
-			auto_override = false;   // do not override automation
-			mini_fader.on = !mini_fader.on;
+			if (!audition_mixer) {
+				auto_override = false;   // do not override automation
+				mini_fader.on = !mini_fader.on;
+			}
 		}
 
 		mini_fader.process();

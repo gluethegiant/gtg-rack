@@ -128,8 +128,10 @@ struct SchoolBus : Module {
 
 		// process cv trigger
 		if (on_cv_trigger.process(inputs[ON_CV_INPUT].getVoltage())) {
-			auto_override = false;   // do not override automation
-			school_fader.on = !school_fader.on;
+			if (!audition_mixer) {
+				auto_override = false;   // do not override automation
+				school_fader.on = !school_fader.on;
+			}
 		}
 
 		school_fader.process();
