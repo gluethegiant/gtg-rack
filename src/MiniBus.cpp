@@ -269,6 +269,7 @@ struct MiniBus : Module {
 		fade_in = 26.f;
 		fade_out = 26.f;
 		post_fades = loadGtgPluginDefault("default_post_fader", 0);
+		audition_mixer = false;
 	}
 };
 

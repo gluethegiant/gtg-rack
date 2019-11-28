@@ -483,6 +483,7 @@ struct MetroCityBus : Module {
 		post_fades[1] = post_fades[0];
 		initializePanObjects();
 		level_cv_filter = true;
+		audition_mixer = false;
 	}
 
 	// initialize pan objects
@@ -657,7 +658,7 @@ struct MetroCityBusWidget : ModuleWidget {
 		menu->addChild(levelCvFiltersItem);
 
 		menu->addChild(new MenuEntry);
-		menu->addChild(createMenuLabel("Panel Theme"));
+		menu->addChild(createMenuLabel("Panel Themes"));
 
 		std::string themeTitles[2] = {"70's Cream", "Night Ride"};
 		for (int i = 0; i < 2; i++) {
