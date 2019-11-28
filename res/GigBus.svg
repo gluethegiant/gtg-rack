@@ -2709,7 +2709,7 @@
      inkscape:pageshadow="2"
      inkscape:zoom="4.2475514"
      inkscape:cx="115.98244"
-     inkscape:cy="334.82615"
+     inkscape:cy="363.07772"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -3393,20 +3393,24 @@
     <g
        aria-label="_"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.11666656px;line-height:1.25;font-family:Rubik;-inkscape-font-specification:Rubik;letter-spacing:0px;word-spacing:0px;display:inline;fill:#333333;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-       id="text1583">
+       id="text1583"
+       transform="translate(0,-0.12799)">
       <path
          d="m 4.3638,185.37799 q -0.021167,0 -0.035983,-0.0148 Q 4.313,185.35048 4.313,185.32719 v -0.1397 q 0,-0.0212 0.014817,-0.036 0.014817,-0.0148 0.035983,-0.0148 h 1.2424832 q 0.021167,0 0.035983,0.0148 0.014817,0.0148 0.014817,0.036 v 0.1397 q 0,0.0233 -0.014817,0.036 -0.0127,0.0148 -0.035983,0.0148 z"
          style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';fill:#333333;stroke-width:0.26458332"
-         id="path14420" />
+         id="path14420"
+         inkscape:connector-curvature="0" />
     </g>
     <g
        aria-label="_"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.11666656px;line-height:1.25;font-family:Rubik;-inkscape-font-specification:Rubik;letter-spacing:0px;word-spacing:0px;display:inline;fill:#333333;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-       id="text14415">
+       id="text14415"
+       transform="translate(0,-0.12799)">
       <path
          d="m 14.6138,185.37799 q -0.02117,0 -0.03598,-0.0148 -0.01482,-0.0127 -0.01482,-0.036 v -0.1397 q 0,-0.0212 0.01482,-0.036 0.01482,-0.0148 0.03598,-0.0148 h 1.242484 q 0.02117,0 0.03598,0.0148 0.01482,0.0148 0.01482,0.036 v 0.1397 q 0,0.0233 -0.01482,0.036 -0.0127,0.0148 -0.03598,0.0148 z"
          style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11666656px;font-family:Rubik;-inkscape-font-specification:'Rubik Medium';fill:#333333;stroke-width:0.26458332"
-         id="path14417" />
+         id="path14417"
+         inkscape:connector-curvature="0" />
     </g>
   </g>
   <g

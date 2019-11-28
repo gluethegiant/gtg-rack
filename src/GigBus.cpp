@@ -296,6 +296,7 @@ struct GigBus : Module {
 		gig_fader.setGain(1.f);
 		fade_in = 26.f;
 		fade_out = 26.f;
+		audition_mixer = false;
 	}
 };
 
@@ -334,7 +335,7 @@ struct GigBusWidget : ModuleWidget {
 
 		// create vu lights
 		for (int i = 0; i < 11; i++) {
-			float spacing = i * 3.5f;
+			float spacing = i * 3.25f;
 			float top = 15.f;
 			if (i < 1 ) {
 				addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(3.27, top + spacing)), module, GigBus::LEFT_LIGHTS + i));
@@ -427,7 +428,7 @@ struct GigBusWidget : ModuleWidget {
 
 		// panel themes
 		menu->addChild(new MenuEntry);
-		menu->addChild(createMenuLabel("Panel Theme"));
+		menu->addChild(createMenuLabel("Panel Themes"));
 
 		std::string themeTitles[2] = {"70's Cream", "Night Ride"};
 		for (int i = 0; i < 2; i++) {
