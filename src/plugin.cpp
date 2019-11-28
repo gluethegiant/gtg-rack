@@ -12,8 +12,8 @@ void init(Plugin *p) {
 
 	// Add modules here
 	// p->addModel(modelMyModule);
-	p->addModel(modelMiniBus);
 	p->addModel(modelGigBus);
+	p->addModel(modelMiniBus);
 	p->addModel(modelSchoolBus);
 	p->addModel(modelMetroCityBus);
 	p->addModel(modelBusDepot);

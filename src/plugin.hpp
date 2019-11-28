@@ -12,8 +12,8 @@ extern bool audition_depot;
 
 // Declare each Model, defined in each module source file
 // extern Model *modelMyModule;
-extern Model *modelMiniBus;
 extern Model *modelGigBus;
+extern Model *modelMiniBus;
 extern Model *modelSchoolBus;
 extern Model *modelMetroCityBus;
 extern Model *modelBusDepot;
