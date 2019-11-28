@@ -27,25 +27,30 @@ struct BusDepot : Module {
 		NUM_OUTPUTS
 	};
 	enum LightIds {
-		ON_LIGHT,
+		ENUMS(ON_LIGHT, 2),
 		ENUMS(LEFT_LIGHTS, 11),
 		ENUMS(RIGHT_LIGHTS, 11),
 		NUM_LIGHTS
 	};
 
+	LongPressButton on_button;
 	dsp::VuMeter2 vu_meters[2];
 	dsp::ClockDivider vu_divider;
 	dsp::ClockDivider light_divider;
-	dsp::SchmittTrigger on_trigger;
+	dsp::ClockDivider audition_divider;
 	dsp::SchmittTrigger on_cv_trigger;
 	AutoFader depot_fader;
 	SimpleSlewer level_smoother;
 
+	const int bypass_speed = 26;
 	const int level_speed = 26;   // for level cv filter
 	float peak_left = 0.f;
 	float peak_right = 0.f;
 	bool level_cv_filter = true;
 	int fade_cv_mode = 0;
+	bool auto_override = false;
+	bool auditioned = false;
+	int audition_mode = 0;
 	int color_theme = 0;
 
 	BusDepot() {
@@ -59,18 +64,159 @@ struct BusDepot : Module {
 		vu_meters[1].lambda = 25.f;
 		vu_divider.setDivision(500);
 		light_divider.setDivision(240);
+		audition_divider.setDivision(512);
 		depot_fader.setSpeed(26);
 		level_smoother.setSlewSpeed(level_speed);   // for level cv filter
 		color_theme = loadGtgPluginDefault("default_theme", 0);
 	}
 
 	void process(const ProcessArgs &args) override {
-		// on off button with fader that filters pops
-		if (on_trigger.process(params[ON_PARAM].getValue()) + on_cv_trigger.process(inputs[ON_CV_INPUT].getVoltage())) {
+
+		// on off button
+		switch (on_button.step(params[ON_PARAM])) {
+		default:
+		case LongPressButton::NO_PRESS:
+			break;
+		case LongPressButton::SHORT_PRESS:
+			if (audition_depot) {
+				audition_depot = false;   // single click turns off auditions
+			} else {
+				if ((APP->window->getMods() & RACK_MOD_MASK) == RACK_MOD_CTRL) {   // bypass fades with ctrl click
+					auto_override = true;
+					depot_fader.setSpeed(bypass_speed);
+
+					// bypass the fade even if the fade is already underway
+					if (depot_fader.on) {
+						depot_fader.on = (depot_fader.getFade() != depot_fader.getGain());
+					} else {
+						depot_fader.on = (depot_fader.getFade() == 0.f);
+					}
+
+				} else {   // normal single click
+					auto_override = false;   // do not override automation
+					depot_fader.on = !depot_fader.on;
+					if (depot_fader.on) {
+						depot_fader.setSpeed(int(params[FADE_IN_PARAM].getValue()));
+					} else {
+						depot_fader.setSpeed(int(params[FADE_PARAM].getValue()));
+					}
+				}
+			}
+			break;
+		case LongPressButton::LONG_PRESS:   // long press to audition
+
+			audition_depot = true;   // all depots to audition mode
+			auditioned = true;
+
+			if (!depot_fader.on) {
+				depot_fader.temped = !depot_fader.temped;   // remember if auditioned depot is off
+			}
+			break;
+		}
+
+		// process cv trigger
+		if (on_cv_trigger.process(inputs[ON_CV_INPUT].getVoltage())) {
+			auto_override = false;   // do not override automation
 			depot_fader.on = !depot_fader.on;
 		}
 
 		depot_fader.process();
+
+		// process fade states and on light
+		if (audition_divider.process()) {
+
+			if (audition_depot) {   // all depots are in audition state
+
+				// bypass all fade automation
+				auto_override = true;
+				depot_fader.setSpeed(bypass_speed);
+
+				// set to auditioned if audition mode = 1
+				if (audition_mode == 1) {
+					if (!depot_fader.on) {
+						depot_fader.temped = !depot_fader.temped;
+					}
+					auditioned = true;
+				}
+
+			if (auditioned) {   // this depot is being auditioned
+					depot_fader.on =  true;
+				} else {   // mute the depot
+					if (depot_fader.on) {
+						depot_fader.temped = true;   // remember this depot was on
+					}
+					depot_fader.on = false;
+				}
+			} else {   // stop auditions
+
+				// return to states before auditions
+				if (depot_fader.temped) {
+					depot_fader.temped = false;
+					auto_override = true;
+					depot_fader.setSpeed(bypass_speed);
+					if (auditioned) {
+						depot_fader.on = false;
+					} else {
+						depot_fader.on = true;
+					}
+				}
+
+				// turn off auditions
+				auditioned = false;
+			}
+
+			// process fade speed changes if turning knobs
+			if (!auto_override) {
+				if (inputs[FADE_CV_INPUT].isConnected()) {
+					if (depot_fader.on) {   // fade in with CV
+						if (fade_cv_mode == 0 || fade_cv_mode == 1) {
+							depot_fader.setSpeed(std::round((clamp(inputs[FADE_CV_INPUT].getNormalVoltage(0.0f) * 0.1f, 0.0f, 1.0f) * 33974.f) + 26.f));   // 26 to 34000 milliseconds
+						} else {
+							if (params[FADE_IN_PARAM].getValue() != depot_fader.last_speed) {
+								depot_fader.setSpeed(params[FADE_IN_PARAM].getValue());
+							}
+						}
+					} else {   // fade out with CV
+						if (fade_cv_mode == 0 || fade_cv_mode == 2) {
+							depot_fader.setSpeed(std::round((clamp(inputs[FADE_CV_INPUT].getNormalVoltage(0.0f) * 0.1f, 0.0f, 1.0f) * 33974.f) + 26.f));   // 26 to 34000 milliseconds
+						} else {
+							if (params[FADE_PARAM].getValue() != depot_fader.last_speed) {
+								depot_fader.setSpeed(params[FADE_PARAM].getValue());
+							}
+						}
+					}
+				} else {
+					if (depot_fader.on) {
+						if (params[FADE_IN_PARAM].getValue() != depot_fader.getFade()) {
+							depot_fader.setSpeed(params[FADE_IN_PARAM].getValue());
+						}
+					} else {
+						if (params[FADE_PARAM].getValue() != depot_fader.getFade()) {
+							depot_fader.setSpeed(params[FADE_PARAM].getValue());
+						}
+					}
+				}
+			}
+
+			// set lights
+			if (depot_fader.getFade() == depot_fader.getGain()) {
+				if (audition_depot) {
+					lights[ON_LIGHT + 0].value = 1.f;   // yellow when auditioned
+					lights[ON_LIGHT + 1].value = 1.f;
+				} else {
+					lights[ON_LIGHT + 0].value = 1.f;   // green light when on
+					lights[ON_LIGHT + 1].value = 0.f;
+				}
+			} else {
+				if (depot_fader.temped) {
+					lights[ON_LIGHT + 0].value = 0.f;   // red when temporarily muted
+					lights[ON_LIGHT + 1].value = 1.f;
+				} else {
+					lights[ON_LIGHT + 0].value = depot_fader.getFade();  // yellow dimmer when fading
+					lights[ON_LIGHT + 1].value = depot_fader.getFade() * 0.5f;
+				}
+			}
+		}
 
 		// process sound
 		float summed_out[2] = {0.f, 0.f};
@@ -112,9 +258,6 @@ struct BusDepot : Module {
 				outputs[BUS_OUTPUT].setVoltage(bus_in[c], c);
 			}
 
-			// set three stereo bus outputs on bus out
-			outputs[BUS_OUTPUT].setChannels(6);
-
 			// sum stereo mix for stereo outputs and light levels
 			for (int c = 0; c < 2; c++) {
 				summed_out[c] = bus_in[c] + bus_in[c + 2] + bus_in[c + 4];
@@ -124,6 +267,9 @@ struct BusDepot : Module {
 			outputs[LEFT_OUTPUT].setVoltage(summed_out[0]);
 			outputs[RIGHT_OUTPUT].setVoltage(summed_out[1]);
 		}
+
+		// set three stereo bus outputs on bus out
+		outputs[BUS_OUTPUT].setChannels(6);
 
 		// hit peak lights accurately by polling every sample
 		if (summed_out[0] > 10.f) peak_left = 1.f;
@@ -137,44 +283,6 @@ struct BusDepot : Module {
 		}
 
 		if (light_divider.process()) {   // set lights and fade speed infrequently
-
-			// set fade speed infrequently
-			if (inputs[FADE_CV_INPUT].isConnected()) {
-				if (depot_fader.on) {   // fade in with CV
-					if (fade_cv_mode == 0 || fade_cv_mode == 1) {
-						depot_fader.setSpeed(std::round((clamp(inputs[FADE_CV_INPUT].getNormalVoltage(0.0f) * 0.1f, 0.0f, 1.0f) * 33974.f) + 26.f));   // 26 to 34000 milliseconds
-					} else {
-						if (params[FADE_IN_PARAM].getValue() != depot_fader.last_speed) {
-							depot_fader.setSpeed(params[FADE_IN_PARAM].getValue());
-						}
-					}
-				} else {   // fade out with CV
-					if (fade_cv_mode == 0 || fade_cv_mode == 2) {
-						depot_fader.setSpeed(std::round((clamp(inputs[FADE_CV_INPUT].getNormalVoltage(0.0f) * 0.1f, 0.0f, 1.0f) * 33974.f) + 26.f));   // 26 to 34000 milliseconds
-					} else {
-						if (params[FADE_PARAM].getValue() != depot_fader.last_speed) {
-							depot_fader.setSpeed(params[FADE_PARAM].getValue());
-						}
-					}
-				}
-			} else {   // fade without CV
-				if (depot_fader.on) {
-					if (params[FADE_IN_PARAM].getValue() != depot_fader.last_speed) {
-						depot_fader.setSpeed(params[FADE_IN_PARAM].getValue());
-					}
-				} else {
-					if (params[FADE_PARAM].getValue() != depot_fader.last_speed) {
-						depot_fader.setSpeed(params[FADE_PARAM].getValue());
-					}
-				}
-			}
-
-			// set on light
-			if (depot_fader.getFade() > 0 && depot_fader.getFade() < depot_fader.getGain()) {
-				lights[ON_LIGHT].value = 0.3f * (depot_fader.getFade() / depot_fader.getGain()) + 0.25f;   // dim light shows click and fade progress
-			} else {
-				lights[ON_LIGHT].value = depot_fader.getFade();
-			}
 
 			// make peak lights stay on when hit
 			if (peak_left > 0) peak_left -= 60.f / args.sampleRate; else peak_left = 0.f;
@@ -197,6 +305,9 @@ struct BusDepot : Module {
 		json_object_set_new(rootJ, "level_cv_filter", json_integer(level_cv_filter));
 		json_object_set_new(rootJ, "color_theme", json_integer(color_theme));
 		json_object_set_new(rootJ, "fade_cv_mode", json_integer(fade_cv_mode));
+		json_object_set_new(rootJ, "auditioned", json_integer(auditioned));
+		json_object_set_new(rootJ, "temped", json_integer(depot_fader.temped));
+		json_object_set_new(rootJ, "audition_mode", json_integer(audition_mode));
 		return rootJ;
 	}
 
@@ -219,10 +330,23 @@ struct BusDepot : Module {
 				params[FADE_IN_PARAM].setValue(params[FADE_PARAM].getValue());   // same behavior on patches saved before fade in knob existed
 			}
 		}
+		json_t *auditionedJ = json_object_get(rootJ, "auditioned");
+		if (auditionedJ) {
+			auditioned = json_integer_value(auditionedJ);
+			if (!audition_depot) audition_depot = auditioned;   // if one bus depot is auditioned then audition_depot
+		}
+		json_t *tempedJ = json_object_get(rootJ, "temped");
+		if (tempedJ) depot_fader.temped = json_integer_value(tempedJ);
+		json_t *audition_modeJ = json_object_get(rootJ, "audition_mode");
+		if (audition_modeJ) audition_mode = json_integer_value(audition_modeJ);
 	}
 
 	void onSampleRateChange() override {
-		depot_fader.setSpeed(params[FADE_PARAM].getValue());
+		if (depot_fader.on) {
+			depot_fader.setSpeed(params[FADE_IN_PARAM].getValue());
+		} else {
+			depot_fader.setSpeed(params[FADE_PARAM].getValue());
+		}
 		level_smoother.setSlewSpeed(level_speed);
 	}
 
@@ -231,6 +355,8 @@ struct BusDepot : Module {
 		depot_fader.setGain(1.f);
 		level_cv_filter = true;
 		fade_cv_mode = 0;
+		audition_mode = 0;
+		audition_depot = false;
 	}
 };
 
@@ -256,7 +382,7 @@ struct BusDepotWidget : ModuleWidget {
 		addChild(createThemedWidget<gtgScrewUp>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), module ? &module->color_theme : NULL));
 
 		addParam(createThemedParamCentered<gtgBlackButton>(mm2px(Vec(15.24, 15.20)), module, BusDepot::ON_PARAM, module ? &module->color_theme : NULL));
-		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(15.24, 15.20)), module, BusDepot::ON_LIGHT));
+		addChild(createLightCentered<MediumLight<GreenRedLight>>(mm2px(Vec(15.24, 15.20)), module, BusDepot::ON_LIGHT));
 		addParam(createThemedParamCentered<gtgBlackTinyKnob>(mm2px(Vec(15.24, 59.48)), module, BusDepot::AUX_PARAM, module ? &module->color_theme : NULL));
 		addParam(createThemedParamCentered<gtgBlackKnob>(mm2px(Vec(15.24, 83.88)), module, BusDepot::LEVEL_PARAM, module ? &module->color_theme : NULL));
 		addParam(createThemedParamCentered<gtgGrayTinySnapKnob>(mm2px(Vec(15.24, 42.54)), module, BusDepot::FADE_PARAM, module ? &module->color_theme : NULL));
@@ -296,26 +422,89 @@ struct BusDepotWidget : ModuleWidget {
 	void appendContextMenu(Menu* menu) override {
 		BusDepot* module = dynamic_cast<BusDepot*>(this->module);
 
+		struct LevelCvItem : MenuItem {
+			BusDepot *module;
+			int cv_filter;
+			void onAction(const event::Action &e) override {
+				module->level_cv_filter = cv_filter;
+			}
+		};
+
+		struct LevelCvFiltersItem : MenuItem {
+			BusDepot *module;
+			Menu *createChildMenu() override {
+				Menu *menu = new Menu;
+				std::string filter_titles[2] = {"No filter", "Smoothing (default)"};
+				int cv_filter_mode[2] = {0, 1};
+				for (int i = 0; i < 2; i++) {
+					LevelCvItem *fade_cv_item = new LevelCvItem;
+					fade_cv_item->text = filter_titles[i];
+					fade_cv_item->rightText = CHECKMARK(module->level_cv_filter == cv_filter_mode[i]);
+					fade_cv_item->module = module;
+					fade_cv_item->cv_filter = cv_filter_mode[i];
+					menu->addChild(fade_cv_item);
+				}
+				return menu;
+			}
+		};
+
+		struct FadeCvItem : MenuItem {
+			BusDepot *module;
+			int cv_mode;
+			void onAction(const event::Action &e) override {
+				module->fade_cv_mode = cv_mode;
+			}
+		};
+
+		struct FadeCvModesItem : MenuItem {
+			BusDepot *module;
+			Menu *createChildMenu() override {
+				Menu *menu = new Menu;
+				std::string mode_titles[3] = {"Fade in and fade out (default)", "Fade in only", "Fade out only"};
+				int cv_modes[3] = {0, 1, 2};
+				for (int i = 0; i < 3; i++) {
+					FadeCvItem *fade_cv_item = new FadeCvItem;
+					fade_cv_item->text = mode_titles[i];
+					fade_cv_item->rightText = CHECKMARK(module->fade_cv_mode == cv_modes[i]);
+					fade_cv_item->module = module;
+					fade_cv_item->cv_mode = cv_modes[i];
+					menu->addChild(fade_cv_item);
+				}
+				return menu;
+			}
+		};
+
+		struct AuditionItem : MenuItem {
+			BusDepot *module;
+			int au_mode;
+			void onAction(const event::Action &e) override {
+				module->audition_mode = au_mode;
+			}
+		};
+
+		struct AuditionModesItem : MenuItem {
+			BusDepot *module;
+			Menu *createChildMenu() override {
+				Menu *menu = new Menu;
+				std::string mode_titles[2] = {"Normal (default)", "Always auditioned"};
+				int au_modes[2] = {0, 1};
+				for (int i = 0; i < 2; i++) {
+					AuditionItem *audition_item = new AuditionItem;
+					audition_item->text = mode_titles[i];
+					audition_item->rightText = CHECKMARK(module->audition_mode == au_modes[i]);
+					audition_item->module = module;
+					audition_item->au_mode = au_modes[i];
+					menu->addChild(audition_item);
+				}
+				return menu;
+			}
+		};
+
 		struct ThemeItem : MenuItem {
 			BusDepot* module;
 			int theme;
 			void onAction(const event::Action& e) override {
 				module->color_theme = theme;
-			}
-		};
-
-		struct LevelCvFilterItem : MenuItem {
-			BusDepot* module;
-			void onAction(const event::Action& e) override {
-				module->level_cv_filter = !module->level_cv_filter;
-			}
-		};
-
-		struct FadeCvModeItem : MenuItem {
-			BusDepot* module;
-			int cv_mode;
-			void onAction(const event::Action& e) override {
-				module->fade_cv_mode = cv_mode;
 			}
 		};
 
@@ -334,7 +523,25 @@ struct BusDepotWidget : ModuleWidget {
 		};
 
 		menu->addChild(new MenuEntry);
-		menu->addChild(createMenuLabel("Panel Theme"));
+		menu->addChild(createMenuLabel("Mixer Settings"));
+
+		LevelCvFiltersItem *levelCvFiltersItem = createMenuItem<LevelCvFiltersItem>("Level CV Filters");
+		levelCvFiltersItem->rightText = RIGHT_ARROW;
+		levelCvFiltersItem->module = module;
+		menu->addChild(levelCvFiltersItem);
+
+		FadeCvModesItem *fadeCvModesItem = createMenuItem<FadeCvModesItem>("Fade Speed Modulation");
+		fadeCvModesItem->rightText = RIGHT_ARROW;
+		fadeCvModesItem->module = module;
+		menu->addChild(fadeCvModesItem);
+
+		AuditionModesItem *auditionModesItem = createMenuItem<AuditionModesItem>("Audition Modes");
+		auditionModesItem->rightText = RIGHT_ARROW;
+		auditionModesItem->module = module;
+		menu->addChild(auditionModesItem);
+
+		menu->addChild(new MenuEntry);
+		menu->addChild(createMenuLabel("Panel Themes"));
 
 		std::string themeTitles[2] = {"70's Cream", "Night Ride"};
 		for (int i = 0; i < 2; i++) {
@@ -343,28 +550,6 @@ struct BusDepotWidget : ModuleWidget {
 			themeItem->module = module;
 			themeItem->theme = i;
 			menu->addChild(themeItem);
-		}
-
-		// CV filters
-		menu->addChild(new MenuEntry);
-		menu->addChild(createMenuLabel("CV Input Filters"));
-
-		LevelCvFilterItem* levelCvFilterItem = createMenuItem<LevelCvFilterItem>("Smoothing on level CV");
-		levelCvFilterItem->rightText = CHECKMARK(module->level_cv_filter);
-		levelCvFilterItem->module = module;
-		menu->addChild(levelCvFilterItem);
-
-		// Fade CV filters
-		menu->addChild(new MenuEntry);
-		menu->addChild(createMenuLabel("Fade CV Mode"));
-
-		std::string fadeCvModeTitles[3] = {"Both fade in and fade out speeds", "Fade in speed only", "Fade out speed only"};
-		for (int i = 0; i < 3; i++) {
-			FadeCvModeItem* fadeCvModeItem = createMenuItem<FadeCvModeItem>(fadeCvModeTitles[i]);
-			fadeCvModeItem->rightText = CHECKMARK(module->fade_cv_mode == i);
-			fadeCvModeItem->module = module;
-			fadeCvModeItem->cv_mode = i;
-			menu->addChild(fadeCvModeItem);
 		}
 
 		menu->addChild(new MenuEntry);
