@@ -139,10 +139,20 @@ struct MetroCityBus : Module {
 		case LongPressButton::LONG_PRESS:   // long press to audition
 
 			audition_mixer = true;   // all mixers to audition mode
-			auditioned = true;
 
-			if (!metro_fader.on) {
-				metro_fader.temped = !metro_fader.temped;   // remember if auditioned mixer is off
+			if (auditioned) {
+				auditioned = false;
+				if (metro_fader.temped) {
+					metro_fader.temped = false;
+					metro_fader.on = false;
+				}
+			} else {
+
+				auditioned = true;
+
+				if (!metro_fader.on) {
+					metro_fader.temped = !metro_fader.temped;   // remember if auditioned mixer is off
+				}
 			}
 			break;
 		}

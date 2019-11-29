@@ -99,10 +99,18 @@ struct GigBus : Module {
 		case LongPressButton::LONG_PRESS:   // long press to audition
 
 			audition_mixer = true;   // all mixers to audition mode
-			auditioned = true;
 
-			if (!gig_fader.on) {
-				gig_fader.temped = !gig_fader.temped;   // remember if auditioned mixer is off
+			if (auditioned) {
+				auditioned = false;
+				if (gig_fader.temped) {
+					gig_fader.on = false;
+					gig_fader.temped = false;
+				}
+			} else {
+				auditioned = true;
+				if (!gig_fader.on) {
+					gig_fader.temped = !gig_fader.temped;   // remember if auditioned mixer is off
+				}
 			}
 			break;
 		}

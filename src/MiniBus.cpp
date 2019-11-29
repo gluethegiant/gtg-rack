@@ -89,10 +89,19 @@ struct MiniBus : Module {
 		case LongPressButton::LONG_PRESS:   // long press to audition
 
 			audition_mixer = true;   // all mixers to audition mode
-			auditioned = true;
 
-			if (!mini_fader.on) {
-				mini_fader.temped = !mini_fader.temped;   // remember if auditioned mixer is off
+			if (auditioned) {
+				auditioned = false;
+				if (mini_fader.temped) {
+					mini_fader.temped = false;
+					mini_fader.on = false;
+				}
+			} else {
+				auditioned = true;
+
+				if (!mini_fader.on) {
+					mini_fader.temped = !mini_fader.temped;   // remember if auditioned mixer is off
+				}
 			}
 			break;
 		}

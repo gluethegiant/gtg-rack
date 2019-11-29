@@ -70,10 +70,20 @@ struct BusRoute : Module {
 				break;
 			case LongPressButton::LONG_PRESS:
 				auditioning = true;
-				bus_audition[i] = true;
 
-				if (!route_fader[i].on) {
-					route_fader[i].temped = !route_fader[i].temped;
+				if (bus_audition[i]) {
+					bus_audition[i] = false;
+					if (route_fader[i].temped) {
+						route_fader[i].on = false;
+						route_fader[i].temped = false;
+					}
+				} else {
+
+					bus_audition[i] = true;
+
+					if (!route_fader[i].on) {
+						route_fader[i].temped = !route_fader[i].temped;
+					}
 				}
 				break;
 			}

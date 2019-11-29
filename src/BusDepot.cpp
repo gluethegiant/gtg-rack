@@ -106,10 +106,19 @@ struct BusDepot : Module {
 		case LongPressButton::LONG_PRESS:   // long press to audition
 
 			audition_depot = true;   // all depots to audition mode
-			auditioned = true;
 
-			if (!depot_fader.on) {
-				depot_fader.temped = !depot_fader.temped;   // remember if auditioned depot is off
+			if (auditioned) {
+				auditioned = false;
+				if (depot_fader.temped) {
+					depot_fader.temped = false;
+					depot_fader.on = true;
+				}
+			} else {
+				auditioned = true;
+
+				if (!depot_fader.on) {
+					depot_fader.temped = !depot_fader.temped;   // remember if auditioned depot is off
+				}
 			}
 			break;
 		}

@@ -61,10 +61,20 @@ struct Road : Module {
 				break;
 			case LongPressButton::LONG_PRESS:
 				auditioning = true;
-				bus_audition[i] = true;
 
-				if (!road_fader[i].on) {
-					road_fader[i].temped = !road_fader[i].temped;   // remember if bus was off
+				if (bus_audition[i]) {
+					bus_audition[i] = false;
+					if (road_fader[i].temped) {
+						road_fader[i].on = false;
+						road_fader[i].temped = false;
+					}
+				} else {
+
+					bus_audition[i] = true;
+
+					if (!road_fader[i].on) {
+						road_fader[i].temped = !road_fader[i].temped;   // remember if bus was off
+					}
 				}
 				break;
 			}
