@@ -324,6 +324,7 @@ struct BusDepot : Module {
 		json_object_set_new(rootJ, "level_cv_filter", json_integer(level_cv_filter));
 		json_object_set_new(rootJ, "color_theme", json_integer(color_theme));
 		json_object_set_new(rootJ, "fade_cv_mode", json_integer(fade_cv_mode));
+		json_object_set_new(rootJ, "audition_depot", json_integer(audition_depot));
 		json_object_set_new(rootJ, "auditioned", json_integer(auditioned));
 		json_object_set_new(rootJ, "temped", json_integer(depot_fader.temped));
 		json_object_set_new(rootJ, "audition_mode", json_integer(audition_mode));
@@ -349,11 +350,14 @@ struct BusDepot : Module {
 				params[FADE_IN_PARAM].setValue(params[FADE_PARAM].getValue());   // same behavior on patches saved before fade in knob existed
 			}
 		}
-		json_t *auditionedJ = json_object_get(rootJ, "auditioned");
-		if (auditionedJ) {
-			auditioned = json_integer_value(auditionedJ);
-			if (!audition_depot) audition_depot = auditioned;   // if one bus depot is auditioned then audition_depot
+		json_t *audition_depotJ = json_object_get(rootJ, "audition_depot");
+		if (audition_depotJ) {
+			audition_depot = json_integer_value(audition_depotJ);
+		} else {
+			audition_depot = false;   // off because patch saved before audition
 		}
+		json_t *auditionedJ = json_object_get(rootJ, "auditioned");
+		if (auditionedJ) auditioned = json_integer_value(auditionedJ);
 		json_t *tempedJ = json_object_get(rootJ, "temped");
 		if (tempedJ) depot_fader.temped = json_integer_value(tempedJ);
 		json_t *audition_modeJ = json_object_get(rootJ, "audition_mode");

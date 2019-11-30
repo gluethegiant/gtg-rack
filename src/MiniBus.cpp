@@ -230,6 +230,7 @@ struct MiniBus : Module {
 		json_object_set_new(rootJ, "gain", json_real(mini_fader.getGain()));
 		json_object_set_new(rootJ, "fade_in", json_real(fade_in));
 		json_object_set_new(rootJ, "fade_out", json_real(fade_out));
+		json_object_set_new(rootJ, "audition_mixer", json_integer(audition_mixer));
 		json_object_set_new(rootJ, "auditioned", json_integer(auditioned));
 		json_object_set_new(rootJ, "temped", json_integer(mini_fader.temped));
 		json_object_set_new(rootJ, "color_theme", json_integer(color_theme));
@@ -252,11 +253,14 @@ struct MiniBus : Module {
 		if (fade_inJ) fade_in = json_real_value(fade_inJ);
 		json_t *fade_outJ = json_object_get(rootJ, "fade_out");
 		if (fade_outJ) fade_out = json_real_value(fade_outJ);
-		json_t *auditionedJ = json_object_get(rootJ, "auditioned");
-		if (auditionedJ) {
-			auditioned = json_integer_value(auditionedJ);
-			if (!audition_mixer) audition_mixer = auditioned;
+		json_t *audition_mixerJ = json_object_get(rootJ, "audition_mixer");
+		if (audition_mixerJ) {
+			audition_mixer = json_integer_value(audition_mixerJ);
+		} else {
+			audition_mixer = false;   // no auditioning when loading old patch right after auditioned patch
 		}
+		json_t *auditionedJ = json_object_get(rootJ, "auditioned");
+		if (auditionedJ) auditioned = json_integer_value(auditionedJ);
 		json_t *tempedJ = json_object_get(rootJ, "temped");
 		if (tempedJ) mini_fader.temped = json_integer_value(tempedJ);
 		json_t *color_themeJ = json_object_get(rootJ, "color_theme");
