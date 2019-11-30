@@ -19,6 +19,7 @@
       "description": "Pan to three stereo buses",
       "tags": [
         "Mixer",
+        "visual",
         "Polyphonic"
       ]
     },
@@ -62,7 +63,7 @@
     {
       "slug": "BusRoute",
       "name": "Bus Route",
-      "description": "Three stereo sends and returns",
+      "description": "Three stereo sends and returns with optional sample delays",
       "tags": [
         "Mixer",
         "Delay",
@@ -73,7 +74,7 @@
     {
       "slug": "Road",
       "name": "Road",
-      "description": "Merge stereo buses from mix groups",
+      "description": "Merge stereo buses from mixers and mix groups",
       "tags": [
         "Utility",
         "Polyphonic"
