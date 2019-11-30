@@ -1,10 +1,10 @@
 # Glue the Giant's Modular Bus Mixers for VCV Rack
 
-Build your own lightweight, powerful mixer by connecting these modules together with the BUS IN and BUS OUT ports.
-The audio is routed along three stereo buses: red, orange, and blue.
+Build your next mixer visually by connecting these modules together with the BUS IN and BUS OUT ports.
+With features like send effects, fade automation, solo, mixer groups, group auditions, effect auditions, pop filters, mixer preamps, two polyphonic stereo spread modes, and integrated latency compensation, they can also help your next patch sound amazing.
 
-The bus design makes it easy to patch together modules while creating simple or complex routing.
-With features like pop filters, fade automation, send effects, mix groups, effect and bus auditioning, polyphonic stereo spread, and integrated latency compensation, they can also help you make your next patch sound amazing.
+The audio between modules is routed along three stereo buses: red, orange, and blue.
+This bus design makes it easy to patch together modules for a simple mixer or for complex audio routing similar to what can be found in modern DAWs.
 
 ![Modular bus mixers from Glue the Giant](https://github.com/gluethegiant/gtg-rack/blob/master/design/screenshot.png)
 
@@ -37,6 +37,19 @@ Finally, thanks always to Rebecca.
 To build these rack modules, see the official [VCV Rack documentation](https://vcvrack.com/manual/Building.html).
 
 ## Release Notes
+
+v. 1.0.7 The Solo Release (December 1, 2019)
+
+- Added audition mode (solo) to all mixers by long pressing the on buttons
+- Added separate fade in and fade out automation speeds to all mixer modules (from the context menu)
+- Added vu meters to the Gig Bus Mixer
+- Added audition modes to Bus Depots (for group auditions) by long pressing the on buttons
+- Added "Always audition" mode to Bus Depots for the ability to keep a master Bus Depot always on
+- Updated on/audition buttons on Road and Bus Route to match new mixer audition functionality
+- New 8x gain mode on all mixer preamps
+- Improved vu meters on Bus Depot
+- Updated context menus
+- Small code optimizations
 
 v. 1.0.6 A Chilly November Release (November 15, 2019)
 
