@@ -19,6 +19,7 @@ struct AutoFader {
 	void setGain(float amount) {
 		gain = amount;
 		setSpeed(last_speed);
+		if (fade > gain) fade = gain;   // keep from getting a fade stuck higher than gain
 	}
 
 	float getGain() {
