@@ -390,8 +390,8 @@ struct GigBusWidget : ModuleWidget {
 			GigBus *module;
 			Menu *createChildMenu() override {
 				Menu *menu = new Menu;
-				std::string gain_titles[4] = {"No gain (default)", "2x gain", "4x gain", "6x gain"};
-				float gain_amounts[4] = {1.f, 2.f, 4.f, 6.f};
+				std::string gain_titles[4] = {"No gain (default)", "2x gain", "4x gain", "8x gain"};
+				float gain_amounts[4] = {1.f, 2.f, 4.f, 8.f};
 				for (int i = 0; i < 4; i++) {
 					GainLevelItem *gain_item = new GainLevelItem;
 					gain_item->text = gain_titles[i];
