@@ -1,10 +1,10 @@
 # Glue the Giant's Modular Bus Mixers for VCV Rack
 
-Build your next mixer visually by connecting these modules together with the BUS IN and BUS OUT ports.
-With features like send effects, fade automation, solo, mixer groups, group auditions, effect auditions, pop filters, mixer preamps, two polyphonic stereo spread modes, and integrated latency compensation, they can also help your next patch sound amazing.
+Create your own mixer by connecting these modules together with the BUS IN and BUS OUT ports.
+With features like send effects, fade automation, solo, mixer groups, group auditions, effect auditions, pop filters, mixer preamps, two polyphonic stereo spread modes, and integrated latency compensation, they can also help your next patch look and sound amazing.
 
 The audio between modules is routed along three stereo buses: red, orange, and blue.
-This bus design makes it easy to patch together modules for a simple mixer or for complex audio routing similar to what can be found in modern DAWs.
+This bus design makes it easy to patch together a simple mixer or complex audio routing similar to what can be found in modern DAWs.
 
 ![Modular bus mixers from Glue the Giant](https://github.com/gluethegiant/gtg-rack/blob/master/design/screenshot.png)
 
