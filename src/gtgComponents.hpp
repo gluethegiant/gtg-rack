@@ -104,7 +104,7 @@ struct LongPressButton {
 		bool pressed = param.value > 0.f;
 		if (pressed && pressedTime >= 0.f) {
 			pressedTime += APP->engine->getSampleTime();
-			if (pressedTime >= 1.f) {
+			if (pressedTime >= 0.7f) {
 				pressedTime = -1.f;
 				result = LONG_PRESS;
 			}
