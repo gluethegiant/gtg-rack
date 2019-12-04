@@ -38,7 +38,12 @@ To build these rack modules, see the official [VCV Rack documentation](https://v
 
 ## Release Notes
 
-v. 1.0.7 The Solo Release (December 1, 2019)
+v1.1.0 The Live Mix Release (December 5, 2019)
+
+- Made knobs more responsive (for full fades when live mixing)
+- Made long press for audition modes more responsive
+
+v1.0.7 The Solo Release (November 30, 2019)
 
 - Added audition mode (solo) to all mixers by long pressing the on buttons
 - Added separate fade in and fade out automation speeds to all mixer modules (from the context menu)
@@ -51,13 +56,13 @@ v. 1.0.7 The Solo Release (December 1, 2019)
 - Updated context menus
 - Small code optimizations
 
-v. 1.0.6 A Chilly November Release (November 15, 2019)
+v1.0.6 A Chilly November Release (November 15, 2019)
 
 - Fix issue with Bus Depot where the fade out time did not change until the fade in knob was moved or the patch was restarted.
 - Added post fader send to orange and blue on Mini Bus Mixer (through context menu)
 - Added ability to always default mixer strips to use post fader sends
 
-v. 1.0.5 The Audition Release (November 11, 2019)
+v1.0.5 The Audition Release (November 11, 2019)
 
 - Fade in automation and three fade modulation modes added to Bus Depot
 - Bus Depot fade automation time increased to 34 seconds
@@ -69,7 +74,7 @@ v. 1.0.5 The Audition Release (November 11, 2019)
 - Filters added to post send buttons on School Bus Mixer and Metro City Bus Mixer to remove clicks during live use
 - Minor visual improvements to some panels
 
-v. 1.0.4 The Halloween Release (October 31, 2019)
+v1.0.4 The Halloween Release (October 31, 2019)
 
 - Night Ride theme released on Halloween day (available in the context menu)
 - Optionally default to the Night Ride theme
@@ -77,7 +82,7 @@ v. 1.0.4 The Halloween Release (October 31, 2019)
 - Improved fade automation on Bus Depot (exponential)
 - Improved responsiveness on Bus Depot vu meters
 
-v. 1.0.3 The Mix Group Release (October 18, 2019)
+v1.0.3 The Mix Group Release (October 18, 2019)
 
 - Mix groups can more easily use the faders and vu meters of Bus Depot modules while still routing buses to final send effects (e.g. when you have one reverb to rule them all)
 - Added bus output to Bus Depot to facilitate mix groups
@@ -85,7 +90,7 @@ v. 1.0.3 The Mix Group Release (October 18, 2019)
 - Added three input level knobs to Enter Bus (allows, among other things, creative routing of a send effect return)
 - Wrote an initial User's Guide, including a tutorial
 
-v. 1.0.2 The Tick Release (October 12, 2019)
+v1.0.2 The Tick Release (October 12, 2019)
 
 - Added 2x or 4x preamp-style gain on all four mixer strips (selected from the context menu)
 - New sample delay lines provide latency compensation on Bus Route
@@ -96,7 +101,7 @@ v. 1.0.2 The Tick Release (October 12, 2019)
 - Other improvements in the code (e.g. a fader object allowed the addition of new features with no CPU increase)
 - Small UI enhancements, including fleas ... I mean lice ... no, I mean ticks (tick marks, that is, our buses do not have lice)
 
-v. 1.0.1 Metro City Bus Release (September 23, 2019)
+v1.0.1 Metro City Bus Release (September 23, 2019)
 
 - Added Metro City Bus Mixer with polyphonic stereo spread
 - Added Gig Bus Mixer for easy, standard mixing
@@ -107,12 +112,12 @@ Note: Some VCV patches saved with version 1.0.0 of the modular bus mixers will n
 The developer thought parameters were being saved by their names.
 He now knows parameters are saved by their order.
 
-v. 1.0.0 Initial VCV Rack Library Release (September 6, 2019)
+v1.0.0 Initial VCV Rack Library Release (September 6, 2019)
 
 - Peak indicators on Bus Depot are now sample accurate
 - Peak indicators stay on longer
 
-v. 1.0.0 Initial Release (September 3, 2019)
+v1.0.0 Initial Release (September 3, 2019)
 
 - Mini Bus Mixer, School Bus Mixer, and Bus Depot modules released
 - Bus Route, Enter Bus, and Exit Bus utility modules for bus mixers released
