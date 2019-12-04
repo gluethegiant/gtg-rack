@@ -195,6 +195,7 @@ struct gtgRedKnob : ThemedSvgKnob {
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/RedKnob_Night.svg")));
 		minAngle = -0.83 * M_PI;
 		maxAngle = 0.83 * M_PI;
+		speed = 2.2f;
 	}
 };
 
@@ -204,6 +205,7 @@ struct gtgOrangeKnob : ThemedSvgKnob {
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/OrangeKnob_Night.svg")));
 		minAngle = -0.83 * M_PI;
 		maxAngle = 0.83 * M_PI;
+		speed = 2.2f;
 	}
 };
 
@@ -213,6 +215,7 @@ struct gtgBlueKnob : ThemedSvgKnob {
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlueKnob_Night.svg")));
 		minAngle = -0.83 * M_PI;
 		maxAngle = 0.83 * M_PI;
+		speed = 2.2f;
 	}
 };
 
@@ -222,6 +225,7 @@ struct gtgGrayKnob : ThemedSvgKnob {
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/GrayKnob_Night.svg")));
 		minAngle = -0.83 * M_PI;
 		maxAngle = 0.83 * M_PI;
+		speed = 2.2f;
 	}
 };
 
@@ -231,6 +235,7 @@ struct gtgBlackKnob : ThemedSvgKnob {
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlackKnob_Night.svg")));
 		minAngle = -0.83 * M_PI;
 		maxAngle = 0.83 * M_PI;
+		speed = 2.2f;
 	}
 };
 
@@ -240,6 +245,7 @@ struct gtgBlackTinyKnob : ThemedSvgKnob {
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlackTinyKnob_Night.svg")));
 		minAngle = -0.83 * M_PI;
 		maxAngle = 0.83 * M_PI;
+		speed = 2.2f;
 	}
 };
 
@@ -249,6 +255,7 @@ struct gtgGrayTinyKnob : ThemedSvgKnob {
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/GrayTinyKnob_Night.svg")));
 		minAngle = -0.83 * M_PI;
 		maxAngle = 0.83 * M_PI;
+		speed = 2.2f;
 	}
 };
 
@@ -258,6 +265,7 @@ struct gtgBlueTinyKnob : ThemedSvgKnob {
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlueTinyKnob_Night.svg")));
 		minAngle = -0.83 * M_PI;
 		maxAngle = 0.83 * M_PI;
+		speed = 2.2f;
 	}
 };
 
@@ -267,6 +275,7 @@ struct gtgOrangeTinyKnob : ThemedSvgKnob {
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/OrangeTinyKnob_Night.svg")));
 		minAngle = -0.83 * M_PI;
 		maxAngle = 0.83 * M_PI;
+		speed = 2.2f;
 	}
 };
 
@@ -276,6 +285,7 @@ struct gtgRedTinyKnob : ThemedSvgKnob {
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/RedTinyKnob_Night.svg")));
 		minAngle = -0.83 * M_PI;
 		maxAngle = 0.83 * M_PI;
+		speed = 2.2f;
 	}
 };
 
@@ -285,6 +295,7 @@ struct gtgBlueTinySnapKnob : ThemedRoundBlackSnapKnob {
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlueTinyKnob_Night.svg")));
 		minAngle = -0.83 * M_PI;
 		maxAngle = 0.83 * M_PI;
+		speed = 0.6f;
 	}
 };
 
@@ -294,6 +305,7 @@ struct gtgOrangeTinySnapKnob : ThemedRoundBlackSnapKnob {
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/OrangeTinyKnob_Night.svg")));
 		minAngle = -0.83 * M_PI;
 		maxAngle = 0.83 * M_PI;
+		speed = 0.6f;
 	}
 };
 
@@ -303,6 +315,7 @@ struct gtgRedTinySnapKnob : ThemedRoundBlackSnapKnob {
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/RedTinyKnob_Night.svg")));
 		minAngle = -0.83 * M_PI;
 		maxAngle = 0.83 * M_PI;
+		speed = 0.6f;
 	}
 };
 
@@ -312,6 +325,7 @@ struct gtgGrayTinySnapKnob : ThemedRoundBlackSnapKnob {
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/GrayTinyKnob_Night.svg")));
 		minAngle = -0.83 * M_PI;
 		maxAngle = 0.83 * M_PI;
+		speed = 2.2f;
 	}
 };
 
