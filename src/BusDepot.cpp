@@ -302,18 +302,20 @@ struct BusDepot : Module {
 			lights[RIGHT_LIGHTS + 0].setBrightness(peak_right);
 
 			// green and yellow lights
-			for (int i = 1; i < 7; i++) {
+			for (int i = 1; i < 6; i++) {
 				lights[LEFT_LIGHTS + i].setBrightness(vu_meters[0].getBrightness((-3 * i), -3 * (i - 1)));
 				lights[RIGHT_LIGHTS + i].setBrightness(vu_meters[1].getBrightness((-3 * i), -3 * (i - 1)));
 			}
-			lights[LEFT_LIGHTS + 7].setBrightness(vu_meters[0].getBrightness(-22, -18));
-			lights[RIGHT_LIGHTS + 7].setBrightness(vu_meters[1].getBrightness(-22, -18));
-			lights[LEFT_LIGHTS + 8].setBrightness(vu_meters[0].getBrightness(-26, -22));
-			lights[RIGHT_LIGHTS + 8].setBrightness(vu_meters[1].getBrightness(-26, -22));
-			lights[LEFT_LIGHTS + 9].setBrightness(vu_meters[0].getBrightness(-32, -26));
-			lights[RIGHT_LIGHTS + 9].setBrightness(vu_meters[1].getBrightness(-32, -26));
-			lights[LEFT_LIGHTS + 10].setBrightness(vu_meters[0].getBrightness(-48, -32));
-			lights[RIGHT_LIGHTS + 10].setBrightness(vu_meters[1].getBrightness(-48, -32));
+			lights[LEFT_LIGHTS + 6].setBrightness(vu_meters[0].getBrightness(-19, -15));
+			lights[RIGHT_LIGHTS + 6].setBrightness(vu_meters[1].getBrightness(-19, -15));
+			lights[LEFT_LIGHTS + 7].setBrightness(vu_meters[0].getBrightness(-24, -19));
+			lights[RIGHT_LIGHTS + 7].setBrightness(vu_meters[1].getBrightness(-24, -19));
+			lights[LEFT_LIGHTS + 8].setBrightness(vu_meters[0].getBrightness(-30, -24));
+			lights[RIGHT_LIGHTS + 8].setBrightness(vu_meters[1].getBrightness(-30, -24));
+			lights[LEFT_LIGHTS + 9].setBrightness(vu_meters[0].getBrightness(-36, -28));
+			lights[RIGHT_LIGHTS + 9].setBrightness(vu_meters[1].getBrightness(-36, -28));
+			lights[LEFT_LIGHTS + 10].setBrightness(vu_meters[0].getBrightness(-48, -36));
+			lights[RIGHT_LIGHTS + 10].setBrightness(vu_meters[1].getBrightness(-48, -36));
 		}
 	}
 
