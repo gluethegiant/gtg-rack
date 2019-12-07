@@ -55,7 +55,7 @@ struct GigBus : Module {
 		configParam(LEVEL_PARAMS + 2, 0.f, 1.f, 1.f, "Master level to red stereo bus");
 		vu_meters[0].lambda = 25.f;
 		vu_meters[1].lambda = 25.f;
-		vu_divider.setDivision(500);
+		vu_divider.setDivision(32);
 		light_divider.setDivision(240);
 		audition_divider.setDivision(512);
 		pan_divider.setDivision(3);
@@ -207,6 +207,10 @@ struct GigBus : Module {
 				float red_level = stereo_in[i] * in_levels[2];
 				vu_meters[i].process(args.sampleTime * vu_divider.getDivision(), red_level / 10.f);
 			}
+		}
+
+		// set lights infrequently
+		if (light_divider.process()) {   // set lights infrequently
 
 			// set on light
 			if (gig_fader.getFade() == gig_fader.getGain()) {
@@ -226,10 +230,6 @@ struct GigBus : Module {
 					lights[ON_LIGHT + 1].value = gig_fader.getFade() * 0.5f;
 				}
 			}
-		}
-
-		// set lights infrequently
-		if (light_divider.process()) {   // set lights infrequently
 
 			// make peak lights stay on when hit
 			for (int c = 0; c < 2; c++) {
@@ -238,7 +238,7 @@ struct GigBus : Module {
 			lights[LEFT_LIGHTS + 0].setBrightness(peak_stereo[0]);
 			lights[RIGHT_LIGHTS + 0].setBrightness(peak_stereo[1]);
 
-			// green and yellow lights
+			// green and yellow vu lights
 			for (int i = 1; i < 7; i++) {
 				lights[LEFT_LIGHTS + i].setBrightness(vu_meters[0].getBrightness((-3 * i), -3 * (i - 1)));
 				lights[RIGHT_LIGHTS + i].setBrightness(vu_meters[1].getBrightness((-3 * i), -3 * (i - 1)));

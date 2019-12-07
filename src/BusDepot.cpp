@@ -62,7 +62,7 @@ struct BusDepot : Module {
 		configParam(FADE_IN_PARAM, 26, 34000, 26, "Fade in automation in milliseconds");
 		vu_meters[0].lambda = 25.f;
 		vu_meters[1].lambda = 25.f;
-		vu_divider.setDivision(500);
+		vu_divider.setDivision(32);
 		light_divider.setDivision(240);
 		audition_divider.setDivision(512);
 		depot_fader.setSpeed(26);
