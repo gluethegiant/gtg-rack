@@ -19,7 +19,8 @@
       "description": "Stereo mixer to three stereo buses",
       "tags": [
         "Mixer",
-        "visual",
+        "Panning",
+        "Visual",
         "Polyphonic"
       ]
     },
@@ -38,6 +39,7 @@
       "description": "Pan and levels with CVs to three stereo buses",
       "tags": [
         "Mixer",
+        "Panning",
         "Polyphonic"
       ]
     },
@@ -47,6 +49,7 @@
       "description": "Polyphonic stereo spread (and pan follow) to three stereo buses",
       "tags": [
         "Mixer",
+        "Panning",
         "Polyphonic"
       ]
     },
@@ -85,7 +88,8 @@
       "name": "Enter Mixer Bus",
       "description": "Three stereo inputs to stereo buses",
       "tags": [
-        "Utility"
+        "Utility",
+        "Polyphonic"
       ]
     },
     {
@@ -93,7 +97,8 @@
       "name": "Exit Mixer Bus",
       "description": "Three stereo outputs from stereo buses",
       "tags": [
-        "Utility"
+        "Utility",
+        "Polyphonic"
       ]
     }
   ]
