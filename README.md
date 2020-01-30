@@ -26,8 +26,8 @@ Thanks to Andrew Belt (Vortico) for the VCV Rack software and its community of d
 
 Thanks to all the other Rack coders, especially those who share their code.
 You are too numerous to thank individually, but I tried to star all of your repos and have started to include acknowledgments in the code.
-Thanks for the early encouragement from users, like Aria_Salvatrice, dag2099, browneditor, and chaircrusher, who displayed the use of the modular bus mixers in published songs and videos.
-While these modules are still a work in progress, that early encouragement made me want to make them more feature complete with better code under the hood.
+Thanks for the early encouragement from users, like Aria_Salvatrice, dag2099, browneditor, and chaircrusher, who displayed the use of the Modular Bus Mixers in published songs and videos.
+That early encouragement made me want to make them more feature complete with better code under the hood.
 Thanks to rsmus7 for beta testing.
 Thanks to Omri Cohen for the videos that helped inspire these modules.
 Finally, thanks always to Rebecca.
@@ -37,6 +37,13 @@ Finally, thanks always to Rebecca.
 To build these rack modules, see the official [VCV Rack documentation](https://vcvrack.com/manual/Building.html).
 
 ## Release Notes
+
+v1.1.1 Gigging the Gig Bus Release (February 1, 2019)
+
+- Added normal fader mode to orange and blue knobs on the Gig Bus Mixer (per Aria_Salvatrice request)
+- Fixed the exponential curve on the fade automation of some mixer strip modules
+- Preamp gain changes take effect immediately (even if fade automation is set)
+- Minor code optimizations
 
 v1.1.0 The Live Mix Release (December 5, 2019)
 
