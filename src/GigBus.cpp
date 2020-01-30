@@ -37,11 +37,14 @@ struct GigBus : Module {
 	dsp::ClockDivider pan_divider;
 	AutoFader gig_fader;
 	ConstantPan gig_pan;
+	SimpleSlewer post_fade_filter;
 
 	const int bypass_speed = 26;
+	const int smooth_speed = 26;
 	float fade_in = 26.f;
 	float fade_out = 26.f;
 	bool auto_override = false;
+	bool post_fades = true;
 	bool auditioned = false;
 	float peak_stereo[2] = {0.f, 0.f};
 	int color_theme = 0;
@@ -60,6 +63,8 @@ struct GigBus : Module {
 		audition_divider.setDivision(512);
 		pan_divider.setDivision(3);
 		gig_fader.setSpeed(fade_in);
+		post_fade_filter.setSlewSpeed(smooth_speed);
+		post_fade_filter.value = 1.f;
 		color_theme = loadGtgPluginDefault("default_theme", 0);
 	}
 
@@ -172,11 +177,23 @@ struct GigBus : Module {
 			}
 		}
 
-		// get input levels
+		// define input levels
 		float in_levels[3] = {0.f, 0.f, 0.f};
+
+		// get red level
 		in_levels[2] = params[LEVEL_PARAMS + 2].getValue();   // master red level
+
+		// slew a post fader level if needed
+		float post_amount = 1.f;
+		if (post_fades) {
+			post_amount = post_fade_filter.slew(in_levels[2]);
+		} else {
+			post_amount = post_fade_filter.slew(1.f);
+		}
+
+		// get orange and blue levels
 		for (int sb = 0; sb < 2; sb++) {   // send levels
-			in_levels[sb] = params[LEVEL_PARAMS + sb].getValue() * in_levels[2];   // multiply by master for post send levels
+			in_levels[sb] = params[LEVEL_PARAMS + sb].getValue() * post_amount;   // multiply by master for post send levels
 		}
 
 		// get stereo pan levels
@@ -184,15 +201,23 @@ struct GigBus : Module {
 			gig_pan.setPan(params[PAN_PARAM].getValue());
 		}
 
+		// get exponential fade
+		float exp_fade = 0.f;
+		if (gig_fader.fading) {
+			exp_fade = gig_fader.getExpFade(2.5);
+		} else {
+			exp_fade = gig_fader.getFade();
+		}
+
 		// process inputs
 		float stereo_in[2] = {0.f, 0.f};
 		if (inputs[R_INPUT].isConnected()) {   // get a channel from each cable input
-			stereo_in[0] = inputs[LMP_INPUT].getVoltage() * gig_pan.getLevel(0) * gig_fader.getFade();
-			stereo_in[1] = inputs[R_INPUT].getVoltage() * gig_pan.getLevel(1) * gig_fader.getFade();
+			stereo_in[0] = inputs[LMP_INPUT].getVoltage() * gig_pan.getLevel(0) * exp_fade;
+			stereo_in[1] = inputs[R_INPUT].getVoltage() * gig_pan.getLevel(1) * exp_fade;
 		} else {   // split mono or sum of polyphonic cable on LMP
 			float lmp_in = inputs[LMP_INPUT].getVoltageSum();
 			for (int c = 0; c < 2; c++) {
-				stereo_in[c] = lmp_in * gig_pan.getLevel(c) * gig_fader.getFade();
+				stereo_in[c] = lmp_in * gig_pan.getLevel(c) * exp_fade;
 			}
 		}
 
@@ -233,7 +258,7 @@ struct GigBus : Module {
 
 			// make peak lights stay on when hit
 			for (int c = 0; c < 2; c++) {
-				if (peak_stereo[c] > 0) peak_stereo[c] -= 60.f /args.sampleRate; else peak_stereo[c] = 0.f;
+				if (peak_stereo[c] > 0) peak_stereo[c] -= 120.f / args.sampleRate; else peak_stereo[c] = 0.f;
 			}
 			lights[LEFT_LIGHTS + 0].setBrightness(peak_stereo[0]);
 			lights[RIGHT_LIGHTS + 0].setBrightness(peak_stereo[1]);
@@ -271,6 +296,7 @@ struct GigBus : Module {
 	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
 		json_object_set_new(rootJ, "input_on", json_integer(gig_fader.on));
+		json_object_set_new(rootJ, "post_fades", json_integer(post_fades));
 		json_object_set_new(rootJ, "gain", json_real(gig_fader.getGain()));
 		json_object_set_new(rootJ, "color_theme", json_integer(color_theme));
 		json_object_set_new(rootJ, "fade_in", json_real(fade_in));
@@ -285,6 +311,8 @@ struct GigBus : Module {
 	void dataFromJson(json_t *rootJ) override {
 		json_t *input_onJ = json_object_get(rootJ, "input_on");
 		if (input_onJ) gig_fader.on = json_integer_value(input_onJ);
+		json_t *post_fadesJ = json_object_get(rootJ, "post_fades");
+		if (post_fadesJ) post_fades = json_integer_value(post_fadesJ);
 		json_t *gainJ = json_object_get(rootJ, "gain");
 		if (gainJ) gig_fader.setGain((float)json_real_value(gainJ));
 		json_t *fade_inJ = json_object_get(rootJ, "fade_in");
@@ -320,6 +348,7 @@ struct GigBus : Module {
 		gig_fader.setGain(1.f);
 		fade_in = 26.f;
 		fade_out = 26.f;
+		post_fades = true;
 		audition_mixer = false;
 	}
 };
@@ -406,6 +435,33 @@ struct GigBusWidget : ModuleWidget {
 			}
 		};
 
+		// set post fader sends on blue and orange buses
+		struct PostToggleItem : MenuItem {
+			GigBus *module;
+			int post_fade;
+			void onAction(const event::Action &e) override {
+				module->post_fades = post_fade;
+			}
+		};
+
+		struct PostFadesItem : MenuItem {
+			GigBus *module;
+			Menu *createChildMenu() override {
+				Menu *menu = new Menu;
+				std::string fade_titles[2] = {"Normal faders", "Post red fader sends (default)"};
+				int post_mode[2] = {0, 1};
+				for (int i = 0; i < 2; i++) {
+					PostToggleItem *post_item = new PostToggleItem;
+					post_item->text = fade_titles[i];
+					post_item->rightText = CHECKMARK(module->post_fades == post_mode[i]);
+					post_item->module = module;
+					post_item->post_fade = post_mode[i];
+					menu->addChild(post_item);
+				}
+				return menu;
+			}
+		};
+
 		struct ThemeItem : MenuItem {
 			GigBus* module;
 			int theme;
@@ -449,6 +505,11 @@ struct GigBusWidget : ModuleWidget {
 		gainsItem->rightText = RIGHT_ARROW;
 		gainsItem->module = module;
 		menu->addChild(gainsItem);
+
+		PostFadesItem *postFadesItem = createMenuItem<PostFadesItem>("Blue and Orange Levels");
+		postFadesItem->rightText = RIGHT_ARROW;
+		postFadesItem->module = module;
+		menu->addChild(postFadesItem);
 
 		// panel themes
 		menu->addChild(new MenuEntry);
