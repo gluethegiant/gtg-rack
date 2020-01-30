@@ -336,12 +336,20 @@ struct MetroCityBus : Module {
 			}
 		}   // end pan_divider.process()
 
+		// get exponential fade
+		float exp_fade = 0.f;
+		if (metro_fader.fading) {
+			exp_fade = metro_fader.getExpFade(2.5);
+		} else {
+			exp_fade = metro_fader.getFade();
+		}
+
 		// process inputs
 		float stereo_in[2] = {0.f, 0.f};
 		if (spread_pos == 0 && metro_pan[channel_no - 1].position == params[PAN_PARAM].getValue()) {   // sum channels if no spread
 			float sum_in = inputs[POLY_INPUT].getVoltageSum();
 			for (int c = 0; c < 2; c++) {
-				stereo_in[c] = sum_in * metro_pan[0].levels[c] * metro_fader.getFade();
+				stereo_in[c] = sum_in * metro_pan[0].levels[c] * exp_fade;
 			}
 		} else {
 			for (int c = 0; c < channel_no; c++) {
@@ -356,8 +364,8 @@ struct MetroCityBus : Module {
 			}
 
 			// Apply fade after summing
-			stereo_in[0] *= metro_fader.getFade();
-			stereo_in[1] *= metro_fader.getFade();
+			stereo_in[0] *= exp_fade;
+			stereo_in[1] *= exp_fade;
 		}
 
 		// process bus outputs
