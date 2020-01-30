@@ -185,7 +185,12 @@ struct MiniBus : Module {
 		}
 
 		// get inputs
-		float mono_in = inputs[MP_INPUT].getVoltageSum() * mini_fader.getExpFade(2.5);
+		float mono_in = 0.f;
+		if (mini_fader.fading) {
+			mono_in = inputs[MP_INPUT].getVoltageSum() * mini_fader.getExpFade(2.5);
+		} else {
+			mono_in = inputs[MP_INPUT].getVoltageSum() * mini_fader.getFade();
+		}
 
 		// get levels
 		float in_levels[3];
@@ -364,7 +369,7 @@ struct MiniBusWidget : ModuleWidget {
 			MiniBus *module;
 			Menu *createChildMenu() override {
 				Menu *menu = new Menu;
-				std::string fade_titles[2] = {"Normal (default)", "Post red fader sends"};
+				std::string fade_titles[2] = {"Normal faders (default)", "Post red fader sends"};
 				int post_mode[2] = {0, 1};
 				for (int i = 0; i < 2; i++) {
 					PostToggleItem *post_item = new PostToggleItem;
