@@ -231,13 +231,18 @@ struct BusDepot : Module {
 
 		// process sound
 		float summed_out[2] = {0.f, 0.f};
-		if (depot_fader.getFade() > 0) {   // don't need to process sound when silent
+		if (depot_fader.getFade() > 0.f) {   // don't need to process sound when silent
 
 			// get param levels
 			float aux_level = params[AUX_PARAM].getValue();
 			float master_level = clamp(inputs[LEVEL_CV_INPUT].getNormalVoltage(10.0f) * 0.1f, 0.0f, 1.0f) * params[LEVEL_PARAM].getValue();
 			if (level_cv_filter) master_level = level_smoother.slew(master_level);
-			float fade = depot_fader.getExpFade(2.5);   // exponential fade for fade automation
+			float exp_fade = 0.f;
+			if (depot_fader.fading) {
+				exp_fade = depot_fader.getExpFade(2.5);   // exponential fade for fade automation
+			} else {
+				exp_fade = depot_fader.getFade();
+			}
 
 			// get aux inputs
 			float stereo_in[2] = {0.f, 0.f};
@@ -256,12 +261,12 @@ struct BusDepot : Module {
 
 			// get blue and orange buses with levels
 			for (int c = 0; c < 4; c++) {
-				bus_in[c] = inputs[BUS_INPUT].getPolyVoltage(c) * master_level * fade;
+				bus_in[c] = inputs[BUS_INPUT].getPolyVoltage(c) * master_level * exp_fade;
 			}
 
 			// get red levels and add aux inputs
 			for (int c = 4; c < 6; c++) {
-				bus_in[c] = (stereo_in[c - 4] + inputs[BUS_INPUT].getPolyVoltage(c)) * master_level * fade;
+				bus_in[c] = (stereo_in[c - 4] + inputs[BUS_INPUT].getPolyVoltage(c)) * master_level * exp_fade;
 			}
 
 			// set bus outputs
@@ -296,8 +301,8 @@ struct BusDepot : Module {
 		if (light_divider.process()) {   // set lights and fade speed infrequently
 
 			// make peak lights stay on when hit
-			if (peak_left > 0) peak_left -= 60.f / args.sampleRate; else peak_left = 0.f;
-			if (peak_right > 0) peak_right -= 60.f / args.sampleRate; else peak_right = 0.f;
+			if (peak_left > 0) peak_left -= 120.f / args.sampleRate; else peak_left = 0.f;
+			if (peak_right > 0) peak_right -= 120.f / args.sampleRate; else peak_right = 0.f;
 			lights[LEFT_LIGHTS + 0].setBrightness(peak_left);
 			lights[RIGHT_LIGHTS + 0].setBrightness(peak_right);
 
