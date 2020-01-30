@@ -6,6 +6,7 @@
 struct AutoFader {
 
 	bool on = true;
+	bool fading = false;
 	bool temped = false;
 	float fade = 0.f;
 	int last_speed = 26;   // can be checked to see if a fade speed has changed
@@ -13,13 +14,13 @@ struct AutoFader {
 	void setSpeed(int speed) {   // uses sampleRate and gain to keep time consistent
 		last_speed = speed;
 		float sampleRate = APP->engine->getSampleRate();
-		delta = gain/(sampleRate * 0.001f * (float)speed);   // milliseconds from 0 to full gain
+		delta = gain / (sampleRate * 0.001f * (float)speed);   // milliseconds from 0 to full gain
 	}
 
 	void setGain(float amount) {
 		gain = amount;
-		setSpeed(last_speed);
-		if (fade > gain) fade = gain;   // keep from getting a fade stuck higher than gain
+		setSpeed(last_speed);   // initializes delta when necessary
+		if (fade > 0.f) fade = gain;   // keep from getting a fade stuck higher than gain
 	}
 
 	float getGain() {
@@ -37,13 +38,21 @@ struct AutoFader {
 	void process() {   // increments or decreases fade value
 		if (on) {
 			if (fade < gain) {
+				fading = true;
 				fade += delta;
-				if (fade > gain) fade = gain;
+				if (fade > gain) {
+					fade = gain;
+					fading = false;
+				}
 			}
 		} else {
 			if (fade > 0.f) {
+				fading = true;
 				fade -= delta;
-				if (fade < 0.f) fade = 0.f;
+				if (fade < 0.f) {
+					fade = 0.f;
+					fading = false;
+				}
 			}
 		}
 	}
