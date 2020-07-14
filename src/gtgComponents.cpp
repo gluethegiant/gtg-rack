@@ -110,10 +110,13 @@ void saveGtgPluginDefault(const char* plugin_setting, int setting_value) {
 	json_t *settingsJ = json_object();
 	std::string settingsFilename = asset::user("GlueTheGiant.json");
 
-	FILE *file = fopen(settingsFilename.c_str(), "r");
+	FILE *file;
+
+	file = fopen(settingsFilename.c_str(), "r");
 	if (file) {
 		json_error_t error;
 		settingsJ = json_loadf(file, 0, &error);
+		fclose(file);
 	}
 
 	json_object_set_new(settingsJ, plugin_setting, json_integer(setting_value));
@@ -121,9 +124,9 @@ void saveGtgPluginDefault(const char* plugin_setting, int setting_value) {
 	file = fopen(settingsFilename.c_str(), "w");
 	if (file) {
 		json_dumpf(settingsJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
+		fclose(file);
 	}
 
-	fclose(file);
 	json_decref(settingsJ);
 }
 
