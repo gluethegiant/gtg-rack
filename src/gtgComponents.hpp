@@ -23,32 +23,32 @@ TThemedParam* createThemedParamCentered(Vec pos, Module *module, int paramId, in
 }
 
 struct ThemedSvgSwitch : SvgSwitch {
-    int* theme = NULL;
-    int old_theme = -1;
+	int* theme = NULL;
+	int old_theme = -1;
 	std::vector<std::shared_ptr<Svg>> framesAll;
 
 	void addFrameAll(std::shared_ptr<Svg> svg);
-    void step() override;
+	void step() override;
 };
 
 struct ThemedSvgKnob : SvgKnob {
-    int* theme = NULL;
-    int old_theme = -1;
+	int* theme = NULL;
+	int old_theme = -1;
 	std::vector<std::shared_ptr<Svg>> framesAll;
 
 	void setOrientation(float angle);
 	void addFrameAll(std::shared_ptr<Svg> svg);
-    void step() override;
+	void step() override;
 };
 
 struct ThemedRoundBlackSnapKnob : SvgKnob {
-    int* theme = NULL;
-    int old_theme = -1;
+	int* theme = NULL;
+	int old_theme = -1;
 	std::vector<std::shared_ptr<Svg>> framesAll;
 
 	void setOrientation(float angle);
 	void addFrameAll(std::shared_ptr<Svg> svg);
-    void step() override;
+	void step() override;
 };
 
 // themed port widgets

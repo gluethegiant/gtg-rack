@@ -3,7 +3,7 @@
 
 // themed button (switch)
 void ThemedSvgSwitch::addFrameAll(std::shared_ptr<Svg> svg) {
-    framesAll.push_back(svg);
+	framesAll.push_back(svg);
 	if (framesAll.size() == 2) {
 		addFrame(framesAll[0]);
 		addFrame(framesAll[1]);
@@ -11,8 +11,8 @@ void ThemedSvgSwitch::addFrameAll(std::shared_ptr<Svg> svg) {
 }
 
 void ThemedSvgSwitch::step() {
-    if(theme != NULL && *theme != old_theme) {
-        if ((*theme) == 0 || framesAll.size() < 4) {
+	if(theme != NULL && *theme != old_theme) {
+		if ((*theme) == 0 || framesAll.size() < 4) {
 			frames[0]=framesAll[0];
 			frames[1]=framesAll[1];
 		}
@@ -20,7 +20,7 @@ void ThemedSvgSwitch::step() {
 			frames[0]=framesAll[2];
 			frames[1]=framesAll[3];
 		}
-        old_theme = *theme;
+		old_theme = *theme;
 		onChange(*(new event::Change()));
 		fb->dirty = true;
 	}
@@ -29,45 +29,45 @@ void ThemedSvgSwitch::step() {
 
 // themed knob
 void ThemedSvgKnob::addFrameAll(std::shared_ptr<Svg> svg) {
-    framesAll.push_back(svg);
+	framesAll.push_back(svg);
 	if (framesAll.size() == 1) {
 		setSvg(svg);
 	}
 }
 
 void ThemedSvgKnob::step() {
-    if(theme != NULL && *theme != old_theme) {
-        if ((*theme) == 0) {
+	if(theme != NULL && *theme != old_theme) {
+		if ((*theme) == 0) {
 			setSvg(framesAll[0]);
 		}
 		else {
 			setSvg(framesAll[1]);
 		}
-        old_theme = *theme;
+		old_theme = *theme;
 		fb->dirty = true;
-    }
+	}
 	SvgKnob::step();
 }
 
 // themed snap knob
 void ThemedRoundBlackSnapKnob::addFrameAll(std::shared_ptr<Svg> svg) {
-    framesAll.push_back(svg);
+	framesAll.push_back(svg);
 	if (framesAll.size() == 1) {
 		setSvg(svg);
 	}
 }
 
 void ThemedRoundBlackSnapKnob::step() {
-    if(theme != NULL && *theme != old_theme) {
-        if ((*theme) == 0) {
+	if(theme != NULL && *theme != old_theme) {
+		if ((*theme) == 0) {
 			setSvg(framesAll[0]);
 		}
 		else {
 			setSvg(framesAll[1]);
 		}
-        old_theme = *theme;
+		old_theme = *theme;
 		fb->dirty = true;
-    }
+	}
 	SvgKnob::step();
 }
 
