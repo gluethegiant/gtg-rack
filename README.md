@@ -38,6 +38,10 @@ To build these rack modules, see the official [VCV Rack documentation](https://v
 
 ## Release Notes
 
+v1.1.2 Rock the Default Settings (July 14, 2020)
+
+- Fixed bug with default settings when valid GlueTheGiant.json didn't already exist
+
 v1.1.1 Gigging the Gig Bus Release (February 1, 2019)
 
 - Added normal fader mode to orange and blue knobs on the Gig Bus Mixer (per Aria_Salvatrice request)
