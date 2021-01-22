@@ -29,6 +29,7 @@ struct GigBus : Module {
 	};
 
 	dsp::VuMeter2 vu_meters[2];
+    dsp::ClockDivider housekeeping_divider;
 	dsp::ClockDivider vu_divider;
 	dsp::ClockDivider light_divider;
 	dsp::ClockDivider audition_divider;
@@ -58,6 +59,7 @@ struct GigBus : Module {
 		configParam(LEVEL_PARAMS + 2, 0.f, 1.f, 1.f, "Master level to red stereo bus");
 		vu_meters[0].lambda = 25.f;
 		vu_meters[1].lambda = 25.f;
+		housekeeping_divider.setDivision(100000);
 		vu_divider.setDivision(32);
 		light_divider.setDivision(240);
 		audition_divider.setDivision(512);
@@ -69,6 +71,12 @@ struct GigBus : Module {
 	}
 
 	void process(const ProcessArgs &args) override {
+
+		// check default theme and reset vu meters
+		if (housekeeping_divider.process()) {
+			vu_meters[0].v = 0.f;
+			vu_meters[1].v = 0.f;
+		}
 
 		// on off button
 		switch (on_button.step(params[ON_PARAM])) {
