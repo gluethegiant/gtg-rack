@@ -71,7 +71,7 @@ struct BusDepot : Module {
 		depot_fader.setSpeed(26);
 		level_smoother.setSlewSpeed(level_speed);   // for level cv filter
 		gtg_default_theme = loadGtgPluginDefault("default_theme", 0);
-		color_theme = gtg_default_theme;;
+		color_theme = gtg_default_theme;
 	}
 
 	void process(const ProcessArgs &args) override {
@@ -625,6 +625,8 @@ struct BusDepotWidget : ModuleWidget {
 		auditionModesItem->rightText = RIGHT_ARROW;
 		auditionModesItem->module = module;
 		menu->addChild(auditionModesItem);
+
+		menu->addChild(new MenuEntry);
 
 		ThemesItem *themesItem = createMenuItem<ThemesItem>("Panel Themes");
 		themesItem->rightText = RIGHT_ARROW;

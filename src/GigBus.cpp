@@ -565,6 +565,8 @@ struct GigBusWidget : ModuleWidget {
 		postFadesItem->module = module;
 		menu->addChild(postFadesItem);
 
+		menu->addChild(new MenuEntry);
+
 		ThemesItem *themesItem = createMenuItem<ThemesItem>("Panel Themes");
 		themesItem->rightText = RIGHT_ARROW;
 		themesItem->module = module;

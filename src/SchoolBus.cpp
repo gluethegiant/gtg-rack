@@ -81,7 +81,7 @@ struct SchoolBus : Module {
 		post_fades[0] = loadGtgPluginDefault("default_post_fader", 0);
 		post_fades[1] = post_fades[0];
 		gtg_default_theme = loadGtgPluginDefault("default_theme", 0);
-		color_theme = gtg_default_theme;;
+		color_theme = gtg_default_theme;
 	}
 
 	void process(const ProcessArgs &args) override {
@@ -633,6 +633,8 @@ struct SchoolBusWidget : ModuleWidget {
 		postFadesItem->rightText = RIGHT_ARROW;
 		postFadesItem->module = module;
 		menu->addChild(postFadesItem);
+
+		menu->addChild(new MenuEntry);
 
 		ThemesItem *themesItem = createMenuItem<ThemesItem>("Panel Themes");
 		themesItem->rightText = RIGHT_ARROW;
