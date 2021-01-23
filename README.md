@@ -1,6 +1,6 @@
 # Glue the Giant's Modular Bus Mixers for VCV Rack
 
-Create your own mixer by connecting these modules together with the BUS IN and BUS OUT ports.
+Stereo mix your Rack by connecting these modules with the BUS IN and BUS OUT ports.
 With features like send effects, fade automation, solo, mixer groups, group auditions, effect auditions, pop filters, mixer preamps, two polyphonic stereo spread modes, and integrated latency compensation, they can also help your next patch look and sound amazing.
 
 The audio between modules is routed along three stereo buses: red, orange, and blue.
@@ -38,11 +38,11 @@ To build these rack modules, see the official [VCV Rack documentation](https://v
 
 ## Release Notes
 
-v1.1.3 Forever Vu Meters Release (January 25, 2021)
+v1.1.3 The Forever Vu Release (January 25, 2021)
 
-- Vu meters no longer get knocked out by rogue modules that throw infinities or NANs
+- Vu meters no longer get knocked out by rogue modules that throw infinities and NANs
 - New theme setting to dynamically use the default theme
-- Cleaner context menu
+- Cleaned up context menus
 
 v1.1.2 Rock the Default Settings Release (July 14, 2020)
 
