@@ -38,6 +38,12 @@ To build these rack modules, see the official [VCV Rack documentation](https://v
 
 ## Release Notes
 
+v1.1.3 Forever Vu Meters Release (January 25, 2021)
+
+- Vu meters no longer get knocked out by rogue modules that throw infinities or NANs
+- New theme setting to dynamically use the default theme
+- Cleaner context menu
+
 v1.1.2 Rock the Default Settings Release (July 14, 2020)
 
 - Fixed bug with default settings when valid GlueTheGiant.json didn't already exist
