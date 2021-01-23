@@ -52,7 +52,7 @@ struct BusRoute : Module {
 			route_fader[i].setSpeed(fade_speed);
 		}
 		gtg_default_theme = loadGtgPluginDefault("default_theme", 0);
-		color_theme = gtg_default_theme;;
+		color_theme = gtg_default_theme;
 	}
 
 	void process(const ProcessArgs &args) override {
