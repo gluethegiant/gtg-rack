@@ -6,6 +6,7 @@ Plugin *pluginInstance;
 // variables used by all modules
 bool audition_mixer = false;
 bool audition_depot = false;
+int gtg_default_theme = 0;
 
 void init(Plugin *p) {
 	pluginInstance = p;

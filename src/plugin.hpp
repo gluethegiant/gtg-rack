@@ -9,6 +9,7 @@ extern Plugin *pluginInstance;
 // variables used by all plugins
 extern bool audition_mixer;
 extern bool audition_depot;
+extern int gtg_default_theme;
 
 // Declare each Model, defined in each module source file
 // extern Model *modelMyModule;
