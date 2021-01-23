@@ -37,6 +37,7 @@ struct BusRoute : Module {
 	bool bus_audition[3] = {false, false, false};
 	bool auditioning = false;
 	int color_theme = 0;
+	bool use_default_theme = true;
 
 	BusRoute() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -50,7 +51,8 @@ struct BusRoute : Module {
 		for (int i = 0; i < 3; i++) {
 			route_fader[i].setSpeed(fade_speed);
 		}
-		color_theme = loadGtgPluginDefault("default_theme", 0);
+		gtg_default_theme = loadGtgPluginDefault("default_theme", 0);
+		color_theme = gtg_default_theme;;
 	}
 
 	void process(const ProcessArgs &args) override {
@@ -93,6 +95,10 @@ struct BusRoute : Module {
 
 		// set send or audtion button lights
 		if (light_divider.process()) {
+
+			if (use_default_theme) {
+				color_theme = gtg_default_theme;
+			}
 
 			if (auditioning) {
 				for (int i = 0; i < 3; i++) {
@@ -214,6 +220,7 @@ struct BusRoute : Module {
 		json_object_set_new(rootJ, "temped2", json_integer(route_fader[1].temped));
 		json_object_set_new(rootJ, "temped3", json_integer(route_fader[2].temped));
 		json_object_set_new(rootJ, "color_theme", json_integer(color_theme));
+		json_object_set_new(rootJ, "use_default_theme", json_integer(use_default_theme));
 		return rootJ;
 	}
 
@@ -243,6 +250,12 @@ struct BusRoute : Module {
 		json_t *temped3j = json_object_get(rootJ, "temped3");
 		if (temped3j) route_fader[2].temped = json_integer_value(temped3j);
 
+		json_t *use_default_themeJ = json_object_get(rootJ, "use_default_theme");
+		if (use_default_themeJ) {
+			use_default_theme = json_integer_value(use_default_themeJ);
+		} else {
+			if (onau_1J) use_default_theme = false;   // do not change existing patches
+		}
 		json_t *color_themeJ = json_object_get(rootJ, "color_theme");
 		if (color_themeJ) color_theme = json_integer_value(color_themeJ);
 	}
@@ -372,48 +385,65 @@ struct BusRouteWidget : ModuleWidget {
 			BusRoute* module;
 			int theme;
 			void onAction(const event::Action& e) override {
-				module->color_theme = theme;
+				if (theme == 10) {
+					module->use_default_theme = true;
+					module->color_theme = gtg_default_theme;
+				} else {
+					module->use_default_theme = false;
+					module->color_theme = theme;
+				}
 			}
 		};
 
 		struct DefaultThemeItem : MenuItem {
 			BusRoute* module;
+			int theme;
 			void onAction(const event::Action &e) override {
-				saveGtgPluginDefault("default_theme", rightText.empty());
+				gtg_default_theme = theme;
+				saveGtgPluginDefault("default_theme", theme);
 			}
 		};
 
-		struct DefaultSendItem : MenuItem {
-			BusRoute* module;
-			void onAction(const event::Action &e) override {
-				saveGtgPluginDefault("default_post_fader", rightText.empty());
+		struct ThemesItem : MenuItem {
+			BusRoute *module;
+			Menu *createChildMenu() override {
+				Menu *menu = new Menu;
+				std::string theme_titles[3] = {"Default", "70's Cream", "Night Ride"};
+				int theme_selected[3] = {10, 0, 1};
+				for (int i = 0; i < 3; i++) {
+					ThemeItem *theme_item = new ThemeItem;
+					theme_item->text = theme_titles[i];
+					if (i == 0) {
+						theme_item->rightText = CHECKMARK(module->use_default_theme);
+					} else {
+						if (!module->use_default_theme) {
+							theme_item->rightText = CHECKMARK(module->color_theme == theme_selected[i]);
+						}
+					}
+					theme_item->module = module;
+					theme_item->theme = theme_selected[i];
+					menu->addChild(theme_item);
+				}
+		        menu->addChild(new MenuEntry);
+				std::string default_theme_titles[2] = {"Default to 70's Cream", "Default to Night Ride"};
+				for (int i = 0; i < 2; i++) {
+					DefaultThemeItem *default_theme_item = new DefaultThemeItem;
+					default_theme_item->text = default_theme_titles[i];
+					default_theme_item->rightText = CHECKMARK(gtg_default_theme == i);
+					default_theme_item->module = module;
+					default_theme_item->theme = i;
+					menu->addChild(default_theme_item);
+				}
+				return menu;
 			}
 		};
 
 		menu->addChild(new MenuEntry);
-		menu->addChild(createMenuLabel("Panel Themes"));
 
-		std::string themeTitles[2] = {"70's Cream", "Night Ride"};
-		for (int i = 0; i < 2; i++) {
-			ThemeItem* themeItem = createMenuItem<ThemeItem>(themeTitles[i]);
-			themeItem->rightText = CHECKMARK(module->color_theme == i);
-			themeItem->module = module;
-			themeItem->theme = i;
-			menu->addChild(themeItem);
-		}
-
-		menu->addChild(new MenuEntry);
-		menu->addChild(createMenuLabel("All Modular Bus Mixers"));
-
-		DefaultThemeItem* defaultThemeItem = createMenuItem<DefaultThemeItem>("Default to Night Ride theme");
-		defaultThemeItem->rightText = CHECKMARK(loadGtgPluginDefault("default_theme", 0));
-		defaultThemeItem->module = module;
-		menu->addChild(defaultThemeItem);
-
-		DefaultSendItem* defaultSendItem = createMenuItem<DefaultSendItem>("Default to post fader sends");
-		defaultSendItem->rightText = CHECKMARK(loadGtgPluginDefault("default_post_fader", 0));
-		defaultSendItem->module = module;
-		menu->addChild(defaultSendItem);
+		ThemesItem *themesItem = createMenuItem<ThemesItem>("Panel Themes");
+		themesItem->rightText = RIGHT_ARROW;
+		themesItem->module = module;
+		menu->addChild(themesItem);
 	}
 
 	// display the panel based on the theme
