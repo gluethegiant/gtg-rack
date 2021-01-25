@@ -1,10 +1,11 @@
 # Glue the Giant's Modular Bus Mixers for VCV Rack
 
-Stereo mix your Rack by connecting these modules with the BUS IN and BUS OUT ports.
-With features like send effects, fade automation, solo, mixer groups, group auditions, effect auditions, pop filters, mixer preamps, two polyphonic stereo spread modes, and integrated latency compensation, they can also help your next patch look and sound amazing.
+These mixers provide send effects, fade automation, solo, mixer groups, group auditions, effect auditions, pop filters, mixer preamps, two polyphonic stereo spread modes, and integrated latency compensation.
+To chain the mixers, simply connect the BUS OUT and BUS IN ports.
 
 The audio between modules is routed along three stereo buses: red, orange, and blue.
 This bus design makes it easy to patch together a simple mixer or complex audio routing similar to what can be found in modern DAWs.
+Using modular mixers can improve demonstrations, enhance live performance, and make your mixing more intuitive.
 
 ![Modular bus mixers from Glue the Giant](https://github.com/gluethegiant/gtg-rack/blob/master/design/screenshot.png)
 
@@ -41,8 +42,8 @@ To build these rack modules, see the official [VCV Rack documentation](https://v
 v1.1.3 The Forever Vu Release (January 25, 2021)
 
 - Vu meters no longer get knocked out by rogue modules that throw infinities and NANs
-- New theme setting to dynamically use the default theme
-- Cleaned up context menus
+- Added a new default panel theme setting (change the appearance of all modules at once)
+- Simplified context menus
 
 v1.1.2 Rock the Default Settings Release (July 14, 2020)
 
