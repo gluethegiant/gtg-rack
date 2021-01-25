@@ -5,7 +5,7 @@ To chain the mixers, simply connect the BUS OUT and BUS IN ports.
 
 The audio between modules is routed along three stereo buses: red, orange, and blue.
 This bus design makes it easy to patch together a simple mixer or complex audio routing similar to what can be found in modern DAWs.
-Using modular mixers can improve demonstrations, enhance live performance, and make your mixing more intuitive.
+Using modular mixers can make your mixing more intuitive.
 
 ![Modular bus mixers from Glue the Giant](https://github.com/gluethegiant/gtg-rack/blob/master/design/screenshot.png)
 
