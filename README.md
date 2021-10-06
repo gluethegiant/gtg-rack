@@ -39,7 +39,7 @@ To build these rack modules, see the official [VCV Rack documentation](https://v
 
 ## Release Notes
 
-v2.0.0 The (October 6, 2021)
+v2.0.0 The v2 (October 6, 2021)
 
 - Color themes and text modified to work on VCV Rack 2
 
