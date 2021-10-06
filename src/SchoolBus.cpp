@@ -645,6 +645,7 @@ struct SchoolBusWidget : ModuleWidget {
 	// display panel based on theme
 	void step() override {
 		if (module) {
+			Widget* panel = getPanel();
 			panel->visible = ((((SchoolBus*)module)->color_theme) == 0);
 			night_panel->visible = ((((SchoolBus*)module)->color_theme) == 1);
 		}

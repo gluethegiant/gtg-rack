@@ -281,17 +281,18 @@ struct BusRoute : Module {
 // delay display widget
 struct DelayDisplayWidget : TransparentWidget {
 	BusRoute *module;
-	std::shared_ptr<Font> font;
+//	std::shared_ptr<Font> font;
 	int delay_knob = 0;
 
 	DelayDisplayWidget() {
 		box.size = mm2px(Vec(6.519, 4.0));
-		font = APP->window->loadFont(asset::plugin(pluginInstance, "res/fonts/DSEG7-Classic-MINI/DSEG7ClassicMini-Bold.ttf"));
+//		font = APP->window->loadFont(asset::plugin(pluginInstance, "res/fonts/DSEG7-Classic-MINI/DSEG7ClassicMini-Bold.ttf"));
 	}
 
 	void draw(const DrawArgs &args) override {
 		int value = module ? module->delay_knobs[delay_knob] : 0;
 		std::string text = string::f("%03d", value);
+		std::shared_ptr<Font> font = APP->window->loadFont("res/fonts/DSEG7-Classic-MINI/DSEG7ClassicMini-Bold.ttf");
 
 		// background
 		NVGcolor backgroundColor = nvgRGB(26, 26, 26);
@@ -301,14 +302,16 @@ struct DelayDisplayWidget : TransparentWidget {
 		nvgFill(args.vg);
 
 		// display text text
-		nvgFontSize(args.vg, 6);
-		nvgFontFaceId(args.vg, font->handle);
-		nvgTextLetterSpacing(args.vg, 0.5);
-		nvgTextAlign(args.vg, NVG_ALIGN_RIGHT);
-		Vec textPos = mm2px(Vec(6.05, 3.1));
-		NVGcolor textColor = nvgRGB(0x90, 0xc7, 0x3e);
-		nvgFillColor(args.vg, textColor);
-		nvgText(args.vg, textPos.x, textPos.y, text.c_str(), NULL);
+		if (font) {
+			nvgFontSize(args.vg, 6);
+			nvgFontFaceId(args.vg, font->handle);
+			nvgTextLetterSpacing(args.vg, 0.5);
+			nvgTextAlign(args.vg, NVG_ALIGN_RIGHT);
+			Vec textPos = mm2px(Vec(6.05, 3.1));
+			NVGcolor textColor = nvgRGB(0x90, 0xc7, 0x3e);
+			nvgFillColor(args.vg, textColor);
+			nvgText(args.vg, textPos.x, textPos.y, text.c_str(), NULL);
+		}
 	}
 };
 
@@ -449,6 +452,7 @@ struct BusRouteWidget : ModuleWidget {
 	// display the panel based on the theme
 	void step() override {
 		if (module) {
+			Widget* panel = getPanel();
 			panel->visible = ((((BusRoute*)module)->color_theme) == 0);
 			night_panel->visible = ((((BusRoute*)module)->color_theme) == 1);
 		}

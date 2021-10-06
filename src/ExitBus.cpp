@@ -171,6 +171,7 @@ struct ExitBusWidget : ModuleWidget {
 	// display the panel based on the theme
 	void step() override {
 		if (module) {
+			Widget* panel = getPanel();
 			panel->visible = ((((ExitBus*)module)->color_theme) == 0);
 			night_panel->visible = ((((ExitBus*)module)->color_theme) == 1);
 		}

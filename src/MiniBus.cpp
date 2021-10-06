@@ -507,6 +507,7 @@ struct MiniBusWidget : ModuleWidget {
 	// display panel based on theme
 	void step() override {
 		if (module) {
+			Widget* panel = getPanel();
 			panel->visible = ((((MiniBus*)module)->color_theme) == 0);
 			night_panel->visible = ((((MiniBus*)module)->color_theme) == 1);
 		}

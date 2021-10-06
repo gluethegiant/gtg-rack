@@ -771,6 +771,7 @@ struct MetroCityBusWidget : ModuleWidget {
 	// display panel based on theme
 	void step() override {
 		if (module) {
+			Widget* panel = getPanel();
 			panel->visible = ((((MetroCityBus*)module)->color_theme) == 0);
 			night_panel->visible = ((((MetroCityBus*)module)->color_theme) == 1);
 		}

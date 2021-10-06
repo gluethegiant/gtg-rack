@@ -39,6 +39,10 @@ To build these rack modules, see the official [VCV Rack documentation](https://v
 
 ## Release Notes
 
+v2.0.0 The (October 6, 2021)
+
+- Color themes and text modified to work on VCV Rack 2
+
 v1.1.3 The Forever Vu Release (January 25, 2021)
 
 - Vu meters no longer get knocked out by rogue modules that throw infinities and NANs

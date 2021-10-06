@@ -637,6 +637,7 @@ struct BusDepotWidget : ModuleWidget {
 	// display the panel based on the theme
 	void step() override {
 		if (module) {
+			Widget* panel = getPanel();
 			panel->visible = ((((BusDepot*)module)->color_theme) == 0);
 			night_panel->visible = ((((BusDepot*)module)->color_theme) == 1);
 		}

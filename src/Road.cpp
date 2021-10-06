@@ -373,6 +373,7 @@ struct RoadWidget : ModuleWidget {
 	// display the panel based on the theme
 	void step() override {
 		if (module) {
+			Widget* panel = getPanel();
 			panel->visible = ((((Road*)module)->color_theme) == 0);
 			night_panel->visible = ((((Road*)module)->color_theme) == 1);
 		}

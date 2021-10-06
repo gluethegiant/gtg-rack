@@ -576,6 +576,7 @@ struct GigBusWidget : ModuleWidget {
 	// display panel based on theme
 	void step() override {
 		if (module) {
+			Widget* panel = getPanel();
 			panel->visible = ((((GigBus*)module)->color_theme) == 0);
 			night_panel->visible = ((((GigBus*)module)->color_theme) == 1);
 		}
