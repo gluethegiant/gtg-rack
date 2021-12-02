@@ -62,6 +62,15 @@ struct BusDepot : Module {
 		configParam(LEVEL_PARAM, 0.f, 1.f, 1.f, "Master level");
 		configParam(FADE_PARAM, 26, 34000, 26, "Fade out automation in milliseconds");
 		configParam(FADE_IN_PARAM, 26, 34000, 26, "Fade in automation in milliseconds");
+		configInput(ON_CV_INPUT, "On CV");
+		configInput(LEVEL_CV_INPUT, "Level CV");
+		configInput(LMP_INPUT, "Left, mono, or poly");
+		configInput(R_INPUT, "Right");
+		configInput(BUS_INPUT, "Bus chain");
+		configInput(FADE_CV_INPUT, "Fade automation CV");
+		configOutput(LEFT_OUTPUT, "Left");
+		configOutput(RIGHT_OUTPUT, "Right");
+		configOutput(BUS_OUTPUT, "Bus chain");
 		vu_meters[0].lambda = 25.f;
 		vu_meters[1].lambda = 25.f;
 		housekeeping_divider.setDivision(100000);
