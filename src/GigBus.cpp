@@ -58,6 +58,11 @@ struct GigBus : Module {
 		configParam(LEVEL_PARAMS + 0, 0.f, 1.f, 0.f, "Post red level send to blue stereo bus");
 		configParam(LEVEL_PARAMS + 1, 0.f, 1.f, 0.f, "Post red level send to orange stereo bus");
 		configParam(LEVEL_PARAMS + 2, 0.f, 1.f, 1.f, "Master level to red stereo bus");
+		configInput(ON_CV_INPUT, "On CV");
+		configInput(LMP_INPUT, "Left, mono, or poly");
+		configInput(R_INPUT, "Right");
+		configInput(BUS_INPUT, "Bus chain");
+		configOutput(BUS_OUTPUT, "Bus chain");
 		vu_meters[0].lambda = 25.f;
 		vu_meters[1].lambda = 25.f;
 		housekeeping_divider.setDivision(50000);

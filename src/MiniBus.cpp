@@ -46,6 +46,10 @@ struct MiniBus : Module {
 		configParam(LEVEL_PARAMS + 0, 0.f, 1.f, 0.f, "Level to blue bus");
 		configParam(LEVEL_PARAMS + 1, 0.f, 1.f, 0.f, "Level to orange bus");
 		configParam(LEVEL_PARAMS + 2, 0.f, 1.f, 1.f, "Level to red bus");
+		configInput(ON_CV_INPUT, "On CV");
+		configInput(MP_INPUT, "Mono or poly");
+		configInput(BUS_INPUT, "Bus chain");
+		configOutput(BUS_OUTPUT, "Bus chain");
 		light_divider.setDivision(512);
 		mini_fader.setSpeed(fade_in);
 		post_fade_filter.setSlewSpeed(smooth_speed);

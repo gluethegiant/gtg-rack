@@ -47,6 +47,22 @@ struct BusRoute : Module {
 		configParam(ONAU_PARAMS + 0, 0.f, 1.f, 0.f, "Blue bus on (hold to audition)");
 		configParam(ONAU_PARAMS + 1, 0.f, 1.f, 0.f, "Orange bus on (hold to audition)");
 		configParam(ONAU_PARAMS + 2, 0.f, 1.f, 0.f, "Red bus on (hold to audition)");
+		configInput(RETURN_INPUTS + 0, "Blue return left");
+		configInput(RETURN_INPUTS + 1, "Blue return right");
+		configInput(RETURN_INPUTS + 2, "Orange return left");
+		configInput(RETURN_INPUTS + 3, "Orange return right");
+		configInput(RETURN_INPUTS + 4, "Red return left");
+		configInput(RETURN_INPUTS + 5, "Red return right");
+		configInput(BUS_INPUT, "Bus chain");
+		configOutput(SEND_OUTPUTS + 0, "Blue send left");
+		configOutput(SEND_OUTPUTS + 1, "Blue send right");
+		configOutput(SEND_OUTPUTS + 2, "Orange send left");
+		configOutput(SEND_OUTPUTS + 3, "Orange send right");
+		configOutput(SEND_OUTPUTS + 4, "Red send left");
+		configOutput(SEND_OUTPUTS + 5, "Red send right");
+		configOutput(BUS_OUTPUT, "Bus chain");
+		configOutput(MIX_L_OUTPUT, "Mixed left");
+		configOutput(MIX_R_OUTPUT, "Mixed right");
 		light_divider.setDivision(512);
 		for (int i = 0; i < 3; i++) {
 			route_fader[i].setSpeed(fade_speed);

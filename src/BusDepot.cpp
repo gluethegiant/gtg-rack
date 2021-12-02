@@ -68,8 +68,8 @@ struct BusDepot : Module {
 		configInput(R_INPUT, "Right");
 		configInput(BUS_INPUT, "Bus chain");
 		configInput(FADE_CV_INPUT, "Fade automation CV");
-		configOutput(LEFT_OUTPUT, "Left");
-		configOutput(RIGHT_OUTPUT, "Right");
+		configOutput(LEFT_OUTPUT, "Mixed left");
+		configOutput(RIGHT_OUTPUT, "Mixed right");
 		configOutput(BUS_OUTPUT, "Bus chain");
 		vu_meters[0].lambda = 25.f;
 		vu_meters[1].lambda = 25.f;

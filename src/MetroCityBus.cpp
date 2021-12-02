@@ -87,6 +87,14 @@ struct MetroCityBus : Module {
 		configParam(LEVEL_PARAMS + 2, 0.f, 1.f, 1.f, "Level to red stereo bus");
 		configParam(BLUE_POST_PARAM, 0.f, 1.f, 0.f, "Post red fader send");
 		configParam(ORANGE_POST_PARAM, 0.f, 1.f, 0.f, "Post red fader send");
+		configInput(POLY_INPUT, "Poly");
+		configInput(ON_CV_INPUT, "On CV");
+		configInput(PAN_CV_INPUT, "Pan follow CV (-5.0 to 5.0)");
+		configInput(LEVEL_CV_INPUTS + 0, "Blue level CV");
+		configInput(LEVEL_CV_INPUTS + 1, "Orange level CV");
+		configInput(LEVEL_CV_INPUTS + 2, "Red level CV");
+		configInput(BUS_INPUT, "Bus chain");
+		configOutput(BUS_OUTPUT, "Bus chain");
 		pan_divider.setDivision(pan_division);
 		pan_light_divider.setDivision(499);
 		light_divider.setDivision(512);

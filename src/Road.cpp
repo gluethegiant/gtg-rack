@@ -38,6 +38,13 @@ struct Road : Module {
 		configParam(ON_PARAMS + 3, 0.f, 1.f, 0.f, "BUS IN 4 on");
 		configParam(ON_PARAMS + 4, 0.f, 1.f, 0.f, "BUS IN 5 on");
 		configParam(ON_PARAMS + 5, 0.f, 1.f, 0.f, "BUS IN 6 on");
+		configInput(BUS_INPUTS + 0, "Bus chain 1");
+		configInput(BUS_INPUTS + 1, "Bus chain 2");
+		configInput(BUS_INPUTS + 2, "Bus chain 3");
+		configInput(BUS_INPUTS + 3, "Bus chain 4");
+		configInput(BUS_INPUTS + 4, "Bus chain 5");
+		configInput(BUS_INPUTS + 5, "Bus chain 6");
+		configOutput(BUS_OUTPUT, "Mixed bus chain");
 		light_divider.setDivision(512);
 		for (int i = 0; i < 6; i++) {
 			road_fader[i].setSpeed(fade_speed);

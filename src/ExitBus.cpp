@@ -26,6 +26,14 @@ struct ExitBus : Module {
 
 	ExitBus() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+		configInput(BUS_INPUT, "Bus chain");
+		configOutput(EXIT_OUTPUTS + 0, "Blue left");
+		configOutput(EXIT_OUTPUTS + 1, "Blue right");
+		configOutput(EXIT_OUTPUTS + 2, "Orange left");
+		configOutput(EXIT_OUTPUTS + 3, "Orange right");
+		configOutput(EXIT_OUTPUTS + 4, "Red left");
+		configOutput(EXIT_OUTPUTS + 5, "Red right");
+		configOutput(BUS_OUTPUT, "Bus chain");
 		housekeeping_divider.setDivision(50000);
 		gtg_default_theme = loadGtgPluginDefault("default_theme", 0);
 		color_theme = gtg_default_theme;

@@ -30,6 +30,14 @@ struct EnterBus : Module {
 		configParam(LEVEL_PARAMS + 0, 0.f, 1.f, 1.f, "Blue stereo input level");
 		configParam(LEVEL_PARAMS + 1, 0.f, 1.f, 1.f, "Orange stereo input level");
 		configParam(LEVEL_PARAMS + 2, 0.f, 1.f, 1.f, "Red stereo input level");
+		configInput(ENTER_INPUTS + 0, "Blue left");
+		configInput(ENTER_INPUTS + 1, "Blue right");
+		configInput(ENTER_INPUTS + 2, "Orange left");
+		configInput(ENTER_INPUTS + 3, "Orange right");
+		configInput(ENTER_INPUTS + 4, "Red left");
+		configInput(ENTER_INPUTS + 5, "Red right");
+		configInput(BUS_INPUT, "Bus chain");
+		configOutput(BUS_OUTPUT, "Bus chain");
 		housekeeping_divider.setDivision(50000);
 		gtg_default_theme = loadGtgPluginDefault("default_theme", 0);
 		color_theme = gtg_default_theme;

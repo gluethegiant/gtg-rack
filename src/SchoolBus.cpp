@@ -67,6 +67,15 @@ struct SchoolBus : Module {
 		configParam(LEVEL_PARAMS + 2, 0.f, 1.f, 1.f, "Level to red stereo bus");
 		configParam(BLUE_POST_PARAM, 0.f, 1.f, 0.f, "Post red fader send");
 		configParam(ORANGE_POST_PARAM, 0.f, 1.f, 0.f, "Post red fader send");
+		configInput(LMP_INPUT, "Left, mono, or poly");
+		configInput(R_INPUT, "Right");
+		configInput(ON_CV_INPUT, "On CV");
+		configInput(PAN_CV_INPUT, "Pan CV (-5.0 to 5.0)");
+		configInput(LEVEL_CV_INPUTS + 0, "Blue level CV");
+		configInput(LEVEL_CV_INPUTS + 1, "Orange level CV");
+		configInput(LEVEL_CV_INPUTS + 2, "Red level CV");
+		configInput(BUS_INPUT, "Bus chain");
+		configOutput(BUS_OUTPUT, "Bus chain");
 		pan_divider.setDivision(3);
 		light_divider.setDivision(512);
 		school_fader.setSpeed(fade_in);
