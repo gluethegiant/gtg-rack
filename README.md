@@ -38,7 +38,7 @@ Finally, thanks always to Rebecca.
 To build these rack modules, see the official [VCV Rack documentation](https://vcvrack.com/manual/Building.html).
 
 ## Release Notes
-v2.0.1 Port Labels for V2 (November 10, 2021)
+v2.0.1 Port Labels for v2 (December 2, 2021)
 
 - Added port and light labels throughout
 
