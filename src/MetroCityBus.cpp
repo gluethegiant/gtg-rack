@@ -89,7 +89,7 @@ struct MetroCityBus : Module {
 		configParam(ORANGE_POST_PARAM, 0.f, 1.f, 0.f, "Post red fader send");
 		configInput(POLY_INPUT, "Poly");
 		configInput(ON_CV_INPUT, "On CV");
-		configInput(PAN_CV_INPUT, "Pan follow CV (-5.0 to 5.0)");
+		configInput(PAN_CV_INPUT, "Pan poly follow CV (-5.0 to 5.0)");
 		configInput(LEVEL_CV_INPUTS + 0, "Blue level CV");
 		configInput(LEVEL_CV_INPUTS + 1, "Orange level CV");
 		configInput(LEVEL_CV_INPUTS + 2, "Red level CV");
