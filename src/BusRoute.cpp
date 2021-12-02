@@ -297,18 +297,17 @@ struct BusRoute : Module {
 // delay display widget
 struct DelayDisplayWidget : TransparentWidget {
 	BusRoute *module;
-//	std::shared_ptr<Font> font;
+	std::string fontPath="res/fonts/DSEG7-Classic-MINI/DSEG7ClassicMini-Bold.ttf";
 	int delay_knob = 0;
 
 	DelayDisplayWidget() {
 		box.size = mm2px(Vec(6.519, 4.0));
-//		font = APP->window->loadFont(asset::plugin(pluginInstance, "res/fonts/DSEG7-Classic-MINI/DSEG7ClassicMini-Bold.ttf"));
 	}
 
 	void draw(const DrawArgs &args) override {
 		int value = module ? module->delay_knobs[delay_knob] : 0;
+		std::shared_ptr<Font> font = APP->window->loadFont(asset::plugin(pluginInstance, fontPath));
 		std::string text = string::f("%03d", value);
-		std::shared_ptr<Font> font = APP->window->loadFont("res/fonts/DSEG7-Classic-MINI/DSEG7ClassicMini-Bold.ttf");
 
 		// background
 		NVGcolor backgroundColor = nvgRGB(26, 26, 26);
