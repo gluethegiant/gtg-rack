@@ -38,9 +38,10 @@ Finally, thanks always to Rebecca.
 To build these rack modules, see the official [VCV Rack documentation](https://vcvrack.com/manual/Building.html).
 
 ## Release Notes
-v2.0.1 Port Labels for v2 (December 2, 2021)
+v2.0.1 Ports are Labeled (December 2, 2021)
 
-- Added port and light labels throughout
+- Added port labels throughout
+- Fixed a v2 font issue with the sample delay on BusRoute
 
 v2.0.0 The v2 (October 6, 2021)
 
