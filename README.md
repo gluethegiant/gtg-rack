@@ -19,7 +19,7 @@ A [User's Guide](https://github.com/gluethegiant/gtg-rack/wiki), including a VCV
 Do your best to not steal it (we know it's cool).
 The visual designs under the res/ and designs/ directories help to give these modules a unique look and are automatically copyrighted (c) 2019 in some jurisdictions.
 Try to not copy them too closely.
-All the code is released to use under the GPL 3 license and above.
+All the code and artwork is released to use under the GPL 3 license and above.
 
 ## Acknowledgments 
 
