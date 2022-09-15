@@ -273,7 +273,10 @@ struct RoadWidget : ModuleWidget {
 		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Road.svg")));
 
 		// load night panel if not preview
-		if (module) {
+#ifndef USING_CARDINAL_NOT_RACK
+		if (module)
+#endif
+		{
 			night_panel = new SvgPanel();
 			night_panel->setBackground(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Road_Night.svg")));
 			night_panel->visible = false;
@@ -308,6 +311,7 @@ struct RoadWidget : ModuleWidget {
 		addOutput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(7.62, 114.107)), false, module, Road::BUS_OUTPUT, module ? &module->color_theme : NULL));
 	}
 
+#ifndef USING_CARDINAL_NOT_RACK
 	// build the menu
 	void appendContextMenu(Menu* menu) override {
 		Road* module = dynamic_cast<Road*>(this->module);
@@ -376,14 +380,21 @@ struct RoadWidget : ModuleWidget {
 		themesItem->module = module;
 		menu->addChild(themesItem);
 	}
+#endif
 
 	// display the panel based on the theme
 	void step() override {
+#ifdef USING_CARDINAL_NOT_RACK
+		Widget* panel = getPanel();
+		panel->visible = !settings::darkMode;
+		night_panel->visible = settings::darkMode;
+#else
 		if (module) {
 			Widget* panel = getPanel();
 			panel->visible = ((((Road*)module)->color_theme) == 0);
 			night_panel->visible = ((((Road*)module)->color_theme) == 1);
 		}
+#endif
 		Widget::step();
 	}
 };
