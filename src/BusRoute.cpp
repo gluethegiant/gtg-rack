@@ -339,7 +339,10 @@ struct BusRouteWidget : ModuleWidget {
 		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/BusRoute.svg")));
 
 		// load night panel if not preview
-		if (module) {
+#ifndef USING_CARDINAL_NOT_RACK
+		if (module)
+#endif
+		{
 			night_panel = new SvgPanel();
 			night_panel->setBackground(APP->window->loadSvg(asset::plugin(pluginInstance, "res/BusRoute_Night.svg")));
 			night_panel->visible = false;
@@ -395,6 +398,7 @@ struct BusRouteWidget : ModuleWidget {
 		addOutput(createThemedPortCentered<gtgNutPort>(mm2px(Vec(23.49, 114.107)), false, module, BusRoute::MIX_R_OUTPUT, module ? &module->color_theme : NULL));
 	}
 
+#ifndef USING_CARDINAL_NOT_RACK
 	// build the menu
 	void appendContextMenu(Menu* menu) override {
 		BusRoute* module = dynamic_cast<BusRoute*>(this->module);
@@ -463,14 +467,21 @@ struct BusRouteWidget : ModuleWidget {
 		themesItem->module = module;
 		menu->addChild(themesItem);
 	}
+#endif
 
 	// display the panel based on the theme
 	void step() override {
+#ifdef USING_CARDINAL_NOT_RACK
+		Widget* panel = getPanel();
+		panel->visible = !settings::darkMode;
+		night_panel->visible = settings::darkMode;
+#else
 		if (module) {
 			Widget* panel = getPanel();
 			panel->visible = ((((BusRoute*)module)->color_theme) == 0);
 			night_panel->visible = ((((BusRoute*)module)->color_theme) == 1);
 		}
+#endif
 		Widget::step();
 	}
 };

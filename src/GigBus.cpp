@@ -387,7 +387,10 @@ struct GigBusWidget : ModuleWidget {
 		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/GigBus.svg")));
 
 		// load night panel if not preview
-		if (module) {
+#ifndef USING_CARDINAL_NOT_RACK
+		if (module)
+#endif
+		{
 			night_panel = new SvgPanel();
 			night_panel->setBackground(APP->window->loadSvg(asset::plugin(pluginInstance, "res/GigBus_Night.svg")));
 			night_panel->visible = false;
@@ -570,21 +573,29 @@ struct GigBusWidget : ModuleWidget {
 		postFadesItem->module = module;
 		menu->addChild(postFadesItem);
 
+#ifndef USING_CARDINAL_NOT_RACK
 		menu->addChild(new MenuEntry);
 
 		ThemesItem *themesItem = createMenuItem<ThemesItem>("Panel Themes");
 		themesItem->rightText = RIGHT_ARROW;
 		themesItem->module = module;
 		menu->addChild(themesItem);
+#endif
 	}
 
 	// display panel based on theme
 	void step() override {
+#ifdef USING_CARDINAL_NOT_RACK
+		Widget* panel = getPanel();
+		panel->visible = !settings::darkMode;
+		night_panel->visible = settings::darkMode;
+#else
 		if (module) {
 			Widget* panel = getPanel();
 			panel->visible = ((((GigBus*)module)->color_theme) == 0);
 			night_panel->visible = ((((GigBus*)module)->color_theme) == 1);
 		}
+#endif
 		Widget::step();
 	}
 };
