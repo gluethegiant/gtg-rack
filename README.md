@@ -38,7 +38,12 @@ Finally, thanks always to Rebecca.
 To build these rack modules, see the official [VCV Rack documentation](https://vcvrack.com/manual/Building.html).
 
 ## Release Notes
-v2.0.1 Ports are Labeled (December 2, 2021)
+v2.0.2 The Ever Compatible Release (Septeber 27, 2023)
+
+- Contains updates for Cardinal
+- Updated for Rack SDK 1.4.1 compatibility
+
+v2.0.1 Ports Are Labeled (December 2, 2021)
 
 - Added port labels throughout
 - Fixed a v2 font issue with the sample delay on BusRoute
