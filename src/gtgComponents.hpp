@@ -22,7 +22,7 @@ TThemedParam* createThemedParamCentered(Vec pos, Module *module, int paramId, in
 	return o;
 }
 
-struct ThemedSvgSwitch : SvgSwitch {
+struct gtgThemedSvgSwitch : SvgSwitch {
 	int* theme = NULL;
 	int old_theme = -1;
 	std::vector<std::shared_ptr<Svg>> framesAll;
@@ -31,7 +31,7 @@ struct ThemedSvgSwitch : SvgSwitch {
 	void step() override;
 };
 
-struct ThemedSvgKnob : SvgKnob {
+struct gtgThemedSvgKnob : SvgKnob {
 	int* theme = NULL;
 	int old_theme = -1;
 	std::vector<std::shared_ptr<Svg>> framesAll;
@@ -41,7 +41,7 @@ struct ThemedSvgKnob : SvgKnob {
 	void step() override;
 };
 
-struct ThemedRoundBlackSnapKnob : SvgKnob {
+struct gtgThemedRoundBlackSnapKnob : SvgKnob {
 	int* theme = NULL;
 	int old_theme = -1;
 	std::vector<std::shared_ptr<Svg>> framesAll;
@@ -61,7 +61,7 @@ TThemedPort* createThemedPortCentered(Vec pos, bool isInput, Module *module, int
 	return o;
 }
 
-struct ThemedSvgPort : SvgPort {
+struct gtgThemedSvgPort : SvgPort {
 	int* theme = NULL;
 	int old_theme = -1;
 	std::vector<std::shared_ptr<Svg>> frames;
@@ -78,7 +78,7 @@ TWidget *createThemedWidget(Vec pos, int* theme) {
 	return o;
 }
 
-struct ThemedSvgScrew : SvgScrew {
+struct gtgThemedSvgScrew : SvgScrew {
 	int* theme = NULL;
 	int old_theme = -1;
 	std::vector<std::shared_ptr<Svg>> frames;
@@ -169,7 +169,7 @@ struct FadeSliderItem : ui::Slider {
 };
 
 // custom components
-struct gtgBlackButton : ThemedSvgSwitch {
+struct gtgBlackButton : gtgThemedSvgSwitch {
 	gtgBlackButton() {
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlackButton_0.svg")));
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlackButton_1.svg")));
@@ -179,7 +179,7 @@ struct gtgBlackButton : ThemedSvgSwitch {
 	}
 };
 
-struct gtgBlackTinyButton : ThemedSvgSwitch {
+struct gtgBlackTinyButton : gtgThemedSvgSwitch {
 	gtgBlackTinyButton() {
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlackTinyButton_0.svg")));
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlackTinyButton_1.svg")));
@@ -189,7 +189,7 @@ struct gtgBlackTinyButton : ThemedSvgSwitch {
 	}
 };
 
-struct gtgRedKnob : ThemedSvgKnob {
+struct gtgRedKnob : gtgThemedSvgKnob {
 	gtgRedKnob() {
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/RedKnob.svg")));
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/RedKnob_Night.svg")));
@@ -199,7 +199,7 @@ struct gtgRedKnob : ThemedSvgKnob {
 	}
 };
 
-struct gtgOrangeKnob : ThemedSvgKnob {
+struct gtgOrangeKnob : gtgThemedSvgKnob {
 	gtgOrangeKnob() {
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/OrangeKnob.svg")));
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/OrangeKnob_Night.svg")));
@@ -209,7 +209,7 @@ struct gtgOrangeKnob : ThemedSvgKnob {
 	}
 };
 
-struct gtgBlueKnob : ThemedSvgKnob {
+struct gtgBlueKnob : gtgThemedSvgKnob {
 	gtgBlueKnob() {
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlueKnob.svg")));
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlueKnob_Night.svg")));
@@ -219,7 +219,7 @@ struct gtgBlueKnob : ThemedSvgKnob {
 	}
 };
 
-struct gtgGrayKnob : ThemedSvgKnob {
+struct gtgGrayKnob : gtgThemedSvgKnob {
 	gtgGrayKnob() {
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/GrayKnob.svg")));
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/GrayKnob_Night.svg")));
@@ -229,7 +229,7 @@ struct gtgGrayKnob : ThemedSvgKnob {
 	}
 };
 
-struct gtgBlackKnob : ThemedSvgKnob {
+struct gtgBlackKnob : gtgThemedSvgKnob {
 	gtgBlackKnob() {
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlackKnob.svg")));
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlackKnob_Night.svg")));
@@ -239,7 +239,7 @@ struct gtgBlackKnob : ThemedSvgKnob {
 	}
 };
 
-struct gtgBlackTinyKnob : ThemedSvgKnob {
+struct gtgBlackTinyKnob : gtgThemedSvgKnob {
 	gtgBlackTinyKnob() {
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlackTinyKnob.svg")));
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlackTinyKnob_Night.svg")));
@@ -249,7 +249,7 @@ struct gtgBlackTinyKnob : ThemedSvgKnob {
 	}
 };
 
-struct gtgGrayTinyKnob : ThemedSvgKnob {
+struct gtgGrayTinyKnob : gtgThemedSvgKnob {
 	gtgGrayTinyKnob() {
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/GrayTinyKnob.svg")));
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/GrayTinyKnob_Night.svg")));
@@ -259,7 +259,7 @@ struct gtgGrayTinyKnob : ThemedSvgKnob {
 	}
 };
 
-struct gtgBlueTinyKnob : ThemedSvgKnob {
+struct gtgBlueTinyKnob : gtgThemedSvgKnob {
 	gtgBlueTinyKnob() {
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlueTinyKnob.svg")));
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlueTinyKnob_Night.svg")));
@@ -269,7 +269,7 @@ struct gtgBlueTinyKnob : ThemedSvgKnob {
 	}
 };
 
-struct gtgOrangeTinyKnob : ThemedSvgKnob {
+struct gtgOrangeTinyKnob : gtgThemedSvgKnob {
 	gtgOrangeTinyKnob() {
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/OrangeTinyKnob.svg")));
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/OrangeTinyKnob_Night.svg")));
@@ -279,7 +279,7 @@ struct gtgOrangeTinyKnob : ThemedSvgKnob {
 	}
 };
 
-struct gtgRedTinyKnob : ThemedSvgKnob {
+struct gtgRedTinyKnob : gtgThemedSvgKnob {
 	gtgRedTinyKnob() {
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/RedTinyKnob.svg")));
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/RedTinyKnob_Night.svg")));
@@ -289,7 +289,7 @@ struct gtgRedTinyKnob : ThemedSvgKnob {
 	}
 };
 
-struct gtgBlueTinySnapKnob : ThemedRoundBlackSnapKnob {
+struct gtgBlueTinySnapKnob : gtgThemedRoundBlackSnapKnob {
 	gtgBlueTinySnapKnob() {
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlueTinyKnob.svg")));
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/BlueTinyKnob_Night.svg")));
@@ -299,7 +299,7 @@ struct gtgBlueTinySnapKnob : ThemedRoundBlackSnapKnob {
 	}
 };
 
-struct gtgOrangeTinySnapKnob : ThemedRoundBlackSnapKnob {
+struct gtgOrangeTinySnapKnob : gtgThemedRoundBlackSnapKnob {
 	gtgOrangeTinySnapKnob() {
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/OrangeTinyKnob.svg")));
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/OrangeTinyKnob_Night.svg")));
@@ -309,7 +309,7 @@ struct gtgOrangeTinySnapKnob : ThemedRoundBlackSnapKnob {
 	}
 };
 
-struct gtgRedTinySnapKnob : ThemedRoundBlackSnapKnob {
+struct gtgRedTinySnapKnob : gtgThemedRoundBlackSnapKnob {
 	gtgRedTinySnapKnob() {
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/RedTinyKnob.svg")));
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/RedTinyKnob_Night.svg")));
@@ -319,7 +319,7 @@ struct gtgRedTinySnapKnob : ThemedRoundBlackSnapKnob {
 	}
 };
 
-struct gtgGrayTinySnapKnob : ThemedRoundBlackSnapKnob {
+struct gtgGrayTinySnapKnob : gtgThemedRoundBlackSnapKnob {
 	gtgGrayTinySnapKnob() {
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/GrayTinyKnob.svg")));
 		addFrameAll(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/GrayTinyKnob_Night.svg")));
@@ -329,7 +329,7 @@ struct gtgGrayTinySnapKnob : ThemedRoundBlackSnapKnob {
 	}
 };
 
-struct gtgNutPort : ThemedSvgPort {
+struct gtgNutPort : gtgThemedSvgPort {
 	gtgNutPort() {
 		addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/NutPort.svg")));
 		addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/NutPort_Night.svg")));
@@ -338,14 +338,14 @@ struct gtgNutPort : ThemedSvgPort {
 	}
 };
 
-struct gtgKeyPort : ThemedSvgPort {
+struct gtgKeyPort : gtgThemedSvgPort {
 	gtgKeyPort() {
 		addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/KeyPort.svg")));
 		addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/KeyPort_Night.svg")));
 	}
 };
 
-struct gtgScrewUp : ThemedSvgScrew {
+struct gtgScrewUp : gtgThemedSvgScrew {
 	gtgScrewUp() {
 		addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/ScrewUp.svg")));
 		addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/ScrewUp_Night.svg")));

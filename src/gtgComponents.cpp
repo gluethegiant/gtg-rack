@@ -2,7 +2,7 @@
 
 
 // themed button (switch)
-void ThemedSvgSwitch::addFrameAll(std::shared_ptr<Svg> svg) {
+void gtgThemedSvgSwitch::addFrameAll(std::shared_ptr<Svg> svg) {
 	framesAll.push_back(svg);
 	if (framesAll.size() == 2) {
 		addFrame(framesAll[0]);
@@ -10,7 +10,7 @@ void ThemedSvgSwitch::addFrameAll(std::shared_ptr<Svg> svg) {
 	}
 }
 
-void ThemedSvgSwitch::step() {
+void gtgThemedSvgSwitch::step() {
 	if(theme != NULL && *theme != old_theme) {
 		if ((*theme) == 0 || framesAll.size() < 4) {
 			frames[0]=framesAll[0];
@@ -28,14 +28,14 @@ void ThemedSvgSwitch::step() {
 }
 
 // themed knob
-void ThemedSvgKnob::addFrameAll(std::shared_ptr<Svg> svg) {
+void gtgThemedSvgKnob::addFrameAll(std::shared_ptr<Svg> svg) {
 	framesAll.push_back(svg);
 	if (framesAll.size() == 1) {
 		setSvg(svg);
 	}
 }
 
-void ThemedSvgKnob::step() {
+void gtgThemedSvgKnob::step() {
 	if(theme != NULL && *theme != old_theme) {
 		if ((*theme) == 0) {
 			setSvg(framesAll[0]);
@@ -50,14 +50,14 @@ void ThemedSvgKnob::step() {
 }
 
 // themed snap knob
-void ThemedRoundBlackSnapKnob::addFrameAll(std::shared_ptr<Svg> svg) {
+void gtgThemedRoundBlackSnapKnob::addFrameAll(std::shared_ptr<Svg> svg) {
 	framesAll.push_back(svg);
 	if (framesAll.size() == 1) {
 		setSvg(svg);
 	}
 }
 
-void ThemedRoundBlackSnapKnob::step() {
+void gtgThemedRoundBlackSnapKnob::step() {
 	if(theme != NULL && *theme != old_theme) {
 		if ((*theme) == 0) {
 			setSvg(framesAll[0]);
@@ -72,14 +72,14 @@ void ThemedRoundBlackSnapKnob::step() {
 }
 
 // themed port
-void ThemedSvgPort::addFrame(std::shared_ptr<Svg> svg) {
+void gtgThemedSvgPort::addFrame(std::shared_ptr<Svg> svg) {
 	frames.push_back(svg);
 	if(frames.size() == 1) {
 		SvgPort::setSvg(svg);
 	}
 }
 
-void ThemedSvgPort::step() {
+void gtgThemedSvgPort::step() {
 	if(theme != NULL && *theme != old_theme) {
 		sw->setSvg(frames[*theme]);
 		old_theme = *theme;
@@ -89,14 +89,14 @@ void ThemedSvgPort::step() {
 }
 
 // themed screw
-void ThemedSvgScrew::addFrame(std::shared_ptr<Svg> svg) {
+void gtgThemedSvgScrew::addFrame(std::shared_ptr<Svg> svg) {
 	frames.push_back(svg);
 	if(frames.size() == 1) {
 		SvgScrew::setSvg(svg);
 	}
 }
 
-void ThemedSvgScrew::step() {
+void gtgThemedSvgScrew::step() {
 	if(theme != NULL && *theme != old_theme) {
 		sw->setSvg(frames[*theme]);
 		old_theme = *theme;
