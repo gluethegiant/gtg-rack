@@ -195,8 +195,8 @@ struct EnterBusWidget : ModuleWidget {
 	void step() override {
 #ifdef USING_CARDINAL_NOT_RACK
 		Widget* panel = getPanel();
-		panel->visible = !settings::darkMode;
-		night_panel->visible = settings::darkMode;
+		panel->visible = !settings::preferDarkPanels;
+		night_panel->visible = settings::preferDarkPanels;
 #else
 		if (module) {
 			Widget* panel = getPanel();
